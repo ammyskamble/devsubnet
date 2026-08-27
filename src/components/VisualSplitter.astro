@@ -1,0 +1,462 @@
+---
+interface Props {
+  defaultIp?: string;
+  defaultCidr?: number;
+}
+
+const { 
+  defaultIp = "10.0.0.0", 
+  defaultCidr = 24 
+} = Astro.props;
+---
+
+<div class="calculator-layout">
+  <!-- Left Column: Visual Tree Layout -->
+  <div class="calculator-panel">
+    <div class="panel-heading">
+      <div>
+        <span class="step">01</span>
+        <h2>Interactive Subnet Splitter</h2>
+      </div>
+      <span class="live-label">VISUAL TREE DESIGNER</span>
+    </div>
+
+    <p class="aside-copy">
+      Divide your address block into custom network segments. Click <strong>Split</strong> to partition a block in half, edit segment names (e.g., "Web", "DB"), or click <strong>Merge</strong> to combine adjacent siblings back.
+    </p>
+
+    <!-- Base network input -->
+    <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1rem; align-items: flex-end;">
+      <div class="input-row">
+        <label for="split-base-ip">VPC Base CIDR IP Block</label>
+        <div class="ip-input">
+          <input 
+            type="text" 
+            id="split-base-ip" 
+            value={defaultIp} 
+            placeholder="e.g., 10.0.0.0" 
+            inputmode="decimal" 
+          />
+          <span class="slash">/</span>
+          <input 
+            type="number" 
+            id="split-base-cidr" 
+            value={defaultCidr} 
+            min="8" 
+            max="30"
+          />
+        </div>
+      </div>
+      <button 
+        type="button" 
+        class="copy-button" 
+        id="btn-reset-splitter" 
+        style="height: 48px; border-color: var(--accent-network); color: var(--accent-network);"
+      >
+        Reset Block
+      </button>
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner" id="splitter-error" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span>Invalid IPv4 address base network range.</span>
+    </div>
+
+    <!-- Interactive Blocks Rendering Area -->
+    <div class="splitter-visual-root">
+      <span style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Allocated Network Space</span>
+      
+      <div class="subnet-block-row" id="splitter-grid-root">
+        <!-- Rendered Client-Side dynamically -->
+      </div>
+    </div>
+
+    <!-- Output List Details -->
+    <div class="result-heading">
+      <div>
+        <span class="step">02</span>
+        <h2>Allocated Subnets List</h2>
+      </div>
+      <button class="copy-button" type="button" id="copy-splitter-json">Copy JSON</button>
+    </div>
+
+    <div class="guide-table-wrapper">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>CIDR Range</th>
+            <th>Usable IP Range</th>
+            <th>Usable Hosts</th>
+            <th>Split/Merge</th>
+          </tr>
+        </thead>
+        <tbody id="splitter-table-body">
+          <!-- Rendered Client-Side dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Right Column: Exporter Panel -->
+  <div class="insight-panel">
+    <div class="calculator-panel" style="gap: 1.5rem;">
+      <div>
+        <span class="aside-kicker">INFRASTRUCTURE EXPORTER</span>
+        <h2>IaC Manifest</h2>
+      </div>
+      <p class="aside-copy">
+        Generate and export structural subnets configs. Ideal for pasting into DevOps automation templates.
+      </p>
+
+      <div class="export-panel">
+        <div class="export-tabs">
+          <button type="button" class="export-tab-btn active" id="btn-tab-tf">Terraform</button>
+          <button type="button" class="export-tab-btn" id="btn-tab-yaml">YAML</button>
+        </div>
+        <div class="code-wrapper">
+          <div class="code-copy-overlay">
+            <button class="copy-button" type="button" id="copy-splitter-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+          </div>
+          <pre><code id="splitter-code-output"># Loading configurations...</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { long2Ip, ip2Long, validateIPv4 } from '../utils/subnetMath';
+
+  interface SubnetNode {
+    networkLong: number;
+    cidr: number;
+    label: string;
+  }
+
+  // Base state
+  let subnets: SubnetNode[] = [];
+  let baseIp = "10.0.0.0";
+  let baseCidr = 24;
+  let activeTab = 'tf';
+
+  // DOM Elements
+  const baseIpInput = document.getElementById('split-base-ip') as HTMLInputElement;
+  const baseCidrInput = document.getElementById('split-base-cidr') as HTMLInputElement;
+  const resetBtn = document.getElementById('btn-reset-splitter');
+  const gridRoot = document.getElementById('splitter-grid-root');
+  const tableBody = document.getElementById('splitter-table-body');
+  const codeOutput = document.getElementById('splitter-code-output');
+  const copyCodeBtn = document.getElementById('copy-splitter-code');
+  const copyJsonBtn = document.getElementById('copy-splitter-json');
+  const errorBanner = document.getElementById('splitter-error');
+  
+  const tfTab = document.getElementById('btn-tab-tf');
+  const yamlTab = document.getElementById('btn-tab-yaml');
+
+  function initializeState() {
+    baseIp = baseIpInput.value.trim();
+    baseCidr = parseInt(baseCidrInput.value, 10);
+
+    if (!validateIPv4(baseIp)) {
+      errorBanner?.classList.add('show');
+      return;
+    } else {
+      errorBanner?.classList.remove('show');
+    }
+
+    const ipLong = ip2Long(baseIp);
+    const alignedNetwork = (ipLong & (~0 << (32 - baseCidr))) >>> 0;
+    
+    // Reset to single parent block
+    subnets = [{
+      networkLong: alignedNetwork,
+      cidr: baseCidr,
+      label: "Subnet 1"
+    }];
+    
+    renderAll();
+  }
+
+  function splitSubnet(index: number) {
+    const node = subnets[index];
+    if (node.cidr >= 32) return; // Cannot split further
+
+    const newCidr = node.cidr + 1;
+    const offset = Math.pow(2, 32 - newCidr);
+
+    const child1: SubnetNode = {
+      networkLong: node.networkLong,
+      cidr: newCidr,
+      label: `${node.label} (A)`
+    };
+
+    const child2: SubnetNode = {
+      networkLong: node.networkLong + offset,
+      cidr: newCidr,
+      label: `${node.label} (B)`
+    };
+
+    // Replace parent with two children
+    subnets.splice(index, 1, child1, child2);
+    renderAll();
+  }
+
+  function canMerge(index: number): boolean {
+    const node = subnets[index];
+    if (node.cidr <= baseCidr) return false;
+
+    // Find its sibling
+    const offset = Math.pow(2, 32 - node.cidr);
+    const isRightSibling = (node.networkLong / offset) % 2 === 1;
+    const siblingNetwork = isRightSibling ? node.networkLong - offset : node.networkLong + offset;
+
+    // Sibling must be in list and have the same CIDR size
+    const siblingIndex = subnets.findIndex(s => s.networkLong === siblingNetwork && s.cidr === node.cidr);
+    return siblingIndex !== -1;
+  }
+
+  function mergeSubnet(index: number) {
+    const node = subnets[index];
+    if (node.cidr <= baseCidr) return;
+
+    const offset = Math.pow(2, 32 - node.cidr);
+    const isRightSibling = (node.networkLong / offset) % 2 === 1;
+    const siblingNetwork = isRightSibling ? node.networkLong - offset : node.networkLong + offset;
+    const siblingIndex = subnets.findIndex(s => s.networkLong === siblingNetwork && s.cidr === node.cidr);
+
+    if (siblingIndex === -1) return;
+
+    const parentCidr = node.cidr - 1;
+    const parentNetwork = isRightSibling ? siblingNetwork : node.networkLong;
+
+    const parentNode: SubnetNode = {
+      networkLong: parentNetwork,
+      cidr: parentCidr,
+      label: node.label.replace(/\s*\(A\)|\s*\(B\)/g, '') || "Merged Subnet"
+    };
+
+    const firstIdx = Math.min(index, siblingIndex);
+    // Remove the two siblings and replace with parent
+    subnets.splice(firstIdx, 2, parentNode);
+    renderAll();
+  }
+
+  function updateLabel(index: number, newLabel: string) {
+    subnets[index].label = newLabel;
+    updateCodeSnippet();
+  }
+
+  function renderAll() {
+    if (!gridRoot || !tableBody) return;
+
+    // Sort subnets by address layout order
+    subnets.sort((a, b) => a.networkLong - b.networkLong);
+
+    // Render visual block diagram
+    let gridHtml = '';
+    const totalBlocksCapacity = Math.pow(2, 32 - baseCidr);
+
+    subnets.forEach((node, idx) => {
+      const nodeCapacity = Math.pow(2, 32 - node.cidr);
+      const widthPct = (nodeCapacity / totalBlocksCapacity) * 100;
+      
+      // Determine coloring based on CIDR
+      let sizeClass = 'size-medium';
+      if (node.cidr - baseCidr <= 1) sizeClass = 'size-large';
+      else if (node.cidr - baseCidr >= 4) sizeClass = 'size-small';
+
+      gridHtml += `
+        <div class="subnet-block ${sizeClass}" style="flex: 1 1 ${widthPct}%; min-width: max(140px, ${widthPct}%); max-width: 100%;">
+          <div class="subnet-block-highlight"></div>
+          <div class="subnet-info">
+            <div class="subnet-meta">
+              <span class="subnet-cidr">${long2Ip(node.networkLong)}/${node.cidr}</span>
+              <input 
+                type="text" 
+                class="subnet-label-input" 
+                value="${node.label}" 
+                data-idx="${idx}" 
+                placeholder="Label segment..."
+              />
+            </div>
+          </div>
+          <div class="subnet-actions">
+            ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">Split</button>` : ''}
+            ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">Merge</button>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    gridRoot.innerHTML = gridHtml;
+
+    // Render detailed table rows
+    let tableHtml = '';
+    subnets.forEach((node, idx) => {
+      const size = Math.pow(2, 32 - node.cidr);
+      const usableHosts = node.cidr === 32 ? 1 : node.cidr === 31 ? 2 : size - 2;
+      const firstUsable = node.cidr === 32 ? long2Ip(node.networkLong) : long2Ip(node.networkLong + 1);
+      const lastUsable = node.cidr === 32 ? long2Ip(node.networkLong) : long2Ip(node.networkLong + size - 2);
+
+      tableHtml += `
+        <tr>
+          <td>
+            <input 
+              type="text" 
+              class="subnet-table-label-input" 
+              value="${node.label}" 
+              data-idx="${idx}"
+              style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.9rem; outline:none;"
+            />
+          </td>
+          <td><strong>${long2Ip(node.networkLong)}/${node.cidr}</strong></td>
+          <td>${node.cidr >= 31 ? `${long2Ip(node.networkLong)} - ${long2Ip(node.networkLong + size - 1)}` : `${firstUsable} - ${lastUsable}`}</td>
+          <td>${usableHosts.toLocaleString()}</td>
+          <td>
+            <div style="display:flex; gap:0.4rem;">
+              ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">Split</button>` : ''}
+              ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">Merge</button>` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    tableBody.innerHTML = tableHtml;
+
+    // Rebind inline event listeners for splitter/merge triggers
+    gridRoot.querySelectorAll('[data-split]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-split')!, 10);
+        splitSubnet(idx);
+      });
+    });
+
+    gridRoot.querySelectorAll('[data-merge]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-merge')!, 10);
+        mergeSubnet(idx);
+      });
+    });
+
+    tableBody.querySelectorAll('[data-split]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-split')!, 10);
+        splitSubnet(idx);
+      });
+    });
+
+    tableBody.querySelectorAll('[data-merge]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-merge')!, 10);
+        mergeSubnet(idx);
+      });
+    });
+
+    // Label inputs change listener
+    gridRoot.querySelectorAll('.subnet-label-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const idx = parseInt(target.getAttribute('data-idx')!, 10);
+        updateLabel(idx, target.value);
+        // Sync label with table row input
+        const tableInput = tableBody.querySelector(`.subnet-table-label-input[data-idx="${idx}"]`) as HTMLInputElement;
+        if (tableInput) tableInput.value = target.value;
+      });
+    });
+
+    tableBody.querySelectorAll('.subnet-table-label-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const idx = parseInt(target.getAttribute('data-idx')!, 10);
+        updateLabel(idx, target.value);
+        // Sync label with block diagram input
+        const blockInput = gridRoot.querySelector(`.subnet-label-input[data-idx="${idx}"]`) as HTMLInputElement;
+        if (blockInput) blockInput.value = target.value;
+      });
+    });
+
+    updateCodeSnippet();
+  }
+
+  function updateCodeSnippet() {
+    if (!codeOutput) return;
+
+    if (activeTab === 'tf') {
+      let code = `# Terraform Variable & CIDR Allocation Map\nvariable "vpc_cidr" {\n  default = "${baseIp}/${baseCidr}"\n}\n\n`;
+      subnets.forEach((node, i) => {
+        const key = node.label.toLowerCase().replace(/[^a-z0-9]/g, '_') || `subnet_${i}`;
+        // Calculate cidrsubnet details relative to base range
+        const newBits = node.cidr - baseCidr;
+        
+        // Calculate netnum
+        const capacityAtTarget = Math.pow(2, 32 - node.cidr);
+        const parentStart = subnets[0].networkLong; // Assumes base aligns
+        const offset = node.networkLong - parentStart;
+        const netNum = offset / capacityAtTarget;
+
+        code += `# Segment: ${node.label}\nresource "aws_subnet" "${key}" {\n  vpc_id     = "vpc-prod"\n  cidr_block = cidrsubnet(var.vpc_cidr, ${newBits}, ${netNum})\n}\n\n`;
+      });
+      codeOutput.innerText = code.trim();
+    } else {
+      let code = `vpc_base_cidr: "${baseIp}/${baseCidr}"\nallocated_subnets:\n`;
+      subnets.forEach(node => {
+        code += `  - name: "${node.label}"\n    cidr: "${long2Ip(node.networkLong)}/${node.cidr}"\n`;
+      });
+      codeOutput.innerText = code.trim();
+    }
+  }
+
+  // Bind parameters inputs
+  baseIpInput.addEventListener('input', initializeState);
+  baseCidrInput.addEventListener('input', initializeState);
+  resetBtn?.addEventListener('click', initializeState);
+
+  // Tab switching
+  tfTab?.addEventListener('click', () => {
+    tfTab.classList.add('active');
+    yamlTab?.classList.remove('active');
+    activeTab = 'tf';
+    updateCodeSnippet();
+  });
+
+  yamlTab?.addEventListener('click', () => {
+    yamlTab.classList.add('active');
+    tfTab?.classList.remove('active');
+    activeTab = 'yaml';
+    updateCodeSnippet();
+  });
+
+  // Copy Exporters
+  copyCodeBtn?.addEventListener('click', async () => {
+    if (!codeOutput) return;
+    await navigator.clipboard.writeText(codeOutput.innerText);
+    copyCodeBtn.innerText = 'Copied!';
+    copyCodeBtn.classList.add('copied');
+    setTimeout(() => {
+      copyCodeBtn.innerText = 'Copy Code';
+      copyCodeBtn.classList.remove('copied');
+    }, 2000);
+  });
+
+  copyJsonBtn?.addEventListener('click', async () => {
+    const formatted = subnets.map(node => ({
+      label: node.label,
+      cidr: `${long2Ip(node.networkLong)}/${node.cidr}`,
+      network: long2Ip(node.networkLong),
+      prefix: node.cidr
+    }));
+    await navigator.clipboard.writeText(JSON.stringify(formatted, null, 2));
+    copyJsonBtn.innerText = 'Copied!';
+    copyJsonBtn.classList.add('copied');
+    setTimeout(() => {
+      copyJsonBtn.innerText = 'Copy JSON';
+      copyJsonBtn.classList.remove('copied');
+    }, 2000);
+  });
+
+  // Initial load
+  window.addEventListener('DOMContentLoaded', () => {
+    initializeState();
+  });
+</script>

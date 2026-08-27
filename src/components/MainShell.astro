@@ -1,0 +1,134 @@
+---
+import IPv4Calculator from './IPv4Calculator.astro';
+import VisualSplitter from './VisualSplitter.astro';
+import KubernetesPlanner from './KubernetesPlanner.astro';
+import IPv6Calculator from './IPv6Calculator.astro';
+import SubnetGuide from './SubnetGuide.astro';
+
+interface Props {
+  activeTab: 'ipv4' | 'splitter' | 'k8s' | 'ipv6';
+  defaultCloud?: 'standard' | 'aws' | 'azure' | 'gcp';
+}
+
+const { 
+  activeTab, 
+  defaultCloud = "standard" 
+} = Astro.props;
+
+// Determine header titles for introduction sections
+const introData = {
+  ipv4: {
+    title: "Make sense of your networks.",
+    eyebrow: "SUBNET CALCULATOR / IPv4",
+    lede: "Compute host ranges, wildcard boundaries, and network subnets dynamically. Natively supports custom rules for major public clouds."
+  },
+  splitter: {
+    title: "Split blocks. Drag subnets.",
+    eyebrow: "CIDR PARTITIONING / SPLITTER",
+    lede: "Divide a network block visually into custom subnets with descriptive labels and export copy-pasteable IaC configurations."
+  },
+  k8s: {
+    title: "Calculate cluster host density.",
+    eyebrow: "KUBERNETES PLANNER / PODS & NODES",
+    lede: "Assess cluster size guidelines, node assignments, pod density constraints, and identify IP exhaustion risks early."
+  },
+  ipv6: {
+    title: "Navigate hexadecimal address spaces.",
+    eyebrow: "SUBNET CALCULATOR / IPv6",
+    lede: "Compress, expand, and classify 128-bit addresses. Instantly generate prefix delegation block increments."
+  }
+}[activeTab];
+---
+
+<div class="app-shell">
+  <!-- Top Bar navigation -->
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Subnetly home">
+      <span class="brand-mark">/</span> subnetly
+    </a>
+    
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a class={`nav-tab ${activeTab === 'ipv4' ? 'active' : ''}`} href="/">
+        IPv4 Calculator
+      </a>
+      <a class={`nav-tab ${activeTab === 'splitter' ? 'active' : ''}`} href="/visual-subnet-splitter">
+        Visual Splitter
+      </a>
+      <a class={`nav-tab ${activeTab === 'k8s' ? 'active' : ''}`} href="/kubernetes-subnet-planner">
+        K8s IP Planner
+      </a>
+      <a class={`nav-tab ${activeTab === 'ipv6' ? 'active' : ''}`} href="/ipv6-subnet-calculator">
+        IPv6 Calculator
+      </a>
+    </nav>
+    
+    <div class="nav-actions">
+      <!-- Dark/Light Theme toggler -->
+      <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
+        <!-- Sun icon (shown in light mode) -->
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <!-- Moon icon (shown in dark mode) -->
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main section -->
+  <main>
+    <!-- Heading section -->
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">{introData.eyebrow}</div>
+      <h1 id="page-title">
+        {introData.title.split('. ').map((part, i) => (
+          i === 1 ? <span><em>{part}</em></span> : part
+        ))}
+      </h1>
+      <p class="lede">{introData.lede}</p>
+    </section>
+
+    <!-- Content panels -->
+    <section aria-label="Subnet utility workspace">
+      {activeTab === 'ipv4' && <IPv4Calculator defaultCloud={defaultCloud} />}
+      {activeTab === 'splitter' && <VisualSplitter />}
+      {activeTab === 'k8s' && <KubernetesPlanner />}
+      {activeTab === 'ipv6' && <IPv6Calculator />}
+    </section>
+
+    <!-- General detailed guide content -->
+    <SubnetGuide />
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <span>SUBNETLY / ENGINEERED FOR CLEAR NETWORKS</span>
+    <span>NO DATA LEAVES YOUR DEVICE</span>
+  </footer>
+</div>
+
+<script>
+  // Theme Switching functionality
+  const themeBtn = document.getElementById('theme-btn');
+  
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const currentTheme = doc.getAttribute('data-theme');
+      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      doc.setAttribute('data-theme', targetTheme);
+      localStorage.setItem('subnetly-theme', targetTheme);
+    });
+  }
+</script>

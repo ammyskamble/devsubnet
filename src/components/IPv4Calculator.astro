@@ -1,0 +1,476 @@
+---
+import { calculateSubnet, getBinaryBits } from '../utils/subnetMath';
+
+interface Props {
+  defaultIp?: string;
+  defaultCidr?: number;
+  defaultCloud?: 'standard' | 'aws' | 'azure' | 'gcp';
+}
+
+const { 
+  defaultIp = "192.168.1.0", 
+  defaultCidr = 24, 
+  defaultCloud = "standard" 
+} = Astro.props;
+
+// Calculate initial values for Server-Side Rendering (SEO & Instant first load)
+const initialResult = calculateSubnet(defaultIp, defaultCidr, defaultCloud);
+const initialBits = getBinaryBits(defaultIp, defaultCidr);
+---
+
+<div class="calculator-layout">
+  <!-- Left Column: Input and Details -->
+  <div class="calculator-panel">
+    <div class="panel-heading">
+      <div>
+        <span class="step">01</span>
+        <h2>Network Parameters</h2>
+      </div>
+      <span class="live-label">LIVE CALCULATION</span>
+    </div>
+
+    <!-- Inputs Row -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+      <div class="input-row">
+        <label for="ip-address">IP address</label>
+        <div class="ip-input">
+          <input 
+            type="text" 
+            id="ip-address" 
+            value={defaultIp} 
+            placeholder="e.g., 10.0.0.0" 
+            inputmode="decimal" 
+            autocomplete="off" 
+            maxlength="15"
+          />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <label for="cidr">CIDR</label>
+        <div class="ip-input">
+          <span class="slash">/</span>
+          <input 
+            type="number" 
+            id="cidr" 
+            value={defaultCidr} 
+            min="0" 
+            max="32"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <div class="slider-container">
+      <input 
+        type="range" 
+        id="cidr-slider" 
+        value={defaultCidr} 
+        min="0" 
+        max="32"
+        aria-label="CIDR prefix slider"
+      />
+    </div>
+
+    <!-- Cloud Selector -->
+    <div class="input-row">
+      <label for="cloud-provider">Cloud Architecture Rules</label>
+      <div class="select-wrapper">
+        <select id="cloud-provider">
+          <option value="standard" selected={defaultCloud === 'standard'}>Standard (Default Gateway + Broadcast Reserved)</option>
+          <option value="aws" selected={defaultCloud === 'aws'}>AWS VPC (5 Reserved IPs)</option>
+          <option value="azure" selected={defaultCloud === 'azure'}>Microsoft Azure VNet (5 Reserved IPs)</option>
+          <option value="gcp" selected={defaultCloud === 'gcp'}>Google Cloud VPC (4 Reserved IPs)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="quick-row">
+      <span>Common blocks:</span>
+      <button type="button" data-fill="10.0.0.0/8">10.0.0.0/8</button>
+      <button type="button" data-fill="172.16.0.0/12">172.16.0.0/12</button>
+      <button type="button" data-fill="192.168.0.0/16">192.168.0.0/16</button>
+      <button type="button" data-fill="192.168.1.0/24">192.168.1.0/24</button>
+    </div>
+
+    <div class="error-banner" id="ip-error" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span>Invalid IPv4 address format. Please enter four octets (0-255) separated by dots.</span>
+    </div>
+
+    <!-- Binary visualization -->
+    <div class="binary-section">
+      <div class="binary-heading">
+        <span>Binary Address Layout</span>
+        <div class="binary-legend">
+          <div class="legend-item"><span class="legend-color net"></span> Network</div>
+          <div class="legend-item"><span class="legend-color host"></span> Host</div>
+        </div>
+      </div>
+      <div class="binary-grid-wrapper" id="binary-grid">
+        {Array.from({ length: 4 }).map((_, octetIdx) => (
+          <div class="binary-octet">
+            {initialBits.slice(octetIdx * 8, (octetIdx + 1) * 8).map((bit) => (
+              <span 
+                class={`binary-bit ${bit.type}`} 
+                title={`Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit`}
+              >
+                {bit.val}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Result List -->
+    <div class="result-heading">
+      <div>
+        <span class="step">02</span>
+        <h2>Subnet Metrics</h2>
+      </div>
+      <button class="copy-button" type="button" id="copy-ipv4-json">Copy JSON</button>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-item primary">
+        <span>Network Range / Address</span>
+        <strong id="res-network">{initialResult.network}/{defaultCidr}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Usable Host IPs</span>
+        <strong id="res-host-range">{initialResult.firstUsable} - {initialResult.lastUsable}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Subnet Mask</span>
+        <strong id="res-mask">{initialResult.netmask}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Wildcard Mask</span>
+        <strong id="res-wildcard">{initialResult.wildcard}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Broadcast Address</span>
+        <strong id="res-broadcast">{initialResult.broadcast}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Total IP Capacity</span>
+        <strong id="res-total-hosts">{initialResult.totalHosts.toLocaleString()}</strong>
+      </div>
+    </div>
+
+    <!-- Reserved IPs Detail list -->
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-color);">
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; font-family: var(--font-display); color: var(--text-secondary); margin-bottom: 0.75rem;">Address Reservations Detail</h3>
+      <ul id="res-details" style="font-family: var(--font-mono); font-size: 0.8rem; list-style-type: none; display: flex; flex-direction: column; gap: 0.35rem;">
+        {initialResult.reservedDetails.map(detail => (
+          <li style="color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: var(--accent-host); font-weight: bold;">•</span> {detail}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right Column: Interactive Side Panel -->
+  <div class="insight-panel">
+    <div class="calculator-panel" style="gap: 1.5rem;">
+      <div>
+        <span class="aside-kicker">INFRASTRUCTURE PLANNING</span>
+        <h2 id="res-aside-title">Your /{defaultCidr} Subnet</h2>
+      </div>
+      <p class="aside-copy" id="res-aside-desc">
+        A subnet with a mask of {initialResult.netmask} provides {initialResult.usableHosts.toLocaleString()} usable IP addresses for devices.
+      </p>
+
+      <div class="capacity">
+        <div>
+          <span>USABLE HOST CAPACITY</span>
+          <strong id="res-usable-hosts">{initialResult.usableHosts.toLocaleString()}</strong>
+        </div>
+        <span class="capacity-unit">IPs available</span>
+      </div>
+
+      <div class="scale-visualizer">
+        <div class="scale-fill" id="res-scale-fill" style={`width: ${Math.max(0, Math.min(100, (defaultCidr / 32) * 100))}%`}></div>
+        <span class="scale-label" id="res-scale-label">Prefix Sizing: /{defaultCidr}</span>
+      </div>
+      
+      <!-- IaC Exporter Section -->
+      <div class="export-panel">
+        <div class="export-tabs">
+          <button type="button" class="export-tab-btn active" data-lang="tf">Terraform IaC</button>
+          <button type="button" class="export-tab-btn" data-lang="yaml">Ansible/YAML</button>
+        </div>
+        <div class="code-wrapper">
+          <div class="code-copy-overlay">
+            <button class="copy-button" type="button" id="copy-iac-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+          </div>
+          <pre><code id="iac-code-output"># Terraform VPC Subnet Definition
+resource "aws_subnet" "subnet_1" &#123;
+  vpc_id     = "vpc-12345678"
+  cidr_block = "{initialResult.network}/{defaultCidr}"
+  
+  tags = &#123;
+    Name = "subnet-{defaultCidr}"
+  &#125;
+&#125;</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { calculateSubnet, getBinaryBits, validateIPv4, long2Ip, ip2Long } from '../utils/subnetMath';
+
+  // DOM Elements
+  const ipInput = document.getElementById('ip-address') as HTMLInputElement;
+  const cidrInput = document.getElementById('cidr') as HTMLInputElement;
+  const cidrSlider = document.getElementById('cidr-slider') as HTMLInputElement;
+  const cloudSelector = document.getElementById('cloud-provider') as HTMLSelectElement;
+  const errorBanner = document.getElementById('ip-error');
+  
+  // Results Display Elements
+  const resNetwork = document.getElementById('res-network');
+  const resHostRange = document.getElementById('res-host-range');
+  const resMask = document.getElementById('res-mask');
+  const resWildcard = document.getElementById('res-wildcard');
+  const resBroadcast = document.getElementById('res-broadcast');
+  const resTotalHosts = document.getElementById('res-total-hosts');
+  const resUsableHosts = document.getElementById('res-usable-hosts');
+  const resDetails = document.getElementById('res-details');
+  const binaryGrid = document.getElementById('binary-grid');
+  
+  // Aside elements
+  const resAsideTitle = document.getElementById('res-aside-title');
+  const resAsideDesc = document.getElementById('res-aside-desc');
+  const resScaleFill = document.getElementById('res-scale-fill');
+  const resScaleLabel = document.getElementById('res-scale-label');
+  
+  // Exporters
+  const iacOutput = document.getElementById('iac-code-output');
+  const copyIacBtn = document.getElementById('copy-iac-code');
+  const copyJsonBtn = document.getElementById('copy-ipv4-json');
+  
+  let currentLang = 'tf';
+
+  function updateAll() {
+    const ip = ipInput.value.trim();
+    const cidr = parseInt(cidrInput.value, 10);
+    const cloud = cloudSelector.value as 'standard' | 'aws' | 'azure' | 'gcp';
+
+    // Format validation
+    if (!validateIPv4(ip)) {
+      errorBanner?.classList.add('show');
+      return;
+    } else {
+      errorBanner?.classList.remove('show');
+    }
+
+    // Run math
+    const result = calculateSubnet(ip, cidr, cloud);
+    const bits = getBinaryBits(ip, cidr);
+
+    // Update display text fields
+    if (resNetwork) resNetwork.innerText = `${result.network}/${cidr}`;
+    if (resHostRange) resHostRange.innerText = `${result.firstUsable} - ${result.lastUsable}`;
+    if (resMask) resMask.innerText = result.netmask;
+    if (resWildcard) resWildcard.innerText = result.wildcard;
+    if (resBroadcast) resBroadcast.innerText = result.broadcast;
+    if (resTotalHosts) resTotalHosts.innerText = result.totalHosts.toLocaleString();
+    if (resUsableHosts) resUsableHosts.innerText = result.usableHosts.toLocaleString();
+    
+    // Update aside elements
+    if (resAsideTitle) resAsideTitle.innerText = `Your /${cidr} Subnet`;
+    if (resAsideDesc) {
+      resAsideDesc.innerText = `A subnet with a mask of ${result.netmask} provides ${result.usableHosts.toLocaleString()} usable IP addresses for devices.`;
+    }
+    if (resScaleFill) {
+      resScaleFill.style.width = `${(cidr / 32) * 100}%`;
+    }
+    if (resScaleLabel) {
+      resScaleLabel.innerText = `Prefix Sizing: /${cidr}`;
+    }
+
+    // Re-render Details List
+    if (resDetails) {
+      resDetails.innerHTML = result.reservedDetails.map(detail => `
+        <li style="color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+          <span style="color: var(--accent-host); font-weight: bold;">•</span> ${detail}
+        </li>
+      `).join('');
+    }
+
+    // Re-render Binary grid
+    if (binaryGrid) {
+      let html = '';
+      for (let oIndex = 0; oIndex < 4; oIndex++) {
+        html += '<div class="binary-octet">';
+        const slice = bits.slice(oIndex * 8, (oIndex + 1) * 8);
+        slice.forEach(bit => {
+          html += `
+            <span 
+              class="binary-bit ${bit.type}" 
+              title="Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit"
+            >${bit.val}</span>
+          `;
+        });
+        html += '</div>';
+      }
+      binaryGrid.innerHTML = html;
+    }
+
+    // Update IaC Snippet Code block
+    updateIaCCode(result.network, cidr, cloud);
+
+    // Sync URL search params
+    const url = new URL(window.location.href);
+    url.searchParams.set('ip', ip);
+    url.searchParams.set('cidr', cidr.toString());
+    url.searchParams.set('cloud', cloud);
+    window.history.replaceState({}, '', url.toString());
+  }
+
+  function updateIaCCode(network: string, cidr: number, cloud: string) {
+    if (!iacOutput) return;
+    
+    if (currentLang === 'tf') {
+      if (cloud === 'aws') {
+        iacOutput.innerText = `# AWS VPC Subnet IaC snippet
+resource "aws_subnet" "subnet_aws" {
+  vpc_id            = "vpc-12345678"
+  cidr_block        = "${network}/${cidr}"
+  availability_zone = "us-east-1a"
+  
+  tags = {
+    Name        = "subnet-${cidr}"
+    Environment = "production"
+  }
+}`;
+      } else if (cloud === 'azure') {
+        iacOutput.innerText = `# Microsoft Azure VNet Subnet
+resource "azurerm_subnet" "subnet_azure" {
+  name                 = "subnet-${cidr}"
+  resource_group_name  = "rg-prod"
+  virtual_network_name = "vnet-prod"
+  address_prefixes     = ["${network}/${cidr}"]
+}`;
+      } else {
+        iacOutput.innerText = `# Standard Terraform Subnet Allocation
+resource "terraform_subnet" "subnet_generic" {
+  cidr_block = "${network}/${cidr}"
+  description = "Assigned IP Block"
+}`;
+      }
+    } else {
+      // Ansible/YAML Configuration
+      iacOutput.innerText = `# Ansible Network Subnet Settings
+network_config:
+  subnet_ip: "${network}"
+  cidr_prefix: ${cidr}
+  provider_rules: "${cloud}"
+  metadata:
+    description: "Calculated via Subnetly"
+    host_capacity: ${cidr}`;
+    }
+  }
+
+  // Bind Listeners
+  ipInput.addEventListener('input', updateAll);
+  
+  cidrInput.addEventListener('input', (e) => {
+    const val = parseInt((e.target as HTMLInputElement).value, 10);
+    if (!isNaN(val) && val >= 0 && val <= 32) {
+      cidrSlider.value = val.toString();
+      updateAll();
+    }
+  });
+
+  cidrSlider.addEventListener('input', (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    cidrInput.value = val;
+    updateAll();
+  });
+
+  cloudSelector.addEventListener('change', updateAll);
+
+  // Preset Buttons
+  document.querySelectorAll('[data-fill]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const [ip, cidr] = (e.currentTarget as HTMLButtonElement).getAttribute('data-fill')!.split('/');
+      ipInput.value = ip;
+      cidrInput.value = cidr;
+      cidrSlider.value = cidr;
+      updateAll();
+    });
+  });
+
+  // IaC Lang tab selection
+  document.querySelectorAll('.export-tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.export-tab-btn').forEach(b => b.classList.remove('active'));
+      const target = e.currentTarget as HTMLButtonElement;
+      target.classList.add('active');
+      currentLang = target.getAttribute('data-lang') || 'tf';
+      
+      const ip = ipInput.value.trim();
+      const cidr = parseInt(cidrInput.value, 10);
+      const result = calculateSubnet(ip, cidr, cloudSelector.value as any);
+      updateIaCCode(result.network, cidr, cloudSelector.value);
+    });
+  });
+
+  // Copy Buttons
+  copyJsonBtn?.addEventListener('click', async () => {
+    const ip = ipInput.value.trim();
+    const cidr = parseInt(cidrInput.value, 10);
+    const cloud = cloudSelector.value as any;
+    if (!validateIPv4(ip)) return;
+    const res = calculateSubnet(ip, cidr, cloud);
+    
+    await navigator.clipboard.writeText(JSON.stringify(res, null, 2));
+    copyJsonBtn.innerText = 'Copied!';
+    copyJsonBtn.classList.add('copied');
+    setTimeout(() => {
+      copyJsonBtn.innerText = 'Copy JSON';
+      copyJsonBtn.classList.remove('copied');
+    }, 2000);
+  });
+
+  copyIacBtn?.addEventListener('click', async () => {
+    if (!iacOutput) return;
+    await navigator.clipboard.writeText(iacOutput.innerText);
+    copyIacBtn.innerText = 'Copied!';
+    copyIacBtn.classList.add('copied');
+    setTimeout(() => {
+      copyIacBtn.innerText = 'Copy Code';
+      copyIacBtn.classList.remove('copied');
+    }, 2000);
+  });
+
+  // Check URL params on mount
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const ip = params.get('ip');
+    const cidr = params.get('cidr');
+    const cloud = params.get('cloud');
+
+    if (ip && validateIPv4(ip)) ipInput.value = ip;
+    if (cidr) {
+      const cNum = parseInt(cidr, 10);
+      if (cNum >= 0 && cNum <= 32) {
+        cidrInput.value = cNum.toString();
+        cidrSlider.value = cNum.toString();
+      }
+    }
+    if (cloud) {
+      if (['standard', 'aws', 'azure', 'gcp'].includes(cloud)) {
+        cloudSelector.value = cloud;
+      }
+    }
+    updateAll();
+  });
+</script>

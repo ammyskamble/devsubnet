@@ -1,0 +1,197 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+}
+
+const { 
+  title = "IP Subnet Calculator & CIDR Range Planner | Subnetly", 
+  description = "Free online IP subnet calculator and CIDR range planner. Calculate subnet masks, usable IP ranges, K8s cluster allocations, and cloud VPC reservations (AWS, Azure, GCP).",
+  canonicalUrl = Astro.url.href
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="theme-color" content="#0d111c" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Subnetly" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={`${Astro.url.origin}/og-image.png`} />
+
+    <!-- Anti-Flash Theme Script -->
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('subnetly-theme') || 
+          (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+
+
+    <!-- FAQ Schema JSON-LD for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a subnet mask and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate subnets from an IP address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. The number of hosts per subnet is 2^h - 2, where h is the number of remaining host bits.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is CIDR notation and how is it used?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix (e.g., /24 implies 24 network bits).</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>A /24 subnet has 256 total IP addresses. Subtracting 2 addresses for the network address (first IP) and the broadcast address (last IP) leaves exactly 254 usable host IP addresses.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between network address and broadcast address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>The network address is the first IP in a subnet range and represents the network itself, used by routers to forward packets. The broadcast address is the last IP in the subnet range, used to send data packets to all hosts connected to that subnet simultaneously.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many IP addresses does a /28 subnet have?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>A /28 subnet has 16 total IP addresses, of which 14 are usable for hosts after excluding the network and broadcast addresses.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a /16 and /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>A /16 subnet allocates 16 bits to the network portion and 16 bits to host addresses, supporting up to 65,534 usable hosts. A /24 subnet allocates 24 bits to the network portion and 8 bits to hosts, supporting up to 254 usable hosts.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I split a network into smaller subnets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>To split a network into smaller subnets, increase the CIDR prefix length (borrow host bits). For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25, creating two subnets each containing 128 total IP addresses.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What IP addresses does AWS reserve in a VPC subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>AWS reserves 5 IP addresses in each subnet: the first four IPs (x.x.x.0 for network, x.x.x.1 for the VPC router, x.x.x.2 for DNS, x.x.x.3 for future use) and the last IP address (x.x.x.255 for network broadcast).</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I subnet a network for an AWS VPC?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>To subnet for an AWS VPC, allocate a large CIDR block (like /16) to the VPC itself, then divide it into smaller subnets (like /24) across different Availability Zones (AZs) for high availability, ensuring none of the CIDR ranges overlap.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is IPv6 and how is it different from IPv4?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>IPv6 is the next-generation internet protocol that uses a 128-bit address format (written in hexadecimal) to provide 3.4 x 10^38 addresses, compared to IPv4 which uses a 32-bit format (written in dotted decimal) with only 4.3 billion addresses.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I convert an IP address to binary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>Convert each of the four octets in the IPv4 address from a base-10 decimal number to an 8-bit base-2 binary number. For example, the IP 192.168.1.1 converts to 11000000.10101000.00000001.00000001.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the smallest subnet mask that supports 200 hosts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>The smallest subnet mask that supports 200 hosts is /24 (255.255.255.0). A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I plan IP ranges for a Kubernetes cluster?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>To plan Kubernetes IP ranges, allocate non-overlapping CIDR blocks for Nodes, Pods, and Services. Ensure the Pod CIDR is large enough to allocate a subnet (usually /24 or /26) per Node depending on the max pods per node configured.</p>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between subnetting and supernetting?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<p>Subnetting is the process of dividing a single large network into multiple smaller sub-networks. Supernetting (or CIDR aggregation) is the process of combining multiple small contiguous networks into a single larger network prefix to reduce routing table size.</p>"
+          }
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <!-- Background Decor Blobs -->
+    <div class="bg-decor" aria-hidden="true">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
+    </div>
+    
+    <slot />
+  </body>
+</html>
+
+<script>
+  import '../styles/global.css';
+</script>

@@ -1,0 +1,475 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="IP Subnetting & CIDR FAQ | Subnetly"
+  description="Answers to the most common IP subnetting and CIDR questions—how to calculate ranges, standard vs cloud reservations, and Kubernetes IP planning, explained simply."
+>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Subnetly home">
+        <span class="brand-mark">/</span> subnetly
+      </a>
+      
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-tab" href="/">IPv4 Calculator</a>
+        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
+        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
+        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
+      </nav>
+      
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="faq-main">
+      <div class="faq-container">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>FAQ</strong>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="faq-intro">
+          <div class="eyebrow">QUICK ANSWERS</div>
+          <h1>IP Subnet FAQ</h1>
+          <p class="lede">
+            The most common IP subnetting and CIDR questions answered in a few sentences each.
+          </p>
+        </section>
+
+        <!-- FAQ Accordion List -->
+        <div class="faq-accordion" role="list">
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is a subnet mask and how does it work?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I calculate subnets from an IP address?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2<sup>n</sup>, where n is the number of borrowed bits. Usable hosts per subnet is 2<sup>h</sup> &minus; 2.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is CIDR notation and how is it used?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix — for example, /24 implies 24 network bits.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How many usable hosts are in a /24 subnet?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>A /24 subnet contains 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly <strong>254 usable host IP addresses</strong>.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is the difference between network address and broadcast address?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>The network address is the first IP in a subnet range and represents the network itself — routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How many IP addresses does a /28 subnet have?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>A /28 subnet has 16 total IP addresses, of which <strong>14 are usable for hosts</strong> after excluding the network and broadcast addresses.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is the difference between a /16 and /24 subnet?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>A /16 subnet allocates 16 bits to the network portion and 16 bits to host addresses, supporting up to 65,534 usable hosts. A /24 subnet allocates 24 bits to the network portion and 8 bits to hosts, supporting up to 254 usable hosts.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I split a network into smaller subnets?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>To split a network, increase the CIDR prefix length by borrowing host bits. For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25 — creating two subnets each containing 128 total IPs (126 usable each).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What IP addresses does AWS reserve in a VPC subnet?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>AWS reserves <strong>5 IP addresses</strong> in every VPC subnet: x.x.x.0 (network address), x.x.x.1 (VPC router), x.x.x.2 (DNS resolver), x.x.x.3 (reserved for future use), and x.x.x.255 (broadcast address).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I subnet a network for an AWS VPC?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>Allocate a large CIDR block (like /16) to the VPC itself, then divide it into smaller subnets (like /24) spread across different Availability Zones (AZs) for high availability. Ensure none of the CIDR ranges overlap and remember to account for AWS's 5 reserved IPs per subnet.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is IPv6 and how is it different from IPv4?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>IPv6 is the next-generation internet protocol using a 128-bit address format (written in hexadecimal) to provide 3.4 &times; 10<sup>38</sup> unique addresses. IPv4 uses a 32-bit dotted-decimal format with only 4.3 billion addresses — a pool that is essentially exhausted globally.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I convert an IP address to binary?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>Convert each of the four octets in the IPv4 address from decimal to an 8-bit binary number. For example, the IP <code>192.168.1.1</code> converts to <code>11000000.10101000.00000001.00000001</code>.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is the smallest subnet mask that supports 200 hosts?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>The smallest subnet mask that supports 200 hosts is <strong>/24 (255.255.255.0)</strong>. A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts — not enough.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I plan IP ranges for a Kubernetes cluster?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>Allocate three non-overlapping CIDR blocks: one for Node IPs, one for Pod IPs, and one for Service IPs. The Pod CIDR must be large enough to give each Node a subnet (usually /24 or /26) based on the max pods per node setting in your kubelet configuration.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>What is the difference between subnetting and supernetting?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>Subnetting divides a single large network into multiple smaller sub-networks. Supernetting (CIDR aggregation) is the opposite — combining multiple small contiguous networks into a single larger prefix to simplify routing tables and reduce the number of routing entries.</p>
+            </div>
+          </details>
+
+        </div><!-- /.faq-accordion -->
+
+        <div class="faq-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+
+      </div><!-- /.faq-container -->
+    </main>
+
+    <footer>
+      <span>SUBNETLY / ENGINEERED FOR CLEAR NETWORKS</span>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  /* ─── FAQ Page Layout ─────────────────────────────────────────── */
+  .faq-main {
+    flex: 1;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .faq-container {
+    max-width: 54rem;
+    margin: 0 auto;
+  }
+
+  /* ─── Breadcrumb ──────────────────────────────────────────────── */
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  /* ─── Intro / Header ──────────────────────────────────────────── */
+  .faq-intro {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2.5rem;
+  }
+
+  .faq-intro .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .faq-intro h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+    line-height: 1.1;
+  }
+
+  .faq-intro .lede {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 40rem;
+    margin: 0;
+  }
+
+  /* ─── Accordion ───────────────────────────────────────────────── */
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Each details row */
+  .faq-details {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* The clickable summary row */
+  .faq-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.4rem 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: color var(--transition-fast);
+  }
+
+  /* Remove default arrow in all browsers */
+  .faq-summary::-webkit-details-marker { display: none; }
+  .faq-summary::marker { display: none; }
+
+  .faq-summary > span:first-child {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.45;
+    transition: color var(--transition-fast);
+  }
+
+  .faq-summary:hover > span:first-child {
+    color: var(--accent);
+  }
+
+  /* ─── +/− icons ───────────────────────────────────────────────── */
+  .icon {
+    flex-shrink: 0;
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+    width: 1.5rem;
+    text-align: center;
+    line-height: 1;
+    transition: color var(--transition-fast);
+  }
+
+  .icon .minus { display: none; }
+  .icon .plus  { display: inline; }
+
+  /* When open: swap icons */
+  .faq-details[open] .icon .plus  { display: none; }
+  .faq-details[open] .icon .minus { display: inline; }
+
+  /* ─── Answer content ──────────────────────────────────────────── */
+  .faq-answer {
+    padding: 0 0 1.5rem;
+    animation: fadeSlideIn 0.18s ease both;
+  }
+
+  .faq-answer p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  .faq-answer code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    background: var(--bg-secondary);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── CTA Button ──────────────────────────────────────────────── */
+  .faq-cta {
+    margin-top: 3.5rem;
+  }
+
+  .btn-return {
+    display: inline-block;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .btn-return:hover { opacity: 0.85; }
+
+  /* ─── Theme Toggle ────────────────────────────────────────────── */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .theme-toggle .sun { display: none; width: 1.25rem; height: 1.25rem; }
+  .theme-toggle .moon { display: block; width: 1.25rem; height: 1.25rem; }
+
+  :root[data-theme="light"] .theme-toggle .sun  { display: block; }
+  :root[data-theme="light"] .theme-toggle .moon { display: none; }
+</style>
+
+<script>
+  const themeBtn = document.getElementById('theme-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const next = doc.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      doc.setAttribute('data-theme', next);
+      localStorage.setItem('subnetly-theme', next);
+    });
+  }
+</script>

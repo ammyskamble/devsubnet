@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MainShell from '../components/MainShell.astro';
+---
+
+<Layout 
+  title="AWS VPC Subnet Calculator | Cloud IP Range Planner"
+  description="Calculate AWS VPC subnet ranges taking into account AWS's 5 reserved IP addresses. Plan node ranges, CIDR blocks, and generate copy-pasteable Terraform IaC."
+>
+  <MainShell activeTab="ipv4" defaultCloud="aws" />
+</Layout>

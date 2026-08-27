@@ -6,7 +6,7 @@ interface Props {
 }
 
 const { 
-  title = "IP Subnet Calculator & CIDR Range Planner | Subnetly", 
+  title = "IP Subnet Calculator & CIDR Range Planner | Devsubnet.com", 
   description = "Free online IP subnet calculator and CIDR range planner. Calculate subnet masks, usable IP ranges, K8s cluster allocations, and cloud VPC reservations (AWS, Azure, GCP).",
   canonicalUrl = Astro.url.href
 } = Astro.props;
@@ -24,27 +24,27 @@ const {
     <link rel="canonical" href={canonicalUrl} />
     <meta name="theme-color" content="#0d111c" />
     <meta name="generator" content={Astro.generator} />
-
+ 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:site_name" content="Subnetly" />
+    <meta property="og:site_name" content="Devsubnet.com" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
-
+ 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={`${Astro.url.origin}/og-image.png`} />
-
+ 
     <!-- Anti-Flash Theme Script -->
     <script is:inline>
       (function() {
-        const theme = localStorage.getItem('subnetly-theme') || 
+        const theme = localStorage.getItem('devsubnet-theme') || 
           (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
         document.documentElement.setAttribute('data-theme', theme);
       })();

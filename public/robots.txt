@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap Link
+Sitemap: https://devsubnet.com/sitemap.xml

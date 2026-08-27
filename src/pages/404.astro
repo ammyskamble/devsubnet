@@ -1,0 +1,269 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="404: Page Not Found | Devsubnet.com"
+  description="The page you are looking for does not exist. Return to Devsubnet.com to calculate IP address ranges, subnets, and cloud VPC configurations."
+>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Devsubnet.com home">
+        <span class="brand-mark">/</span> devsubnet.com
+      </a>
+      
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-tab" href="/">IPv4 Calculator</a>
+        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
+        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
+        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
+      </nav>
+      
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="error-main">
+      <div class="error-container">
+        <div class="error-badge">404</div>
+        <h1>CIDR Block Not Found</h1>
+        <p class="error-message">
+          The requested path could not be resolved. It looks like you've navigated to a non-existent routing prefix or an invalid address space.
+        </p>
+        
+        <!-- Interactive visual cue matching network architecture theme -->
+        <div class="network-diagram" aria-hidden="true">
+          <div class="node central"></div>
+          <div class="connector link-1 broken"></div>
+          <div class="node endpoint ep-1 disconnected"></div>
+          <div class="node endpoint ep-2 disconnected"></div>
+        </div>
+
+        <div class="actions">
+          <a href="/" class="btn-primary">Return to Calculator</a>
+          <a href="/faq" class="btn-secondary">Check FAQ Page</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .error-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    min-height: calc(100vh - 200px);
+  }
+
+  .error-container {
+    max-width: 32rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .error-badge {
+    background-color: rgba(var(--hsl-accent), 0.1);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(var(--hsl-accent), 0.2);
+    margin-bottom: 2rem;
+    display: inline-block;
+  }
+
+  .error-container h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+    line-height: 1.1;
+  }
+
+  .error-message {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 3rem;
+  }
+
+  /* Network diagram simulation styling */
+  .network-diagram {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin-bottom: 3.5rem;
+  }
+
+  .node {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background-color: var(--accent);
+    z-index: 2;
+  }
+
+  .node.central {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px var(--accent);
+  }
+
+  .node.endpoint {
+    width: 10px;
+    height: 10px;
+    background-color: var(--text-muted);
+  }
+
+  .node.ep-1 {
+    top: 15%;
+    left: 20%;
+  }
+
+  .node.ep-2 {
+    bottom: 15%;
+    right: 20%;
+  }
+
+  .connector {
+    position: absolute;
+    height: 2px;
+    background-color: var(--border-color);
+    z-index: 1;
+    transform-origin: left center;
+  }
+
+  .connector.link-1 {
+    width: 80px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .connector.broken {
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 4px,
+      var(--accent-danger, #ef4444) 4px,
+      var(--accent-danger, #ef4444) 8px
+    );
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+  }
+
+  .node.disconnected {
+    background-color: var(--accent-danger, #ef4444);
+    box-shadow: 0 0 10px var(--accent-danger, #ef4444);
+  }
+
+  /* Actions button layout */
+  .actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--bg-secondary);
+  }
+
+  /* Theme Toggle */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .theme-toggle .sun { display: none; width: 1.25rem; height: 1.25rem; }
+  .theme-toggle .moon { display: block; width: 1.25rem; height: 1.25rem; }
+
+  :root[data-theme="light"] .theme-toggle .sun  { display: block; }
+  :root[data-theme="light"] .theme-toggle .moon { display: none; }
+</style>
+
+<script>
+  const themeBtn = document.getElementById('theme-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const next = doc.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      doc.setAttribute('data-theme', next);
+      localStorage.setItem('devsubnet-theme', next);
+    });
+  }
+</script>

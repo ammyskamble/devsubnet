@@ -1,0 +1,249 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Privacy Policy | Subnetly"
+  description="Privacy Policy for Subnetly IP Calculator. Read about how we run entirely client-side and protect your subnet and IP range calculation data."
+>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Subnetly home">
+        <span class="brand-mark">/</span> subnetly
+      </a>
+      
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-tab" href="/">IPv4 Calculator</a>
+        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
+        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
+        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
+      </nav>
+      
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>Privacy Policy</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">DATA PROTECTION</div>
+          <h1>Privacy Policy</h1>
+          <p class="lede">
+            Last updated: August 27, 2026. Your network privacy is our top priority.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="policy-block">
+            <h2>1. Zero Server-Side Transmission</h2>
+            <p>
+              Subnetly is built as a client-side application. Every calculation you perform — including subnet configurations, IP splitting, CIDR checks, Kubernetes range planning, and cloud VPC setups — happens entirely in your local browser's memory. We do not transmit your network details, host counts, or IP ranges to any server.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>2. No Local Storage Tracking</h2>
+            <p>
+              We only use the browser's <code>localStorage</code> API to store your theme preferences (light or dark mode) so that your next visit preserves your UI choice. We do not store subnet ranges or IP addresses in persistent browser storage.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>3. Third-Party Analytics and Cookies</h2>
+            <p>
+              Subnetly does not use tracking cookies, retargeting pixels, or intrusive analytics suites. We do not sell, trade, or share user details because we do not collect them in the first place.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>4. Changes to This Policy</h2>
+            <p>
+              We may update this Privacy Policy from time to time. Any changes will be reflected on this page with an updated date, but the core principle of client-side local calculation will never change.
+            </p>
+          </div>
+        </section>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>SUBNETLY / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page-main {
+    flex: 1;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .content-container {
+    max-width: 54rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2.5rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+    line-height: 1.1;
+  }
+
+  .page-header .lede {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 40rem;
+    margin: 0;
+  }
+
+  .page-header .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .policy-block h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+    color: var(--text-primary);
+  }
+
+  .policy-block p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .policy-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    background: var(--bg-secondary);
+    padding: 0.1em 0.3em;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .page-cta {
+    margin-top: 3.5rem;
+  }
+
+  .btn-return {
+    display: inline-block;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .btn-return:hover { opacity: 0.85; }
+
+  /* Theme Toggle */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .theme-toggle .sun { display: none; width: 1.25rem; height: 1.25rem; }
+  .theme-toggle .moon { display: block; width: 1.25rem; height: 1.25rem; }
+
+  :root[data-theme="light"] .theme-toggle .sun  { display: block; }
+  :root[data-theme="light"] .theme-toggle .moon { display: none; }
+</style>
+
+<script>
+  const themeBtn = document.getElementById('theme-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const next = doc.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      doc.setAttribute('data-theme', next);
+      localStorage.setItem('subnetly-theme', next);
+    });
+  }
+</script>

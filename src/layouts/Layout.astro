@@ -6,7 +6,7 @@ interface Props {
 }
 
 const { 
-  title = "IP Subnet Calculator & CIDR Range Planner | Devsubnet.com", 
+  title = "IP Subnet Calculator & CIDR Range Planner | devsubnet.com", 
   description = "Free online IP subnet calculator and CIDR range planner. Calculate subnet masks, usable IP ranges, K8s cluster allocations, and cloud VPC reservations (AWS, Azure, GCP).",
   canonicalUrl = Astro.url.href
 } = Astro.props;
@@ -14,6 +14,16 @@ const {
 <!doctype html>
 <html lang="en" data-theme="dark">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-F2T4WC5Y9V');
+    </script>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
@@ -30,7 +40,7 @@ const {
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:site_name" content="Devsubnet.com" />
+    <meta property="og:site_name" content="devsubnet.com" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
  

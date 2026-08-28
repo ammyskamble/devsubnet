@@ -1,0 +1,322 @@
+---
+import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+---
+<div class="calculator-layout">
+  <!-- Left Column: Input -->
+  <div class="calculator-panel">
+    <div class="panel-heading">
+      <div>
+        <span class="step">01</span>
+        <h2>VLSM Planner Parameters</h2>
+      </div>
+      <span class="live-label">VARIABLE-LENGTH SUBNET MASKING</span>
+    </div>
+
+    <!-- Base network input -->
+    <div class="input-row">
+      <label for="vlsm-base-ip">Base CIDR Block</label>
+      <div class="ip-input">
+        <input type="text" id="vlsm-base-ip" value="192.168.0.0" placeholder="e.g., 192.168.0.0" inputmode="decimal" autocomplete="off" maxlength="15" />
+        <span class="slash">/</span>
+        <input type="number" id="vlsm-base-cidr" value="24" min="8" max="30" />
+      </div>
+    </div>
+
+    <div class="slider-container">
+      <input type="range" id="vlsm-base-cidr-slider" value="24" min="8" max="30" aria-label="Base CIDR slider" />
+    </div>
+
+    <div class="panel-heading">
+      <div>
+        <span class="step">02</span>
+        <h2>Segment Requirements</h2>
+      </div>
+    </div>
+
+    <div class="guide-table-wrapper">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Hosts Needed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="vlsm-segments-body">
+          <tr>
+            <td><input class="vlsm-name-input" type="text" value="Servers" data-idx="0" placeholder="Segment name" /></td>
+            <td><input class="vlsm-hosts-input" type="number" value="50" data-idx="0" min="1" max="2097152" /></td>
+            <td><button class="vlsm-remove-btn subtool-btn" type="button" data-idx="0">✕</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quick-row">
+      <button type="button" id="btn-add-segment" class="subtool-btn" style="border-color: rgba(var(--hsl-network),0.3); color: var(--accent-network);">+ Add Segment</button>
+      <button type="button" id="btn-run-vlsm" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">Calculate VLSM</button>
+    </div>
+
+    <div class="error-banner" id="vlsm-error" role="alert">
+      <span>Not enough address space to satisfy all segment requirements. Reduce host counts or use a larger base block.</span>
+    </div>
+  </div>
+
+  <!-- Right Column: Results -->
+  <div class="insight-panel">
+    <div class="calculator-panel" style="gap: 1.5rem;">
+      <div>
+        <span class="aside-kicker">VLSM ALLOCATION</span>
+        <h2>Allocated Subnets</h2>
+      </div>
+      <p class="aside-copy">
+        Subnets are allocated from largest to smallest, each with the smallest prefix that satisfies its host requirement — minimizing wasted addresses.
+      </p>
+      <div class="guide-table-wrapper">
+        <table class="guide-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>CIDR</th>
+              <th>Usable</th>
+              <th>Wasted</th>
+            </tr>
+          </thead>
+          <tbody id="vlsm-results-body">
+            <tr><td colspan="4" style="text-align:center; color:var(--text-muted); font-family:var(--font-sans);">Enter segment requirements and click Calculate VLSM.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="export-panel">
+        <div class="export-tabs">
+          <button type="button" class="export-tab-btn active" data-lang="tf">Terraform</button>
+          <button type="button" class="export-tab-btn" data-lang="yaml">YAML</button>
+        </div>
+        <div class="code-wrapper">
+          <div class="code-copy-overlay">
+            <button class="copy-button" type="button" id="copy-vlsm-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+          </div>
+          <pre><code id="vlsm-code-output"># VLSM allocation will appear here</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+
+  const baseIpInput = document.getElementById('vlsm-base-ip') as HTMLInputElement;
+  const baseCidrInput = document.getElementById('vlsm-base-cidr') as HTMLInputElement;
+  const baseCidrSlider = document.getElementById('vlsm-base-cidr-slider') as HTMLInputElement;
+  const segmentsBody = document.getElementById('vlsm-segments-body') as HTMLTableSectionElement;
+  const resultsBody = document.getElementById('vlsm-results-body') as HTMLTableSectionElement;
+  const codeOutput = document.getElementById('vlsm-code-output') as HTMLElement;
+  const addSegmentBtn = document.getElementById('btn-add-segment') as HTMLButtonElement;
+  const runBtn = document.getElementById('btn-run-vlsm') as HTMLButtonElement;
+  const copyCodeBtn = document.getElementById('copy-vlsm-code') as HTMLButtonElement;
+  const errorBanner = document.getElementById('vlsm-error');
+  let activeTab = 'tf';
+
+  let segmentCounter = 1;
+
+  function findSegmentIndex(row: HTMLElement): number {
+    return Array.from(segmentsBody.querySelectorAll('tr')).indexOf(row);
+  }
+
+  function renderSegments() {
+    segmentsBody.querySelectorAll('.vlsm-remove-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const all = Array.from(segmentsBody.querySelectorAll('tr')) as HTMLElement[];
+        if (all.length <= 1) return;
+        const row = (e.currentTarget as HTMLElement).closest('tr') as HTMLElement;
+        row.remove();
+        syncIndices();
+      });
+    });
+  }
+
+  function syncIndices() {
+    const rows = Array.from(segmentsBody.querySelectorAll('tr')) as HTMLElement[];
+    rows.forEach((row, i) => {
+      const name = row.querySelector('.vlsm-name-input') as HTMLInputElement;
+      const hosts = row.querySelector('.vlsm-hosts-input') as HTMLInputElement;
+      const rm = row.querySelector('.vlsm-remove-btn') as HTMLButtonElement;
+      if (name) name.dataset.idx = String(i);
+      if (hosts) hosts.dataset.idx = String(i);
+      if (rm) rm.dataset.idx = String(i);
+    });
+  }
+
+  addSegmentBtn?.addEventListener('click', () => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input class="vlsm-name-input" type="text" value="Segment ${segmentCounter}" data-idx="${segmentCounter}" placeholder="Segment name" /></td>
+      <td><input class="vlsm-hosts-input" type="number" value="10" data-idx="${segmentCounter}" min="1" max="2097152" /></td>
+      <td><button class="vlsm-remove-btn subtool-btn" type="button" data-idx="${segmentCounter}">✕</button></td>`;
+    segmentsBody.appendChild(row);
+    segmentCounter++;
+    renderSegments();
+  });
+
+  function hostsToPrefix(hosts: number): number {
+    if (hosts <= 2) return 30;
+    if (hosts <= 6) return 29;
+    if (hosts <= 14) return 28;
+    if (hosts <= 30) return 27;
+    if (hosts <= 62) return 26;
+    if (hosts <= 126) return 25;
+    if (hosts <= 254) return 24;
+    if (hosts <= 510) return 23;
+    if (hosts <= 1022) return 22;
+    if (hosts <= 2046) return 21;
+    if (hosts <= 4094) return 20;
+    if (hosts <= 8190) return 19;
+    if (hosts <= 16382) return 18;
+    if (hosts <= 32766) return 17;
+    if (hosts <= 65534) return 16;
+    if (hosts <= 131070) return 15;
+    if (hosts <= 262142) return 14;
+    return 13;
+  }
+
+  function collectSegments(): { name: string; hosts: number }[] {
+    const segs: { name: string; hosts: number }[] = [];
+    segmentsBody.querySelectorAll('tr').forEach(row => {
+      const name = (row.querySelector('.vlsm-name-input') as HTMLInputElement)?.value || 'Segment';
+      const hosts = parseInt((row.querySelector('.vlsm-hosts-input') as HTMLInputElement)?.value || '1', 10);
+      if (hosts > 0) segs.push({ name, hosts });
+    });
+    return segs;
+  }
+
+  function runVlsm() {
+    errorBanner?.classList.remove('show');
+    const ip = baseIpInput.value.trim();
+    const baseCidr = parseInt(baseCidrInput.value, 10);
+    if (!validateIPv4(ip)) {
+      errorBanner?.classList.add('show');
+      return;
+    }
+    const segs = collectSegments();
+    if (segs.length === 0) return;
+
+    // Sort by hosts descending (largest first)
+    segs.sort((a, b) => b.hosts - a.hosts);
+
+    // Base network aligned
+    const baseLong = ip2Long(ip);
+    const baseMaskLong = baseCidr === 0 ? 0 : (~0 << (32 - baseCidr)) >>> 0;
+    let cursor = (baseLong & baseMaskLong) >>> 0;
+    const baseCapacity = Math.pow(2, 32 - baseCidr);
+
+    const allocations: { name: string; cidr: string; usable: number; wasted: number; network: string }[] = [];
+
+    for (const seg of segs) {
+      const prefix = hostsToPrefix(seg.hosts);
+      const step = Math.pow(2, 32 - prefix);
+      if (cursor + step > baseLong + baseCapacity) {
+        errorBanner?.classList.add('show');
+        return;
+      }
+      const usable = Math.pow(2, 32 - prefix) - 2;
+      allocations.push({
+        name: seg.name,
+        cidr: `${long2Ip(cursor)}/${prefix}`,
+        usable,
+        wasted: Math.max(0, usable - seg.hosts),
+        network: long2Ip(cursor)
+      });
+      cursor += step;
+    }
+
+    renderResults(allocations);
+  }
+
+  let currentAllocations: { name: string; cidr: string; usable: number; wasted: number; network: string }[] = [];
+
+  function renderResults(allocations: { name: string; cidr: string; usable: number; wasted: number }[]) {
+    currentAllocations = allocations as any;
+    let html = '';
+    allocations.forEach(a => {
+      html += `<tr>
+        <td><strong>${a.name}</strong></td>
+        <td>${a.cidr}</td>
+        <td>${a.usable.toLocaleString()}</td>
+        <td>${a.wasted.toLocaleString()}</td>
+      </tr>`;
+    });
+    resultsBody.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No allocations.</td></tr>';
+    updateCode(allocations);
+  }
+
+  function updateCode(allocations: { name: string; cidr: string; network: string }[]) {
+    if (!codeOutput) return;
+    if (activeTab === 'tf') {
+      let code = '# Terraform VLSM Subnet Allocations\n';
+      allocations.forEach((a, i) => {
+        const key = a.name.toLowerCase().replace(/[^a-z0-9]/g, '_') || `subnet_${i}`;
+        code += `resource "aws_subnet" "${key}" {\n  vpc_id     = "vpc-prod"\n  cidr_block = "${a.cidr}"\n  tags = {\n    Name = "${a.name}"\n  }\n}\n\n`;
+      });
+      codeOutput.innerText = code.trim();
+    } else {
+      let code = 'subnets:\n';
+      allocations.forEach(a => {
+        code += `  - name: "${a.name}"\n    cidr: "${a.cidr}"\n`;
+      });
+      codeOutput.innerText = code.trim();
+    }
+  }
+
+  runBtn?.addEventListener('click', runVlsm);
+
+  baseCidrInput.addEventListener('input', () => {
+    const v = parseInt(baseCidrInput.value, 10);
+    if (!isNaN(v) && v >= 8 && v <= 30) baseCidrSlider.value = String(v);
+  });
+  baseCidrSlider.addEventListener('input', () => {
+    baseCidrInput.value = baseCidrSlider.value;
+  });
+
+  document.querySelectorAll('.export-tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.export-tab-btn').forEach(b => b.classList.remove('active'));
+      (e.currentTarget as HTMLButtonElement).classList.add('active');
+      activeTab = (e.currentTarget as HTMLButtonElement).getAttribute('data-lang') || 'tf';
+      if (currentAllocations.length > 0) updateCode(currentAllocations);
+    });
+  });
+
+  copyCodeBtn?.addEventListener('click', async () => {
+    if (!codeOutput) return;
+    await navigator.clipboard.writeText(codeOutput.innerText);
+    copyCodeBtn.innerText = 'Copied!';
+    copyCodeBtn.classList.add('copied');
+    setTimeout(() => { copyCodeBtn.innerText = 'Copy Code'; copyCodeBtn.classList.remove('copied'); }, 2000);
+  });
+
+  renderSegments();
+</script>
+
+<style>
+  .subtool-btn {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  .subtool-btn:hover { color: var(--text-primary); background-color: var(--border-color); }
+  .vlsm-name-input, .vlsm-hosts-input {
+    background: none; border: none; border-bottom: 1px dashed var(--border-color);
+    color: var(--text-primary); font-size: 0.9rem; outline: none; padding: 0.2rem 0; font-family: var(--font-sans);
+    width: 100%;
+  }
+  .vlsm-hosts-input { font-family: var(--font-mono); width: 6rem; }
+</style>

@@ -28,7 +28,7 @@
             To calculate usable host ranges, use a dedicated <strong>ip address subnet calculator</strong>. Under standard RFC rules, every subnet loses 2 IP addresses: the network identifier and the broadcast address. The formula is 2<sup>(32 - prefix)</sup> - 2.
           </p>
         </div>
-        <a href="/visual-subnet-splitter" class="card-link">Try Usable Host calculations →</a>
+        <a href="/vlsm-calculator" class="card-link">Plan VLSM segments →</a>
       </div>
 
       <!-- Card 3 -->
@@ -47,10 +47,10 @@
         <div>
           <h4>Translating CIDR Notation</h4>
           <p>
-            Classless Inter-Domain Routing (CIDR) replaced the legacy classful address model. An <strong>ip subnet calculator cidr</strong> tool maps slash notation (like <code>/24</code> or <code>/28</code>) into corresponding subnet masks and usable boundaries in real time.
+            Classless Inter-Domain Routing (CIDR) replaced the legacy classful address model. An <strong>ip subnet calculator cidr</strong> tool maps slash notation (like <code>/24</code> or <code>/28</code>) into corresponding subnet masks and usable boundaries in real time. See the complete <a href="/cidr-cheat-sheet">CIDR cheat sheet</a> for every prefix length.
           </p>
         </div>
-        <a href="/kubernetes-subnet-planner" class="card-link">Verify CIDR parameters →</a>
+        <a href="/cidr-cheat-sheet" class="card-link">View CIDR cheat sheet →</a>
       </div>
 
       <!-- Card 5 -->
@@ -58,12 +58,11 @@
         <div>
           <h4>Standard vs. Public Cloud Rules</h4>
           <p>
-            AWS, Azure, and GCP reserve system IP addresses within every subnet block. Traditional tools fail to account for these specific offsets. devsubnet.com maps these out automatically so you don't run into IP exhaustion in your VPCs.
+            AWS, Azure, and GCP reserve system IP addresses within every subnet block. Traditional tools fail to account for these specific offsets. devsubnet.com maps these out automatically so you don't run into IP exhaustion in your VPCs. Use the dedicated <a href="/aws-vpc-subnet-calculator">AWS VPC</a>, <a href="/azure-vnet-subnet-calculator">Azure VNet</a>, and <a href="/gcp-vpc-subnet-calculator">GCP VPC</a> subnet calculators.
           </p>
         </div>
         <a href="/aws-vpc-subnet-calculator" class="card-link">Check Cloud VPC reservations →</a>
       </div>
-
       <!-- Card 6 -->
       <div class="seo-netsudoku-card">
         <div>
@@ -176,6 +175,34 @@
             <td>0.255.255.255</td>
             <td>16,777,214 Hosts</td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Comparison Table Section: Topical Authority Signal -->
+    <h3>How DevSubnet Compares to Other Free Subnet Calculators</h3>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
+      Most free calculators only handle standard RFC math. DevSubnet adds cloud-aware reservation logic, visualization, and IaC export in one place — all running in your browser.
+    </p>
+    <div class="guide-table-wrapper" style="margin-bottom: 3rem;">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>DevSubnet</th>
+            <th>Basic calculators</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Cloud-aware (AWS / Azure / GCP)</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>IPv4 + IPv6</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Often IPv4 only</td></tr>
+          <tr><td>Kubernetes subnet planner</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>VLSM planning</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>Subnet overlap checker</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>CIDR supernetting / aggregation</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>Binary visualization</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Rare</td></tr>
+          <tr><td>Terraform / Ansible export</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>No signup, runs in-browser</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-secondary);">Varies</td></tr>
         </tbody>
       </table>
     </div>

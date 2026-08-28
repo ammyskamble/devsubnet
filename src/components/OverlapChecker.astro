@@ -1,0 +1,187 @@
+---
+import { validateIPv4, ip2Long } from '../utils/subnetMath';
+---
+<div class="calculator-layout">
+  <!-- Left Column: Input -->
+  <div class="calculator-panel">
+    <div class="panel-heading">
+      <div>
+        <span class="step">01</span>
+        <h2>Subnet List</h2>
+      </div>
+      <span class="live-label">OVERLAP CHECKER</span>
+    </div>
+
+    <div class="input-row">
+      <label for="overlap-input">CIDR blocks (one per line, e.g. 10.0.0.0/24)</label>
+      <textarea id="overlap-input" rows="6" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical;">10.0.0.0/24
+10.0.0.128/25
+172.16.0.0/16
+10.0.1.0/24</textarea>
+    </div>
+
+    <div class="quick-row">
+      <button type="button" id="btn-run-overlap" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">Check Overlaps</button>
+      <button type="button" id="btn-clear-overlap" class="subtool-btn">Clear</button>
+    </div>
+
+    <div class="error-banner" id="overlap-error" role="alert">
+      <span>One or more entries are not valid CIDR blocks. Use the format IP/prefix (e.g. 10.0.0.0/24).</span>
+    </div>
+  </div>
+
+  <!-- Right Column: Results -->
+  <div class="insight-panel">
+    <div class="calculator-panel" style="gap: 1.5rem;">
+      <div>
+        <span class="aside-kicker">CONFLICT ANALYSIS</span>
+        <h2>Relationships Detected</h2>
+      </div>
+      <p class="aside-copy">
+        Each pair of subnets is compared to identify identical, overlapping, contained, or separate relationships before peering and routing.
+      </p>
+      <div id="overlap-summary" class="overlap-summary"></div>
+      <div class="guide-table-wrapper">
+        <table class="guide-table">
+          <thead>
+            <tr>
+              <th>Subnet A</th>
+              <th>Subnet B</th>
+              <th>Relationship</th>
+            </tr>
+          </thead>
+          <tbody id="overlap-table-body">
+            <tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Check Overlaps.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+
+  const input = document.getElementById('overlap-input') as HTMLTextAreaElement;
+  const runBtn = document.getElementById('btn-run-overlap') as HTMLButtonElement;
+  const clearBtn = document.getElementById('btn-clear-overlap') as HTMLButtonElement;
+  const tableBody = document.getElementById('overlap-table-body') as HTMLTableSectionElement;
+  const summary = document.getElementById('overlap-summary') as HTMLElement;
+  const errorBanner = document.getElementById('overlap-error');
+
+  function parseBlock(line: string): { network: number; cidr: number } | null {
+    const t = line.trim();
+    if (!t) return null;
+    const slash = t.lastIndexOf('/');
+    if (slash === -1) return null;
+    const ip = t.slice(0, slash).trim();
+    const cidr = parseInt(t.slice(slash + 1), 10);
+    if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32) return null;
+    const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
+    const aligned = (ip2Long(ip) & mask) >>> 0;
+    return { network: aligned, cidr };
+  }
+
+  function relationship(a: { network: number; cidr: number }, b: { network: number; cidr: number }): string {
+    const aEnd = a.network + Math.pow(2, 32 - a.cidr) - 1;
+    const bEnd = b.network + Math.pow(2, 32 - b.cidr) - 1;
+
+    if (a.network === b.network && a.cidr === b.cidr) return 'Identical';
+    const aContainsB = a.network <= b.network && aEnd >= bEnd;
+    const bContainsA = b.network <= a.network && bEnd >= aEnd;
+    if (aContainsB || bContainsA) return 'Contained';
+    const overlap = a.network <= bEnd && b.network <= aEnd;
+    if (overlap) return 'Overlapping';
+    return 'Separate';
+  }
+
+  function run() {
+    errorBanner?.classList.remove('show');
+    const lines = input.value.split('\n');
+    const blocks: { network: number; cidr: number; label: string }[] = [];
+    let valid = true;
+
+    lines.forEach(line => {
+      const b = parseBlock(line);
+      if (b) {
+        blocks.push({ ...b, label: `${long2Ip(b.network)}/${b.cidr}` });
+      } else if (line.trim()) {
+        valid = false;
+      }
+    });
+
+    if (!valid || blocks.length < 2) {
+      errorBanner?.classList.add('show');
+      return;
+    }
+
+    let html = '';
+    let conflictCount = 0;
+    const pairs = blocks.length * (blocks.length - 1) / 2;
+
+    for (let i = 0; i < blocks.length; i++) {
+      for (let j = i + 1; j < blocks.length; j++) {
+        const rel = relationship(blocks[i], blocks[j]);
+        const isConflict = rel === 'Overlapping' || rel === 'Identical';
+        if (isConflict) conflictCount++;
+        const color = isConflict ? 'var(--accent-danger)' : rel === 'Contained' ? 'var(--accent-warning)' : 'var(--accent-highlight)';
+        html += `<tr>
+          <td>${blocks[i].label}</td>
+          <td>${blocks[j].label}</td>
+          <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
+        </tr>`;
+      }
+    }
+
+    tableBody.innerHTML = html;
+    const clean = conflictCount === 0;
+    summary.innerHTML = `
+      <div class="overlap-summary-card ${clean ? 'clean' : 'conflict'}">
+        <strong>${conflictCount} conflict${conflictCount === 1 ? '' : 's'}</strong>
+        <span>across ${pairs} pair comparison${pairs === 1 ? '' : 's'}</span>
+      </div>`;
+  }
+
+  runBtn?.addEventListener('click', run);
+  clearBtn?.addEventListener('click', () => {
+    input.value = '';
+    tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Check Overlaps.</td></tr>';
+    summary.innerHTML = '';
+  });
+</script>
+
+<style>
+  .subtool-btn {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  .subtool-btn:hover { color: var(--text-primary); background-color: var(--border-color); }
+  .overlap-summary-card {
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    border: 1px solid;
+  }
+  .overlap-summary-card strong { font-size: 1.5rem; font-family: var(--font-mono); }
+  .overlap-summary-card.clean {
+    background-color: rgba(var(--hsl-highlight), 0.05);
+    border-color: rgba(var(--hsl-highlight), 0.2);
+    color: var(--accent-highlight);
+  }
+  .overlap-summary-card.conflict {
+    background-color: rgba(var(--hsl-danger), 0.05);
+    border-color: rgba(var(--hsl-danger), 0.2);
+    color: var(--accent-danger);
+  }
+  .overlap-summary-card span { color: var(--text-secondary); }
+</style>

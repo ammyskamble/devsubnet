@@ -8,7 +8,17 @@
   <url>
     <loc>https://devsubnet.com/aws-vpc-subnet-calculator/</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/azure-vnet-subnet-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/gcp-vpc-subnet-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://devsubnet.com/visual-subnet-splitter/</loc>
@@ -22,6 +32,26 @@
   </url>
   <url>
     <loc>https://devsubnet.com/ipv6-subnet-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/vlsm-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/subnet-overlap-checker/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/cidr-supernet-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/cidr-cheat-sheet/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

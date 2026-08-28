@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VlsmCalculator from '../components/VlsmCalculator.astro';
+---
+<Layout
+  title="VLSM Calculator – Variable-Length Subnet Masking Tool | DevSubnet"
+  description="Free online VLSM calculator. Divide a CIDR block into variable-length subnets sized to exact host requirements, minimizing IP address waste for real-world network design."
+>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="DevSubnet.com home"><span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span></a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-tab" href="/">IPv4 Calculator</a>
+        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
+        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
+        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
+        <a class="nav-tab active" href="/vlsm-calculator">VLSM</a>
+        <a class="nav-tab" href="/subnet-overlap-checker">Overlap</a>
+      </nav>
+      <div class="nav-actions"></div>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">VLSM PLANNER / VARIABLE-LENGTH SUBNET MASKING</div>
+        <h1 id="page-title">VLSM Calculator &amp; Subnet Planner</h1>
+        <p class="lede">Divide a base CIDR block into subnets of varying sizes based on exact host requirements — minimizing address waste in real network designs.</p>
+      </section>
+      <section aria-label="VLSM calculator workspace">
+        <VlsmCalculator />
+      </section>
+      <section class="guide-section">
+        <div class="guide-sticky"><h2>What is <em>VLSM</em>?</h2></div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>Variable-Length Subnet Masking</h3>
+            <p>VLSM (Variable-Length Subnet Masking) allocates subnets of different sizes within a single network based on how many hosts each segment actually needs. Instead of splitting a block into equal-sized pieces, a /24 can be divided into, for example, one /26 (62 hosts), two /27 (30 hosts each), and one /28 (14 hosts) — using only the addresses each LAN requires.</p>
+          </div>
+          <div class="guide-block">
+            <h3>VLSM vs. FLSM</h3>
+            <p>Fixed-Length Subnet Masking (FLSM) divides a network into equal-sized subnets, which often wastes large amounts of address space. VLSM is preferred in modern networks because it matches prefix size to the actual host count per segment, making far more efficient use of limited IPv4 address space.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links"><a href="/about">About Us</a><a href="/contact">Contact</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/faq">FAQ</a></div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>

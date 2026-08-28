@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.ja;
+---
+
+<Layout 
+  lang="ja"
+  title="IPサブネット & CIDR よくある質問 (FAQ) | DevSubnet"
+  description="IPサブネット計算、CIDR、AWS/AzureクラウドVPC予約、Kubernetesネットワークに関する疑問をわかりやすく解説。"
+>
+  <div class="app-shell">
+    <NavBar path="faq" lang="ja" />
+
+    <main class="faq-main">
+      <div class="faq-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/ja/">ホーム</a> <span class="sep">/</span> <strong>FAQ</strong>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="faq-intro">
+          <div class="eyebrow">QUICK ANSWERS</div>
+          <h1>よくある質問 (FAQ)</h1>
+          <p class="lede">
+            IPサブネット、CIDR、クラウドネットワーク設計に関する主要な質問を簡潔に回答しています。
+          </p>
+        </section>
+
+        <!-- FAQ Accordion List -->
+        <div class="faq-accordion" role="list">
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>サブネットマスクとは何ですか？どのように機能しますか？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>サブネットマスクは、32ビットのIPアドレスをネットワーク部とホスト部に分割するための数値です。ビット論理積（AND演算）によりネットワーク境界を決定します。</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>IPアドレスからサブネットをどのように計算しますか？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>CIDRスラッシュ表記を2進数に変換し、借用ビット数をnとすると作成可能なサブネット数は2<sup>n</sup>個、使用可能ホスト数は2<sup>h</sup> &minus; 2個となります。</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>CIDR表記とは何ですか？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>CIDR（Classless Inter-Domain Routing）は、スラッシュの後にネットワークビット数を表記する方式（例: /24）で、柔軟なIP割り当てを可能にします。</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>/24 サブネットの使用可能ホスト数は？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>/24 サブネットは合計256個のIPを持ちます。ネットワークアドレスとブロードキャストアドレスを除くと、利用可能なホスト数は254個です。</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>AWS VPC サブネットで予約されているIPアドレスは？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>AWSは各サブネットで先頭4つ（ネットワーク、VPCルーター、DNS、将来の予約）と末尾1つ（ブロードキャスト）の計5つのIPを予約します。</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>KubernetesのCIDR設計はどう行いますか？</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Node、Pod、Serviceで重複しないCIDRを割り当てます。ノードごとに/24（254 Pod）または/26（62 Pod）を確保するのが一般的です。</p>
+            </div>
+          </details>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+          <a href="/ja/" class="btn-seo-primary">サブネット計算機へ →</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/ja/about">{t.footer.about}</a>
+        <a href="/ja/contact">{t.footer.contact}</a>
+        <a href="/ja/privacy">{t.footer.privacy}</a>
+        <a href="/ja/terms">{t.footer.terms}</a>
+        <a href="/ja/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .faq-main {
+    padding: 3rem 1.5rem;
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a {
+    color: var(--accent-network);
+    text-decoration: none;
+  }
+  .faq-intro h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq-intro .lede {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .faq-details {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+  }
+  .faq-summary {
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+  }
+  .faq-answer {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+</style>

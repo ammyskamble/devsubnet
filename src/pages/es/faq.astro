@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.es;
+---
+
+<Layout 
+  lang="es"
+  title="Preguntas Frecuentes sobre Subredes y CIDR | DevSubnet"
+  description="Respuestas a preguntas comunes sobre subredes IP, CIDR, VPCs en la nube y Kubernetes. Cálculos, reservas de AWS y buenas prácticas explicadas."
+>
+  <div class="app-shell">
+    <NavBar path="faq" lang="es" />
+
+    <main class="faq-main">
+      <div class="faq-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/es/">Inicio</a> <span class="sep">/</span> <strong>FAQ</strong>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="faq-intro">
+          <div class="eyebrow">RESPUESTAS RÁPIDAS</div>
+          <h1>Preguntas Frecuentes (FAQ)</h1>
+          <p class="lede">
+            Las dudas más habituales sobre subredes IP, CIDR y redes en la nube respondidas de forma concisa.
+          </p>
+        </section>
+
+        <!-- FAQ Accordion List -->
+        <div class="faq-accordion" role="list">
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Qué es una máscara de subred y cómo funciona?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Una máscara de subred es un número de 32 bits que divide una dirección IP en identificador de red y de host mediante una operación lógica AND.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Cómo calculo subredes a partir de una IP?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Convierta la notación CIDR o máscara a binario. El número de subredes es 2<sup>n</sup> (bits tomados) y los hosts útiles son 2<sup>h</sup> &minus; 2.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Qué es la notación CIDR?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>La notación CIDR (Classless Inter-Domain Routing) representa la longitud del prefijo de red con una barra (por ejemplo, /24 indica 24 bits de red).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Cuántos hosts útiles tiene una subred /24?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Una subred /24 contiene 256 direcciones IP totales. Tras descontar la dirección de red y la de broadcast quedan exactamente 254 hosts útiles.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Qué direcciones IP reserva AWS en una subred VPC?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>AWS reserva 5 direcciones IP por subred: las primeras 4 (red, router VPC, DNS, uso futuro) y la última (broadcast).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>¿Cómo dimensiono los CIDRs en Kubernetes?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Asigne bloques no solapados para Nodos, Pods y Servicios. Asigne típicamente un bloque /24 (254 pods) o /26 (62 pods) por nodo.</p>
+            </div>
+          </details>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+          <a href="/es/" class="btn-seo-primary">Ir a la Calculadora de Subredes →</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/es/about">{t.footer.about}</a>
+        <a href="/es/contact">{t.footer.contact}</a>
+        <a href="/es/privacy">{t.footer.privacy}</a>
+        <a href="/es/terms">{t.footer.terms}</a>
+        <a href="/es/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .faq-main {
+    padding: 3rem 1.5rem;
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a {
+    color: var(--accent-network);
+    text-decoration: none;
+  }
+  .faq-intro h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq-intro .lede {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .faq-details {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+  }
+  .faq-summary {
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+  }
+  .faq-answer {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+</style>

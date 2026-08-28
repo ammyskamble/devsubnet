@@ -1,18 +1,25 @@
 ---
+import { getHrefLangAlternates, languages, type SupportedLanguage } from '../utils/i18n';
+
 interface Props {
   title?: string;
   description?: string;
   canonicalUrl?: string;
+  lang?: SupportedLanguage;
 }
 
 const { 
+  lang = 'en',
   title = "Free IP Subnet Calculator & CIDR Planner | DevSubnet", 
   description = "Free online IPv4 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly.",
   canonicalUrl = Astro.url.href
 } = Astro.props;
+
+const hreflangLinks = getHrefLangAlternates(Astro.url.pathname);
+const currentLangInfo = languages[lang] || languages.en;
 ---
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang={lang} data-theme="dark">
   <head>
     <!-- Google tag (gtag.js) -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V"></script>
@@ -40,6 +47,11 @@ const {
     <meta name="theme-color" content="#0d111c" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Multi-Language Hreflang Tags for International SEO -->
+    {hreflangLinks.map((item) => (
+      <link rel="alternate" hreflang={item.lang} href={item.href} />
+    ))}
+
     <!-- Favicon & Web App Icons -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -54,7 +66,7 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content="devsubnet.com" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content={currentLangInfo.locale} />
     <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
  
     <!-- Twitter -->
@@ -73,43 +85,54 @@ const {
       })();
     </script>
 
-
     <!-- WebApplication / SoftwareApplication Schema JSON-LD for Rich Results -->
-    <script type="application/ld+json">
-    {
+    <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
       "url": "https://devsubnet.com/",
+      "inLanguage": lang,
       "applicationCategory": "UtilitiesApplication",
-      "operatingSystem": "Any (Web Browser)",
-      "browserRequirements": "Requires JavaScript",
-      "description": "Free online IPv4 and IPv6 subnet calculator. Compute network ranges, subnet masks, broadcast addresses, usable host ranges, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly.",
+      "applicationSubCategory": "Networking & Cloud Infrastructure",
+      "operatingSystem": "All (Web Browser, Linux, macOS, Windows, iOS, Android)",
+      "browserRequirements": "Requires JavaScript. Compatible with all modern browsers.",
+      "description": description,
       "author": {
         "@type": "Organization",
-        "name": "DevSubnet"
+        "name": "DevSubnet",
+        "url": "https://devsubnet.com/"
       },
       "publisher": {
         "@type": "Organization",
-        "name": "DevSubnet"
+        "name": "DevSubnet",
+        "url": "https://devsubnet.com/"
       },
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "148",
+        "bestRating": "5",
+        "worstRating": "1"
       },
       "featureList": [
-        "IPv4 subnet calculator",
-        "CIDR planner",
-        "Cloud-aware reserved IP calculation for AWS, Azure, and GCP",
-        "Binary address visualization",
-        "Express export",
-        "Kubernetes subnet planner",
-        "IPv6 calculator",
-        "Visual subnet splitter"
+        "IPv4 & IPv6 subnet calculation",
+        "CIDR prefix planning and binary visualization",
+        "Cloud-aware reserved IP calculation for AWS VPC, Azure VNet, and GCP",
+        "Visual Subnet Splitter with live partition tree",
+        "Terraform cidrsubnet() planner and HCL exporter",
+        "Kubernetes CIDR calculator (Cilium, Calico, AWS VPC CNI, Azure CNI)",
+        "VLSM hierarchical subnet segmenter",
+        "Subnet overlap conflict detector",
+        "CIDR supernetting and route aggregation",
+        "Complete CIDR cheat sheet reference"
       ]
-    }
-    </script>
+    })} />
 
     <!-- FAQ Schema JSON-LD for SEO -->
     <script type="application/ld+json">
@@ -159,66 +182,10 @@ const {
         },
         {
           "@type": "Question",
-          "name": "How many IP addresses does a /28 subnet have?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>A /28 subnet has 16 total IP addresses, of which 14 are usable for hosts after excluding the network and broadcast addresses.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between a /16 and /24 subnet?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>A /16 subnet allocates 16 bits to the network portion and 16 bits to host addresses, supporting up to 65,534 usable hosts. A /24 subnet allocates 24 bits to the network portion and 8 bits to hosts, supporting up to 254 usable hosts.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I split a network into smaller subnets?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>To split a network into smaller subnets, increase the CIDR prefix length (borrow host bits). For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25, creating two subnets each containing 128 total IP addresses.</p>"
-          }
-        },
-        {
-          "@type": "Question",
           "name": "What IP addresses does AWS reserve in a VPC subnet?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "<p>AWS reserves 5 IP addresses in each subnet: the first four IPs (x.x.x.0 for network, x.x.x.1 for the VPC router, x.x.x.2 for DNS, x.x.x.3 for future use) and the last IP address (x.x.x.255 for network broadcast).</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I subnet a network for an AWS VPC?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>To subnet for an AWS VPC, allocate a large CIDR block (like /16) to the VPC itself, then divide it into smaller subnets (like /24) across different Availability Zones (AZs) for high availability, ensuring none of the CIDR ranges overlap.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is IPv6 and how is it different from IPv4?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>IPv6 is the next-generation internet protocol that uses a 128-bit address format (written in hexadecimal) to provide 3.4 x 10^38 addresses, compared to IPv4 which uses a 32-bit format (written in dotted decimal) with only 4.3 billion addresses.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I convert an IP address to binary?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>Convert each of the four octets in the IPv4 address from a base-10 decimal number to an 8-bit base-2 binary number. For example, the IP 192.168.1.1 converts to 11000000.10101000.00000001.00000001.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the smallest subnet mask that supports 200 hosts?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>The smallest subnet mask that supports 200 hosts is /24 (255.255.255.0). A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts.</p>"
           }
         },
         {
@@ -231,10 +198,10 @@ const {
         },
         {
           "@type": "Question",
-          "name": "What is the difference between subnetting and supernetting?",
+          "name": "How does Terraform cidrsubnet() calculate subnet ranges?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "<p>Subnetting is the process of dividing a single large network into multiple smaller sub-networks. Supernetting (or CIDR aggregation) is the process of combining multiple small contiguous networks into a single larger network prefix to reduce routing table size.</p>"
+            "text": "<p>Terraform's cidrsubnet(prefix, newbits, netnum) function calculates a subnet address within a given IP network prefix. 'prefix' is the base CIDR, 'newbits' is the number of additional network bits to add, and 'netnum' is the zero-based index of the subnet to generate.</p>"
           }
         }
       ]

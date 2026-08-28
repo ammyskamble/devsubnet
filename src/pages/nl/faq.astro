@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.nl;
+---
+
+<Layout 
+  lang="nl"
+  title="IP Subnetting & CIDR FAQ – Veelgestelde Vragen | DevSubnet"
+  description="Antwoorden op veelgestelde vragen over IP-subnetten, CIDR, AMS-IX routing en Kubernetes netwerken. Helder uitgelegd voor netwerk engineers."
+>
+  <div class="app-shell">
+    <NavBar path="faq" lang="nl" />
+
+    <main class="faq-main">
+      <div class="faq-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/nl/">Home</a> <span class="sep">/</span> <strong>FAQ</strong>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="faq-intro">
+          <div class="eyebrow">SNELLE ANTWOORDEN</div>
+          <h1>IP Subnet FAQ</h1>
+          <p class="lede">
+            De belangrijkste vragen over IP-subnetten, CIDR en cloud netwerken helder en beknopt beantwoord.
+          </p>
+        </section>
+
+        <!-- FAQ Accordion List -->
+        <div class="faq-accordion" role="list">
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Wat is een subnetmasker en hoe werkt het?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Een subnetmasker is een 32-bits getal dat een IP-adres splitst in een netwerkdeel en een hostdeel via een bitwise AND-bewerking.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Hoe bereken ik subnetten uit een IP-adres?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Zet de CIDR-notatie of het subnetmasker om naar binair. Het aantal mogelijke subnetten is 2<sup>n</sup> (geleende bits) en bruikbare hosts is 2<sup>h</sup> &minus; 2.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Wat betekent CIDR-notatie?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>CIDR (Classless Inter-Domain Routing) noteert de prefixlengte met een schuine streep (bijv. /24 voor 24 netwerkbits) en vervangt het oude classful model.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Hoeveel bruikbare hosts heeft een /24 subnet?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Een /24 subnet bevat 256 IP-adressen. Na aftrek van het netwerk- en broadcastadres blijven er exact 254 bruikbare hostadressen over.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Welke IP-adressen reserveert AWS in een VPC-subnet?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>AWS reserveert 5 IP-adressen per subnet: de eerste 4 (netwerk, VPC-router, DNS, toekomstig) en de laatste (broadcast).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Hoe dimensioneer ik Kubernetes Pod- en Service-CIDRs?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Kies niet-overlappende CIDR-blokken voor Nodes, Pods en Services. Wijs per node doorgaans een /24 (254 pods) of /26 (62 pods) toe.</p>
+            </div>
+          </details>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+          <a href="/nl/" class="btn-seo-primary">Naar de Subnet Calculator →</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/nl/about">{t.footer.about}</a>
+        <a href="/nl/contact">{t.footer.contact}</a>
+        <a href="/nl/privacy">{t.footer.privacy}</a>
+        <a href="/nl/terms">{t.footer.terms}</a>
+        <a href="/nl/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .faq-main {
+    padding: 3rem 1.5rem;
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a {
+    color: var(--accent-network);
+    text-decoration: none;
+  }
+  .faq-intro h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq-intro .lede {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .faq-details {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+  }
+  .faq-summary {
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+  }
+  .faq-answer {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+</style>

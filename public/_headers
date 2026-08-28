@@ -1,2 +1,39 @@
+# Cloudflare CDN Edge Caching & Security Headers
+
+# Immutable static assets (hashed builds, images, icons, manifests, fonts)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.png
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/*.svg
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/*.ico
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/site.webmanifest
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400, stale-while-revalidate=43200
+
+/robots.txt
+  Cache-Control: public, max-age=86400, stale-while-revalidate=43200
+
+# HTML pages and dynamic routes - Edge cached with stale-while-revalidate
+/*
+  Cache-Control: public, max-age=0, s-maxage=86400, stale-while-revalidate=604800
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+
 https://devsubnet-com.ammyskamble.workers.dev/*
-    X-Robots-Tag: noindex
+  X-Robots-Tag: noindex

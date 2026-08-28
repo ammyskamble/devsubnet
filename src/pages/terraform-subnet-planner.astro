@@ -1,0 +1,445 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout
+  title="Terraform Subnet Planner – cidrsubnet() VPC Calculator | DevSubnet"
+  description="Free Terraform subnet planner and cidrsubnet() calculator. Generate HCL code for AWS, Azure, and GCP multi-AZ subnets without CIDR overlaps or state drift."
+>
+  <div class="app-shell">
+    <NavBar path="terraform" />
+
+    <main>
+      <!-- Hero Intro -->
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">INFRASTRUCTURE AS CODE / TERRAFORM</div>
+        <h1 id="page-title">Terraform Subnet Planner & cidrsubnet() Calculator</h1>
+        <p class="lede">
+          Plan multi-tier VPC subnets using Terraform's native <code>cidrsubnet()</code> function. Calculate offsets, visualize availability zone distributions, and export production-ready HCL code instantly.
+        </p>
+      </section>
+
+      <!-- Interactive Calculator Panel -->
+      <section class="calculator-panel" style="margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Terraform VPC & Subnet Configuration</h2></div>
+          <span class="live-label">HCL GENERATOR</span>
+        </div>
+
+        <div class="tf-planner-grid">
+          <!-- Inputs Column -->
+          <div class="tf-inputs-col">
+            <div class="field-group">
+              <label for="tf-base-cidr">Base VPC CIDR Block</label>
+              <input type="text" id="tf-base-cidr" value="10.0.0.0/16" placeholder="e.g. 10.0.0.0/16" class="ip-input" />
+              <span class="field-hint">Root VPC CIDR block to subdivide</span>
+            </div>
+
+            <div class="field-group">
+              <label for="tf-az-count">Availability Zones (AZs)</label>
+              <select id="tf-az-count" class="cloud-select">
+                <option value="2">2 AZs (Standard HA)</option>
+                <option value="3" selected>3 AZs (Production HA)</option>
+                <option value="4">4 AZs (Maximum Redundancy)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="tf-newbits">Subnet Sizing (newbits addition)</label>
+              <select id="tf-newbits" class="cloud-select">
+                <option value="4">newbits = 4 (/20 subnets – 4,094 usable IPs/AZ)</option>
+                <option value="8" selected>newbits = 8 (/24 subnets – 254 usable IPs/AZ)</option>
+                <option value="9">newbits = 9 (/25 subnets – 126 usable IPs/AZ)</option>
+                <option value="10">newbits = 10 (/26 subnets – 62 usable IPs/AZ)</option>
+                <option value="12">newbits = 12 (/28 subnets – 14 usable IPs/AZ)</option>
+              </select>
+              <span class="field-hint">Formula: <code>cidrsubnet(vpc_cidr, newbits, netnum)</code></span>
+            </div>
+
+            <div class="field-group">
+              <label>Subnet Tiers</label>
+              <div class="tier-checkboxes">
+                <label class="tier-item"><input type="checkbox" id="tier-public" checked /> <span>Public (Ingress / ALBs / NAT)</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-private" checked /> <span>Private (App / ECS / EKS Workloads)</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-data" checked /> <span>Database (RDS / Aurora / Cache)</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-mgmt" /> <span>Management (Bastion / VPN)</span></label>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="tf-cloud-provider">Target Cloud Provider</label>
+              <select id="tf-cloud-provider" class="cloud-select">
+                <option value="aws" selected>AWS (aws_subnet & VPC module)</option>
+                <option value="azure">Azure (azurerm_subnet & VNet)</option>
+                <option value="gcp">GCP (google_compute_subnetwork)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Live HCL Output Column -->
+          <div class="tf-output-col">
+            <div class="output-header">
+              <span class="output-title">Generated Terraform HCL</span>
+              <button id="copy-tf-btn" class="btn-copy" type="button">Copy HCL Code</button>
+            </div>
+            <pre class="code-box"><code id="tf-code-output"># Calculating Terraform HCL...</code></pre>
+          </div>
+        </div>
+
+        <!-- Calculated Subnets Breakdown Table -->
+        <div style="margin-top: 2rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--text-primary);">Subnet Index Mapping & Offsets</h3>
+          <div class="guide-table-wrapper">
+            <table class="guide-table" id="tf-subnets-table">
+              <thead>
+                <tr>
+                  <th>Tier</th>
+                  <th>AZ Index</th>
+                  <th>Calculated CIDR</th>
+                  <th>Terraform Expression</th>
+                  <th>Netnum</th>
+                  <th>Usable IPs</th>
+                </tr>
+              </thead>
+              <tbody id="tf-table-body">
+                <!-- Dynamically injected rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deep Technical Architectural Guide -->
+      <section class="guide-section">
+        <div class="guide-sticky">
+          <h2>Mastering <em>Terraform</em> Subnetting</h2>
+        </div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>How the <code>cidrsubnet()</code> Function Works</h3>
+            <p>
+              In Terraform HCL, <code>cidrsubnet(prefix, newbits, netnum)</code> calculates a subnet address within a given IP network prefix:
+            </p>
+            <ul>
+              <li><strong><code>prefix</code></strong>: The base CIDR string (e.g. <code>"10.0.0.0/16"</code>).</li>
+              <li><strong><code>newbits</code></strong>: Number of additional bits to extend the prefix by. Adding <code>8</code> to a <code>/16</code> creates <code>/24</code> subnets.</li>
+              <li><strong><code>netnum</code></strong>: The zero-based integer index of the specific subnet to create.</li>
+            </ul>
+          </div>
+
+          <div class="guide-block">
+            <h3><code>cidrsubnet()</code> vs <code>cidrsubnets()</code></h3>
+            <p>
+              While <code>cidrsubnet()</code> calculates individual subnets with uniform bit shifts, <code>cidrsubnets(prefix, newbits...)</code> calculates multiple contiguous subnets of varying prefix lengths simultaneously:
+            </p>
+            <pre class="mini-code"><code># Creates 1x /20 and 2x /24 subnets from 10.0.0.0/16:
+cidrsubnets("10.0.0.0/16", 4, 8, 8)
+# Result: ["10.0.0.0/20", "10.0.16.0/24", "10.0.17.0/24"]</code></pre>
+          </div>
+
+          <div class="guide-block">
+            <h3>Preventing Destructive Subnet State Drift</h3>
+            <p>
+              When architecting VPCs in Terraform, always fix your <code>netnum</code> ranges with reserved headroom. If you insert a new subnet index between existing subnets, Terraform will attempt to destroy and recreate all downstream subnets, causing critical downtime for databases and running instances!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQs -->
+      <section class="seo-netsudoku-section" style="margin-top: 3rem;">
+        <div class="seo-netsudoku-container">
+          <h2 style="font-size: 1.75rem;">Terraform Networking FAQ</h2>
+          <div class="seo-netsudoku-grid">
+            <div class="seo-netsudoku-card">
+              <div>
+                <h4>Can I resize a VPC CIDR block in Terraform without downtime?</h4>
+                <p>You can add secondary CIDR blocks to an existing AWS VPC via <code>aws_vpc_ipv4_cidr_block_association</code> without recreating the VPC or destroying existing subnets.</p>
+              </div>
+            </div>
+            <div class="seo-netsudoku-card">
+              <div>
+                <h4>How many subnets can a /16 VPC accommodate with /24 subnets?</h4>
+                <p>With <code>newbits = 8</code> (expanding /16 to /24), you can generate exactly 2<sup>8</sup> = 256 unique /24 subnets (indexes 0 through 255), each with 251-254 usable hosts.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR INFRASTRUCTURE AS CODE</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .tf-planner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .tf-inputs-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .tier-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+  }
+
+  .tier-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .tier-item input[type="checkbox"] {
+    accent-color: var(--accent-network);
+  }
+
+  .tf-output-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .output-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .btn-copy {
+    background: var(--accent-network);
+    color: #0d111c;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-copy:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .code-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: var(--accent-highlight);
+    overflow-x: auto;
+    max-height: 480px;
+    margin: 0;
+  }
+
+  .mini-code {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    margin: 0.75rem 0;
+    color: var(--accent-network);
+  }
+
+  @media (max-width: 900px) {
+    .tf-planner-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Terraform cidrsubnet logic implementation in client-side script
+  function ipToLong(ip: string): number {
+    return ip.split('.').reduce((acc, octet) => ((acc << 8) + parseInt(octet, 10)) >>> 0, 0);
+  }
+
+  function longToIp(long: number): string {
+    return [
+      (long >>> 24) & 255,
+      (long >>> 16) & 255,
+      (long >>> 8) & 255,
+      long & 255
+    ].join('.');
+  }
+
+  function calcCidrSubnet(baseCidr: string, newbits: number, netnum: number): string {
+    const [baseIp, basePrefixStr] = baseCidr.split('/');
+    const basePrefix = parseInt(basePrefixStr, 10);
+    const targetPrefix = basePrefix + newbits;
+
+    if (targetPrefix > 32) return 'Invalid prefix';
+
+    const baseLong = ipToLong(baseIp);
+    const shift = 32 - targetPrefix;
+    const subnetLong = (baseLong + (netnum << shift)) >>> 0;
+
+    return `${longToIp(subnetLong)}/${targetPrefix}`;
+  }
+
+  function renderTerraformPlan() {
+    const baseCidrInput = (document.getElementById('tf-base-cidr') as HTMLInputElement)?.value || '10.0.0.0/16';
+    const azCount = parseInt((document.getElementById('tf-az-count') as HTMLSelectElement)?.value || '3', 10);
+    const newbits = parseInt((document.getElementById('tf-newbits') as HTMLSelectElement)?.value || '8', 10);
+    const provider = (document.getElementById('tf-cloud-provider') as HTMLSelectElement)?.value || 'aws';
+
+    const hasPublic = (document.getElementById('tier-public') as HTMLInputElement)?.checked;
+    const hasPrivate = (document.getElementById('tier-private') as HTMLInputElement)?.checked;
+    const hasData = (document.getElementById('tier-data') as HTMLInputElement)?.checked;
+    const hasMgmt = (document.getElementById('tier-mgmt') as HTMLInputElement)?.checked;
+
+    const tiers: { name: string; key: string }[] = [];
+    if (hasPublic) tiers.push({ name: 'Public', key: 'public' });
+    if (hasPrivate) tiers.push({ name: 'Private App', key: 'private' });
+    if (hasData) tiers.push({ name: 'Database', key: 'database' });
+    if (hasMgmt) tiers.push({ name: 'Management', key: 'mgmt' });
+
+    let netnumIndex = 0;
+    const rows: Array<{ tier: string; az: number; cidr: string; expr: string; netnum: number; hosts: number }> = [];
+
+    const targetPrefix = parseInt(baseCidrInput.split('/')[1] || '16', 10) + newbits;
+    const usableHosts = Math.max(0, Math.pow(2, 32 - targetPrefix) - (provider === 'aws' ? 5 : 2));
+
+    tiers.forEach((tier) => {
+      for (let az = 0; az < azCount; az++) {
+        const currentNetnum = netnumIndex++;
+        const calculatedCidr = calcCidrSubnet(baseCidrInput, newbits, currentNetnum);
+        rows.push({
+          tier: tier.name,
+          az: az + 1,
+          cidr: calculatedCidr,
+          expr: `cidrsubnet(var.vpc_cidr, ${newbits}, ${currentNetnum})`,
+          netnum: currentNetnum,
+          hosts: usableHosts
+        });
+      }
+    });
+
+    // Populate Table
+    const tbody = document.getElementById('tf-table-body');
+    if (tbody) {
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong style="color: var(--text-primary);">${r.tier}</strong></td>
+          <td>AZ ${r.az}</td>
+          <td><code style="color: var(--accent-network); font-weight: 600;">${r.cidr}</code></td>
+          <td><code style="color: var(--text-secondary); font-size: 0.78rem;">${r.expr}</code></td>
+          <td>${r.netnum}</td>
+          <td>${r.hosts.toLocaleString()} IPs</td>
+        </tr>
+      `).join('');
+    }
+
+    // Generate HCL snippet
+    let hcl = '';
+    if (provider === 'aws') {
+      hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\nvariable "azs" {\n  type    = list(string)\n  default = [${Array.from({length: azCount}, (_, i) => `"us-east-1${String.fromCharCode(97 + i)}"`).join(', ')}]\n}\n\n`;
+      
+      let offsetCounter = 0;
+      tiers.forEach(tier => {
+        hcl += `# ${tier.name} Subnets\n`;
+        hcl += `resource "aws_subnet" "${tier.key}" {\n`;
+        hcl += `  count             = length(var.azs)\n`;
+        hcl += `  vpc_id            = aws_vpc.main.id\n`;
+        hcl += `  cidr_block        = cidrsubnet(var.vpc_cidr, ${newbits}, count.index + ${offsetCounter})\n`;
+        hcl += `  availability_zone = var.azs[count.index]\n`;
+        hcl += `  tags = {\n`;
+        hcl += `    Name = "${tier.key}-\${var.azs[count.index]}"\n`;
+        hcl += `    Tier = "${tier.name}"\n`;
+        hcl += `  }\n`;
+        hcl += `}\n\n`;
+        offsetCounter += azCount;
+      });
+    } else if (provider === 'azure') {
+      hcl = `variable "vnet_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
+      let offsetCounter = 0;
+      tiers.forEach(tier => {
+        hcl += `resource "azurerm_subnet" "${tier.key}" {\n`;
+        hcl += `  name                 = "snet-${tier.key}"\n`;
+        hcl += `  resource_group_name  = azurerm_resource_group.main.name\n`;
+        hcl += `  virtual_network_name = azurerm_virtual_network.main.name\n`;
+        hcl += `  address_prefixes     = [\n`;
+        for (let i = 0; i < azCount; i++) {
+          hcl += `    cidrsubnet(var.vnet_cidr, ${newbits}, ${offsetCounter + i})${i < azCount - 1 ? ',' : ''}\n`;
+        }
+        hcl += `  ]\n`;
+        hcl += `}\n\n`;
+        offsetCounter += azCount;
+      });
+    } else {
+      hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
+      let offsetCounter = 0;
+      tiers.forEach(tier => {
+        for (let i = 0; i < azCount; i++) {
+          hcl += `resource "google_compute_subnetwork" "${tier.key}_az${i + 1}" {\n`;
+          hcl += `  name          = "sb-${tier.key}-az${i + 1}"\n`;
+          hcl += `  ip_cidr_range = cidrsubnet(var.vpc_cidr, ${newbits}, ${offsetCounter + i})\n`;
+          hcl += `  region        = "us-central1"\n`;
+          hcl += `  network       = google_compute_network.main.id\n`;
+          hcl += `}\n\n`;
+        }
+        offsetCounter += azCount;
+      });
+    }
+
+    const codeEl = document.getElementById('tf-code-output');
+    if (codeEl) codeEl.textContent = hcl;
+  }
+
+  // Attach event listeners
+  ['tf-base-cidr', 'tf-az-count', 'tf-newbits', 'tf-cloud-provider', 'tier-public', 'tier-private', 'tier-data', 'tier-mgmt'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', renderTerraformPlan);
+    document.getElementById(id)?.addEventListener('change', renderTerraformPlan);
+  });
+
+  document.getElementById('copy-tf-btn')?.addEventListener('click', () => {
+    const code = document.getElementById('tf-code-output')?.textContent || '';
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = document.getElementById('copy-tf-btn');
+      if (btn) {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy HCL Code'; }, 2000);
+      }
+    });
+  });
+
+  // Initial render
+  renderTerraformPlan();
+</script>

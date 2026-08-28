@@ -1,84 +1,42 @@
+---
+import { translations, type SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const { lang = "en" } = Astro.props;
+const t = translations[lang] || translations.en;
+const guide = t.guide;
+const langPrefix = lang === 'en' ? '' : `/${lang}`;
+---
+
 <section class="seo-netsudoku-section" aria-labelledby="seo-section-title">
   <div class="seo-netsudoku-container">
     <!-- Header Title & Lead Paragraph -->
-    <h2 id="seo-section-title">Play with Networks – Classic Calculations, Cloud VPCs, and Subnetting Strategies</h2>
-    <p class="lead">
-      Welcome to the premium home for network topology planners. Whether you are a network engineer looking to understand the basics of IP routing or a DevOps specialist planning complex cloud VPC configurations, our platform provides a clean, distraction-free environment to calculate address ranges. Best of all, we offer completely free calculators with zero clutter, letting you focus fully on the network grid.
-    </p>
+    <h2 id="seo-section-title">{guide.title}</h2>
+    <p class="lead">{guide.lead}</p>
 
-    <!-- Card Grid for SEO Topics (Sudoku style layout applied to subnet guide contents) -->
-    <h3 style="margin-top: 0;">Explore Modern Subnet Planning Topics</h3>
+    <!-- Card Grid for SEO Topics -->
+    <h3 style="margin-top: 0;">{guide.exploreTitle}</h3>
     <div class="seo-netsudoku-grid">
-      <!-- Card 1 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>Understanding the Core IP Subnet</h4>
-          <p>
-            An <strong>ip subnet</strong> is a logical subdivision of an IP network. Setting up an efficient <strong>ip subnet</strong> structure is essential for managing security, organizing traffic routing, and optimizing overall performance in enterprise environments. Use our tool to calculate address ranges.
-          </p>
+      {guide.cards.map((card) => (
+        <div class="seo-netsudoku-card">
+          <div>
+            <h4>{card.title}</h4>
+            <p>{card.desc}</p>
+          </div>
+          <a href={card.href.startsWith('/') && lang !== 'en' ? `${langPrefix}${card.href}` : card.href} class="card-link">
+            {card.linkText}
+          </a>
         </div>
-        <a href="/" class="card-link">Calculate Standard Subnets →</a>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>The Usable Host Calculator</h4>
-          <p>
-            To calculate usable host ranges, use a dedicated <strong>ip address subnet calculator</strong>. Under standard RFC rules, every subnet loses 2 IP addresses: the network identifier and the broadcast address. The formula is 2<sup>(32 - prefix)</sup> - 2.
-          </p>
-        </div>
-        <a href="/vlsm-calculator" class="card-link">Plan VLSM segments →</a>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>Demystifying IP Ranges & Subnet Masks</h4>
-          <p>
-            A subnet mask defines which portion of an IP address belongs to the network and which belongs to the hosts. Utilizing an <strong>ip range calculator subnet mask</strong> tool helps you visualize this split dynamically using live binary grids.
-          </p>
-        </div>
-        <a href="/" class="card-link">Open Subnet Mask Visualizer →</a>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>Translating CIDR Notation</h4>
-          <p>
-            Classless Inter-Domain Routing (CIDR) replaced the legacy classful address model. An <strong>ip subnet calculator cidr</strong> tool maps slash notation (like <code>/24</code> or <code>/28</code>) into corresponding subnet masks and usable boundaries in real time. See the complete <a href="/cidr-cheat-sheet">CIDR cheat sheet</a> for every prefix length.
-          </p>
-        </div>
-        <a href="/cidr-cheat-sheet" class="card-link">View CIDR cheat sheet →</a>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>Standard vs. Public Cloud Rules</h4>
-          <p>
-            AWS, Azure, and GCP reserve system IP addresses within every subnet block. Traditional tools fail to account for these specific offsets. devsubnet.com maps these out automatically so you don't run into IP exhaustion in your VPCs. Use the dedicated <a href="/aws-vpc-subnet-calculator">AWS VPC</a>, <a href="/azure-vnet-subnet-calculator">Azure VNet</a>, and <a href="/gcp-vpc-subnet-calculator">GCP VPC</a> subnet calculators.
-          </p>
-        </div>
-        <a href="/aws-vpc-subnet-calculator" class="card-link">Check Cloud VPC reservations →</a>
-      </div>
-      <!-- Card 6 -->
-      <div class="seo-netsudoku-card">
-        <div>
-          <h4>Legacy Downloads vs. Web Tools</h4>
-          <p>
-            Popular legacy options included the traditional <strong>solarwinds ip subnet calculator</strong> or the classic <strong>ip subnet calculator jodies</strong>. Sourcing a legacy <strong>ip subnet calculator download</strong> requires manual installation and lacks modern updates.
-          </p>
-        </div>
-        <a href="/ipv6-subnet-calculator" class="card-link">Compare Legacy Calculators →</a>
-      </div>
+      ))}
     </div>
 
     <!-- Additional Rich Content Section -->
-    <h3>IPv4 Subnet Prefix Reference Table</h3>
+    <h3>{guide.prefixTableTitle}</h3>
     <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
-      Below is a lookup table mapping common prefix lengths to their subnet mask representation, wildcard mask, and total usable IP address capacity under standard rules.
+      {guide.prefixTableDesc}
     </p>
     <div class="guide-table-wrapper" style="margin-bottom: 3rem;">
       <table class="guide-table">
@@ -91,130 +49,60 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>/32</td>
-            <td>255.255.255.255</td>
-            <td>0.0.0.0</td>
-            <td>1 Host</td>
-          </tr>
-          <tr>
-            <td>/31</td>
-            <td>255.255.255.254</td>
-            <td>0.0.0.1</td>
-            <td>2 Hosts (Point-to-point)</td>
-          </tr>
-          <tr>
-            <td>/30</td>
-            <td>255.255.255.252</td>
-            <td>0.0.0.3</td>
-            <td>2 Hosts</td>
-          </tr>
-          <tr>
-            <td>/29</td>
-            <td>255.255.255.248</td>
-            <td>0.0.0.7</td>
-            <td>6 Hosts</td>
-          </tr>
-          <tr>
-            <td>/28</td>
-            <td>255.255.255.240</td>
-            <td>0.0.0.15</td>
-            <td>14 Hosts</td>
-          </tr>
-          <tr>
-            <td>/27</td>
-            <td>255.255.255.224</td>
-            <td>0.0.0.31</td>
-            <td>30 Hosts</td>
-          </tr>
-          <tr>
-            <td>/26</td>
-            <td>255.255.255.192</td>
-            <td>0.0.0.63</td>
-            <td>62 Hosts</td>
-          </tr>
-          <tr>
-            <td>/25</td>
-            <td>255.255.255.128</td>
-            <td>0.0.0.127</td>
-            <td>126 Hosts</td>
-          </tr>
-          <tr>
-            <td>/24</td>
-            <td>255.255.255.0</td>
-            <td>0.0.0.255</td>
-            <td>254 Hosts</td>
-          </tr>
-          <tr>
-            <td>/23</td>
-            <td>255.255.254.0</td>
-            <td>0.0.1.255</td>
-            <td>510 Hosts</td>
-          </tr>
-          <tr>
-            <td>/22</td>
-            <td>255.255.252.0</td>
-            <td>0.0.3.255</td>
-            <td>1,022 Hosts</td>
-          </tr>
-          <tr>
-            <td>/20</td>
-            <td>255.255.240.0</td>
-            <td>0.0.15.255</td>
-            <td>4,094 Hosts</td>
-          </tr>
-          <tr>
-            <td>/16</td>
-            <td>255.0.0.0</td>
-            <td>0.0.255.255</td>
-            <td>65,534 Hosts</td>
-          </tr>
-          <tr>
-            <td>/8</td>
-            <td>255.0.0.0</td>
-            <td>0.255.255.255</td>
-            <td>16,777,214 Hosts</td>
-          </tr>
+          <tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1 Host</td></tr>
+          <tr><td>/31</td><td>255.255.255.254</td><td>0.0.0.1</td><td>2 Hosts (Point-to-point)</td></tr>
+          <tr><td>/30</td><td>255.255.255.252</td><td>0.0.0.3</td><td>2 Hosts</td></tr>
+          <tr><td>/29</td><td>255.255.255.248</td><td>0.0.0.7</td><td>6 Hosts</td></tr>
+          <tr><td>/28</td><td>255.255.255.240</td><td>0.0.0.15</td><td>14 Hosts</td></tr>
+          <tr><td>/27</td><td>255.255.255.224</td><td>0.0.0.31</td><td>30 Hosts</td></tr>
+          <tr><td>/26</td><td>255.255.255.192</td><td>0.0.0.63</td><td>62 Hosts</td></tr>
+          <tr><td>/25</td><td>255.255.255.128</td><td>0.0.0.127</td><td>126 Hosts</td></tr>
+          <tr><td>/24</td><td>255.255.255.0</td><td>0.0.0.255</td><td>254 Hosts</td></tr>
+          <tr><td>/23</td><td>255.255.254.0</td><td>0.0.1.255</td><td>510 Hosts</td></tr>
+          <tr><td>/22</td><td>255.255.252.0</td><td>0.0.3.255</td><td>1,022 Hosts</td></tr>
+          <tr><td>/20</td><td>255.255.240.0</td><td>0.0.15.255</td><td>4,094 Hosts</td></tr>
+          <tr><td>/16</td><td>255.255.0.0</td><td>0.0.255.255</td><td>65,534 Hosts</td></tr>
+          <tr><td>/8</td><td>255.0.0.0</td><td>0.255.255.255</td><td>16,777,214 Hosts</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Comparison Table Section: Topical Authority Signal -->
-    <h3>How DevSubnet Compares to Other Free Subnet Calculators</h3>
+    <!-- Comparison Table Section -->
+    <h3>{guide.comparisonTitle}</h3>
     <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
-      Most free calculators only handle standard RFC math. DevSubnet adds cloud-aware reservation logic, visualization, and IaC export in one place — all running in your browser.
+      {guide.comparisonDesc}
     </p>
     <div class="guide-table-wrapper" style="margin-bottom: 3rem;">
       <table class="guide-table">
         <thead>
           <tr>
-            <th>Feature</th>
+            <th>Feature / Capability</th>
             <th>DevSubnet</th>
             <th>Basic calculators</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>Cloud-aware (AWS / Azure / GCP)</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
-          <tr><td>IPv4 + IPv6</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Often IPv4 only</td></tr>
-          <tr><td>Kubernetes subnet planner</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
-          <tr><td>VLSM planning</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
-          <tr><td>Subnet overlap checker</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>Cloud-aware VPC (AWS / Azure / GCP)</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>IPv4 + IPv6 Dual-Stack</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Often IPv4 only</td></tr>
+          <tr><td>Terraform cidrsubnet() planning</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>Kubernetes & CNI cluster planning</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>VLSM segmentation</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
+          <tr><td>Subnet overlap conflict detection</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
           <tr><td>CIDR supernetting / aggregation</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
-          <tr><td>Binary visualization</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Rare</td></tr>
-          <tr><td>Terraform / Ansible export</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">No</td></tr>
-          <tr><td>No signup, runs in-browser</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-secondary);">Varies</td></tr>
+          <tr><td>Binary grid visualization</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-muted);">Rare</td></tr>
+          <tr><td>No signup, 100% in-browser security</td><td style="color: var(--accent-highlight); font-weight: 600;">Yes</td><td style="color: var(--text-secondary);">Varies</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- FAQ Section (styled exactly like NetSudoku's FAQ page) -->
-    <h3 id="faq-section-title">Frequently Asked Questions (FAQ)</h3>
+    <!-- FAQ Section -->
+    <h3 id="faq-section-title">{guide.faqTitle}</h3>
     <div class="seo-netsudoku-grid" style="margin-bottom: 2rem;">
       <div class="seo-netsudoku-card">
         <div>
           <h4 style="font-size: 1.05rem;">What is a subnet mask and how does it work?</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion.
+            A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address.
           </p>
         </div>
       </div>
@@ -223,7 +111,7 @@
         <div>
           <h4 style="font-size: 1.05rem;">How do I calculate subnets from an IP address?</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2<sup>n</sup>, where n is borrowed bits. Usable hosts per subnet is 2<sup>h</sup> - 2.
+            Convert CIDR slash notation or subnet mask to binary. The number of subnets is 2<sup>n</sup> (borrowed bits) and usable hosts is 2<sup>h</sup> - 2.
           </p>
         </div>
       </div>
@@ -232,7 +120,7 @@
         <div>
           <h4 style="font-size: 1.05rem;">What is CIDR notation and how is it used?</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix.
+            CIDR notation represents an IP address and its routing prefix length (e.g. /24 implies 24 network bits) to replace rigid legacy classful addressing.
           </p>
         </div>
       </div>
@@ -241,21 +129,21 @@
         <div>
           <h4 style="font-size: 1.05rem;">How many usable hosts are in a /24 subnet?</h4>
           <p style="font-size: 0.85rem; color: var(--text-secondary);">
-            A /24 subnet contains 256 total IP addresses. After subtracting the network identifier (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses.
+            A /24 subnet has 256 total IP addresses. Subtracting 2 addresses for network and broadcast leaves exactly 254 usable hosts.
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Link to FAQ page (copied pattern from Netsudoku) -->
+    <!-- Link to FAQ page -->
     <div style="margin-bottom: 3.5rem;">
-      <a href="/faq" class="btn-seo-primary" style="display: inline-block;">View All Questions →</a>
+      <a href={`${langPrefix}/faq`} class="btn-seo-primary" style="display: inline-block;">{guide.faqViewAll}</a>
     </div>
 
-    <!-- CTA Buttons Row (copied layout pattern from Netsudoku) -->
+    <!-- CTA Buttons Row -->
     <div class="seo-netsudoku-ctas">
-      <a href="/" class="btn-seo-primary">Start Subnet Calculation</a>
-      <a href="/visual-subnet-splitter" class="btn-seo-secondary">Try Visual Partitioning</a>
+      <a href={`${langPrefix}/`} class="btn-seo-primary">{guide.ctaPrimary}</a>
+      <a href={`${langPrefix}/visual-subnet-splitter`} class="btn-seo-secondary">{guide.ctaSecondary}</a>
     </div>
   </div>
 </section>
@@ -350,6 +238,34 @@
 
   .seo-netsudoku-card .card-link:hover {
     text-decoration: underline;
+  }
+
+  .guide-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+  }
+
+  .guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    text-align: left;
+  }
+
+  .guide-table th {
+    background: rgba(255,255,255,0.03);
+    padding: 0.85rem 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .guide-table td {
+    padding: 0.75rem 1.2rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
   }
 
   /* Button CTA Row */

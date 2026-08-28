@@ -1,0 +1,441 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout
+  title="K8s CIDR Calculator – Kubernetes Pod & Service Subnet Sizer | DevSubnet"
+  description="Free Kubernetes CIDR calculator. Size Pod and Service CIDR blocks for Cilium, Calico, AWS VPC CNI, and Azure CNI without IP exhaustion or pod scheduling failures."
+>
+  <div class="app-shell">
+    <NavBar path="k8s-cidr" />
+
+    <main>
+      <!-- Hero Intro -->
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">KUBERNETES NETWORKING / CNI SIZING</div>
+        <h1 id="page-title">Kubernetes CIDR Calculator & CNI Subnet Sizer</h1>
+        <p class="lede">
+          Calculate non-overlapping Pod, Service, and Node CIDR allocations for your Kubernetes clusters. Supports Cilium eBPF, Calico BGP, AWS VPC CNI, and Azure CNI with live IP exhaustion diagnostics.
+        </p>
+      </section>
+
+      <!-- Calculator Panel -->
+      <section class="calculator-panel" style="margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Cluster Architecture & CNI Parameters</h2></div>
+          <span class="live-label">K8S CLUSTER SIZER</span>
+        </div>
+
+        <div class="k8s-calc-grid">
+          <!-- Inputs Column -->
+          <div class="k8s-inputs-col">
+            <div class="field-group">
+              <label for="k8s-nodes-count">Target Maximum Node Count</label>
+              <input type="number" id="k8s-nodes-count" value="100" min="1" max="10000" class="ip-input" />
+              <span class="field-hint">Maximum number of worker nodes planned for the cluster</span>
+            </div>
+
+            <div class="field-group">
+              <label for="k8s-pods-per-node">Max Pods per Node</label>
+              <select id="k8s-pods-per-node" class="cloud-select">
+                <option value="30">30 Pods/Node (Lightweight/Microservices)</option>
+                <option value="64">64 Pods/Node (Standard Enterprise)</option>
+                <option value="110" selected>110 Pods/Node (Default Kubernetes / EKS)</option>
+                <option value="250">250 Pods/Node (High Density / GKE)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="k8s-cni-type">CNI Plugin Architecture</label>
+              <select id="k8s-cni-type" class="cloud-select">
+                <option value="cilium" selected>Cilium (eBPF Overlay / ClusterPool IPAM)</option>
+                <option value="calico">Project Calico (BGP / VXLAN Overlay)</option>
+                <option value="awsvpc">AWS VPC CNI (Prefix Delegation / Secondary ENI)</option>
+                <option value="azurecni">Azure CNI (Overlay Mode / VNet Integration)</option>
+                <option value="flannel">Flannel (Host-GW / VXLAN)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="k8s-base-pod-cidr">Pod Network Base CIDR</label>
+              <input type="text" id="k8s-base-pod-cidr" value="10.244.0.0/16" class="ip-input" />
+              <span class="field-hint">Global CIDR allocated for all Pod IP addresses</span>
+            </div>
+
+            <div class="field-group">
+              <label for="k8s-service-cidr">Service ClusterIP Base CIDR</label>
+              <input type="text" id="k8s-service-cidr" value="10.96.0.0/16" class="ip-input" />
+              <span class="field-hint">Internal VIPs for ClusterIP services and CoreDNS</span>
+            </div>
+          </div>
+
+          <!-- Live Output & Diagnostics Column -->
+          <div class="k8s-diagnostics-col">
+            <div class="diagnostic-card" id="diag-summary-card">
+              <div class="diag-header">
+                <span class="diag-title">CIDR Sizing Metrics</span>
+                <span class="diag-badge" id="diag-status-badge">HEALTHY</span>
+              </div>
+
+              <div class="diag-metric-row">
+                <span>Per-Node Subnet Mask:</span>
+                <strong id="diag-node-mask">/24 (254 Pod IPs per Node)</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>Max Accommodated Nodes:</span>
+                <strong id="diag-max-nodes">256 Nodes</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>Total Cluster Pod Capacity:</span>
+                <strong id="diag-total-pods">65,024 Pods</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>Service IP Capacity:</span>
+                <strong id="diag-service-ips">65,534 ClusterIPs</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>CoreDNS Service IP:</span>
+                <strong id="diag-dns-ip">10.96.0.10</strong>
+              </div>
+
+              <div id="diag-exhaustion-warning" class="diag-warning" style="display: none;">
+                ⚠️ <strong>Risk Detected:</strong> Target node count exceeds Pod CIDR capacity. Expand base Pod CIDR (e.g. to /14) or adjust per-node mask.
+              </div>
+            </div>
+
+            <!-- Copyable Config Output -->
+            <div style="margin-top: 1.25rem;">
+              <div class="output-header">
+                <span class="output-title">Export Kubernetes Manifest</span>
+                <button id="copy-k8s-btn" class="btn-copy" type="button">Copy Manifest</button>
+              </div>
+              <pre class="code-box"><code id="k8s-manifest-output"># Generating Kubernetes Manifest...</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Technical Architecture Section -->
+      <section class="guide-section">
+        <div class="guide-sticky">
+          <h2>Kubernetes <em>Networking</em> Rules</h2>
+        </div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>Pod-to-Pod Communication Without NAT</h3>
+            <p>
+              Kubernetes fundamental networking model dictates that every Pod receives its own unique routable IP address and can communicate with all other Pods without Network Address Translation (NAT).
+            </p>
+          </div>
+
+          <div class="guide-block">
+            <h3>Overlay vs. Direct VPC Routing (AWS VPC CNI & Azure CNI)</h3>
+            <p>
+              When using <strong>AWS VPC CNI</strong> or <strong>Azure CNI (Native)</strong>, Pod IPs are drawn directly from the underlying VPC subnet rather than an isolated overlay. Always enable <strong>Prefix Delegation</strong> in EKS to avoid exhausting AWS Elastic Network Interface (ENI) attachment limits!
+            </p>
+          </div>
+
+          <div class="guide-block">
+            <h3>Service CIDR & CoreDNS Allocation</h3>
+            <p>
+              The Service CIDR is virtual and handled by <code>kube-proxy</code> / Cilium eBPF via iptables/IPVS/eBPF maps. The 10th IP (e.g. <code>10.96.0.10</code>) is traditionally reserved for the CoreDNS cluster resolver.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR KUBERNETES & CLOUD NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .k8s-calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .k8s-inputs-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .k8s-diagnostics-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .diagnostic-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+  }
+
+  .diag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .diag-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .diag-badge {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .diag-badge.warning {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+  }
+
+  .diag-metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .diag-metric-row strong {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+  }
+
+  .diag-warning {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-sm);
+    color: #fca5a5;
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .output-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .btn-copy {
+    background: var(--accent-network);
+    color: #0d111c;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-copy:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .code-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--accent-highlight);
+    overflow-x: auto;
+    max-height: 380px;
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .k8s-calc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function calculateK8sArchitecture() {
+    const nodeCount = parseInt((document.getElementById('k8s-nodes-count') as HTMLInputElement)?.value || '100', 10);
+    const maxPodsPerNode = parseInt((document.getElementById('k8s-pods-per-node') as HTMLSelectElement)?.value || '110', 10);
+    const cni = (document.getElementById('k8s-cni-type') as HTMLSelectElement)?.value || 'cilium';
+    const podCidr = (document.getElementById('k8s-base-pod-cidr') as HTMLInputElement)?.value || '10.244.0.0/16';
+    const svcCidr = (document.getElementById('k8s-service-cidr') as HTMLInputElement)?.value || '10.96.0.0/16';
+
+    const podPrefix = parseInt(podCidr.split('/')[1] || '16', 10);
+    const svcPrefix = parseInt(svcCidr.split('/')[1] || '16', 10);
+
+    // Determine node mask required
+    let nodeMask = 24; // 254 IPs
+    if (maxPodsPerNode <= 30) nodeMask = 26; // 62 IPs
+    else if (maxPodsPerNode <= 64) nodeMask = 25; // 126 IPs
+    else if (maxPodsPerNode <= 120) nodeMask = 24; // 254 IPs
+    else nodeMask = 23; // 510 IPs
+
+    const maxNodesCapacity = Math.pow(2, nodeMask - podPrefix);
+    const totalPodCapacity = maxNodesCapacity * (Math.pow(2, 32 - nodeMask) - 2);
+    const serviceIpsCapacity = Math.pow(2, 32 - svcPrefix) - 2;
+
+    const [svcBase] = svcCidr.split('/');
+    const svcParts = svcBase.split('.');
+    const dnsIp = `${svcParts[0]}.${svcParts[1]}.${svcParts[2]}.10`;
+
+    // DOM updates
+    const diagNodeMask = document.getElementById('diag-node-mask');
+    const diagMaxNodes = document.getElementById('diag-max-nodes');
+    const diagTotalPods = document.getElementById('diag-total-pods');
+    const diagServiceIps = document.getElementById('diag-service-ips');
+    const diagDnsIp = document.getElementById('diag-dns-ip');
+    const warningEl = document.getElementById('diag-exhaustion-warning');
+    const badgeEl = document.getElementById('diag-status-badge');
+
+    if (diagNodeMask) diagNodeMask.textContent = `/${nodeMask} (${Math.pow(2, 32 - nodeMask) - 2} Pod IPs per Node)`;
+    if (diagMaxNodes) diagMaxNodes.textContent = `${maxNodesCapacity.toLocaleString()} Nodes`;
+    if (diagTotalPods) diagTotalPods.textContent = `${totalPodCapacity.toLocaleString()} Pods`;
+    if (diagServiceIps) diagServiceIps.textContent = `${serviceIpsCapacity.toLocaleString()} ClusterIPs`;
+    if (diagDnsIp) diagDnsIp.textContent = dnsIp;
+
+    const isExhausted = nodeCount > maxNodesCapacity;
+    if (warningEl && badgeEl) {
+      if (isExhausted) {
+        warningEl.style.display = 'block';
+        badgeEl.textContent = 'EXHAUSTION RISK';
+        badgeEl.classList.add('warning');
+      } else {
+        warningEl.style.display = 'none';
+        badgeEl.textContent = 'HEALTHY CAPACITY';
+        badgeEl.classList.remove('warning');
+      }
+    }
+
+    // Generate Manifest
+    let manifest = '';
+    if (cni === 'cilium') {
+      manifest = `# Cilium Helm values.yaml
+cluster:
+  name: "production-cluster"
+  id: 1
+ipam:
+  mode: "cluster-pool"
+  operator:
+    clusterPoolIPv4PodCIDRList: ["${podCidr}"]
+    clusterPoolIPv4MaskSize: ${nodeMask}
+k8sServiceHost: "127.0.0.1"
+k8sServicePort: 6443
+tunnel: "vxlan"
+kubeProxyReplacement: "true"`;
+    } else if (cni === 'calico') {
+      manifest = `# Calico Installation Manifest (values.yaml)
+kind: Installation
+apiVersion: operator.tigera.io/v1
+metadata:
+  name: default
+spec:
+  calicoNetwork:
+    ipPools:
+      - blockSize: ${nodeMask}
+        cidr: ${podCidr}
+        encapsulation: VXLAN
+        natOutgoing: Enabled
+        nodeSelector: all()`;
+    } else if (cni === 'awsvpc') {
+      manifest = `# AWS EKS Terraform & VPC CNI Configuration
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  cluster_name    = "eks-prod"
+  cluster_version = "1.31"
+  vpc_id          = "vpc-0123456789"
+  subnet_ids      = ["subnet-1", "subnet-2", "subnet-3"]
+
+  cluster_service_ipv4_cidr = "${svcCidr}"
+}
+
+# AWS VPC CNI Prefix Delegation Add-on
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name = module.eks.cluster_name
+  addon_name   = "vpc-cni"
+  configuration_values = jsonencode({
+    env = {
+      ENABLE_PREFIX_DELEGATION = "true"
+      WARM_PREFIX_TARGET       = "1"
+    }
+  })
+}`;
+    } else {
+      manifest = `# Kubeadm ClusterConfiguration YAML
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v1.31.0
+networking:
+  podSubnet: "${podCidr}"
+  serviceSubnet: "${svcCidr}"
+  dnsDomain: "cluster.local"
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+maxPods: ${maxPodsPerNode}`;
+    }
+
+    const codeEl = document.getElementById('k8s-manifest-output');
+    if (codeEl) codeEl.textContent = manifest;
+  }
+
+  // Attach event listeners
+  ['k8s-nodes-count', 'k8s-pods-per-node', 'k8s-cni-type', 'k8s-base-pod-cidr', 'k8s-service-cidr'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', calculateK8sArchitecture);
+    document.getElementById(id)?.addEventListener('change', calculateK8sArchitecture);
+  });
+
+  document.getElementById('copy-k8s-btn')?.addEventListener('click', () => {
+    const code = document.getElementById('k8s-manifest-output')?.textContent || '';
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = document.getElementById('copy-k8s-btn');
+      if (btn) {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Manifest'; }, 2000);
+      }
+    });
+  });
+
+  calculateK8sArchitecture();
+</script>

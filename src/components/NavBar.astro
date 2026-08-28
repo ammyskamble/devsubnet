@@ -1,38 +1,53 @@
 ---
+import { languages, translations, getLocalizedPath, type SupportedLanguage } from '../utils/i18n';
+
 interface Props {
   path?: string;
+  lang?: SupportedLanguage;
 }
 
-const { path = "" } = Astro.props;
+const { 
+  path = "",
+  lang = "en"
+} = Astro.props;
+
+const t = translations[lang] || translations.en;
+const currentLangInfo = languages[lang] || languages.en;
+const langPrefix = lang === 'en' ? '' : `/${lang}`;
 
 const primaryLinks = [
-  { href: "/", label: "IPv4 Calculator", key: "ipv4" },
-  { href: "/visual-subnet-splitter", label: "Visual Splitter", key: "splitter" },
-  { href: "/kubernetes-subnet-planner", label: "K8s IP Planner", key: "k8s" },
-  { href: "/ipv6-subnet-calculator", label: "IPv6 Calculator", key: "ipv6" }
+  { href: `${langPrefix}/` || '/', label: t.nav.ipv4, key: "ipv4" },
+  { href: `${langPrefix}/visual-subnet-splitter`, label: t.nav.splitter, key: "splitter" },
+  { href: `${langPrefix}/kubernetes-subnet-planner`, label: t.nav.k8s, key: "k8s" },
+  { href: `${langPrefix}/ipv6-subnet-calculator`, label: t.nav.ipv6, key: "ipv6" }
 ];
 
 const moreTools = [
-  { href: "/vlsm-calculator", label: "VLSM Calculator", key: "vlsm" },
-  { href: "/subnet-overlap-checker", label: "Subnet Overlap Checker", key: "overlap" },
-  { href: "/cidr-supernet-calculator", label: "CIDR Supernet Calculator", key: "supernet" },
-  { href: "/cidr-cheat-sheet", label: "CIDR Cheat Sheet", key: "cheatsheet" },
-  { href: "/aws-vpc-subnet-calculator", label: "AWS VPC Calculator", key: "aws" },
-  { href: "/azure-vnet-subnet-calculator", label: "Azure VNet Calculator", key: "azure" },
-  { href: "/gcp-vpc-subnet-calculator", label: "GCP VPC Calculator", key: "gcp" }
+  { href: `/terraform-subnet-planner`, label: t.nav.terraform, key: "terraform" },
+  { href: `/k8s-cidr-calculator`, label: t.nav.k8sCidr, key: "k8s-cidr" },
+  { href: `/vlsm-calculator`, label: t.nav.vlsm, key: "vlsm" },
+  { href: `/subnet-overlap-checker`, label: t.nav.overlap, key: "overlap" },
+  { href: `/cidr-supernet-calculator`, label: t.nav.supernet, key: "supernet" },
+  { href: `${langPrefix}/cidr-cheat-sheet`, label: t.nav.cheatsheet, key: "cheatsheet" },
+  { href: `/aws-vpc-subnet-calculator`, label: t.nav.aws, key: "aws" },
+  { href: `/azure-vnet-subnet-calculator`, label: t.nav.azure, key: "azure" },
+  { href: `/gcp-vpc-subnet-calculator`, label: t.nav.gcp, key: "gcp" }
 ];
 
 // Resolve the current path to a key for active-state highlighting
-const pathKey = path.split('/').filter(Boolean)[0] || 'ipv4';
+const pathKey = path.split('/').filter(p => !['de', 'es', 'ja'].includes(p))[0] || 'ipv4';
 function isActive(item: { href: string; key: string }): boolean {
-  if (pathKey === 'ipv4') return item.key === 'ipv4';
+  if (pathKey === 'ipv4' || pathKey === '') return item.key === 'ipv4';
   return item.key === pathKey;
 }
+
+const currentPathname = Astro.url.pathname;
+const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
 ---
 
 <header class="topbar">
   <div class="topbar-row">
-    <a class="brand" href="/" aria-label="DevSubnet.com home">
+    <a class="brand" href={langPrefix || "/"} aria-label="DevSubnet.com home">
       <span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span>
     </a>
 
@@ -45,7 +60,7 @@ function isActive(item: { href: string; key: string }): boolean {
 
       <div class="nav-more">
         <button class="nav-tab nav-more-btn" type="button" aria-haspopup="true" aria-expanded="false">
-          More Tools
+          {t.nav.moreTools}
           <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div class="nav-more-menu">
@@ -59,6 +74,28 @@ function isActive(item: { href: string; key: string }): boolean {
     </nav>
 
     <div class="nav-actions">
+      <!-- Language Switcher Dropdown -->
+      <div class="lang-picker">
+        <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Change Language / Sprache / Idioma / 言語">
+          <span class="lang-flag">{currentLangInfo.flag}</span>
+          <span class="lang-code">{currentLangInfo.code.toUpperCase()}</span>
+          <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-menu">
+          {availableLangs.map((l) => (
+            <a 
+              class={`lang-item ${l === lang ? 'active' : ''}`} 
+              href={getLocalizedPath(currentPathname, l)}
+              hreflang={l}
+            >
+              <span class="lang-flag">{languages[l].flag}</span>
+              <span class="lang-name">{languages[l].nativeName}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Theme Switcher -->
       <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"></circle>
@@ -78,6 +115,82 @@ function isActive(item: { href: string; key: string }): boolean {
     </div>
   </div>
 </header>
+
+<style>
+  .lang-picker {
+    position: relative;
+  }
+
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.38rem 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .lang-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-network);
+  }
+
+  .lang-flag {
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .lang-code {
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  .lang-menu {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    right: 0;
+    min-width: 140px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.35rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    display: none;
+    flex-direction: column;
+    gap: 0.2rem;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .lang-picker.open .lang-menu {
+    display: flex;
+  }
+
+  .lang-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .lang-item:hover,
+  .lang-item.active {
+    background: rgba(var(--accent-network-rgb, 56, 189, 248), 0.12);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+</style>
 
 <script>
   const themeBtn = document.getElementById('theme-btn');
@@ -101,12 +214,35 @@ function isActive(item: { href: string; key: string }): boolean {
       e.stopPropagation();
       const isOpen = moreWrap.classList.toggle('open');
       moreBtn.setAttribute('aria-expanded', String(isOpen));
+      // Close lang picker if open
+      document.querySelector('.lang-picker')?.classList.remove('open');
     });
 
     document.addEventListener('click', (e) => {
       if (!moreWrap.contains(e.target as Node)) {
         moreWrap.classList.remove('open');
         moreBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Language Dropdown Toggle
+  const langBtn = document.querySelector('.lang-btn');
+  const langPicker = document.querySelector('.lang-picker');
+
+  if (langBtn && langPicker) {
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = langPicker.classList.toggle('open');
+      langBtn.setAttribute('aria-expanded', String(isOpen));
+      // Close more tools if open
+      document.querySelector('.nav-more')?.classList.remove('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!langPicker.contains(e.target as Node)) {
+        langPicker.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }

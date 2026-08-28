@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MainShell from '../../components/MainShell.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.ja;
+---
+
+<Layout 
+  lang="ja"
+  title={t.meta.defaultTitle}
+  description={t.meta.defaultDesc}
+>
+  <MainShell activeTab="ipv4" defaultCloud="standard" lang="ja" />
+</Layout>

@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.ja;
+---
+<Layout
+  lang="ja"
+  title="CIDR 早見表 – IPv4 サブネット完全対応表 | DevSubnet"
+  description="IPv4の全33プレフィックス（/0〜/32）に対応したCIDR早見表。サブネットマスク、ワイルドカード、IP総数、使用可能ホスト数を網羅。"
+>
+  <div class="app-shell">
+    <NavBar path="cheatsheet" lang="ja" />
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">リファレンス / CIDR 早見表</div>
+        <h1 id="page-title">IPv4 CIDR 早見表</h1>
+        <p class="lede">/0から/32までのすべてのプレフィックス長におけるサブネットマスク、ワイルドカードマスク、総IP数、使用可能ホスト数を一覧表示。</p>
+      </section>
+
+      <section class="calculator-panel" style="gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>プレフィックス完全リファレンス</h2></div>
+          <span class="live-label">/0 – /32</span>
+        </div>
+        <div class="guide-table-wrapper">
+          <table class="guide-table">
+            <thead>
+              <tr><th>CIDR</th><th>サブネットマスク</th><th>ワイルドカード</th><th>総IP数</th><th>使用可能ホスト</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1</td><td>1</td></tr>
+              <tr><td>/31</td><td>255.255.255.254</td><td>0.0.0.1</td><td>2</td><td>2</td></tr>
+              <tr><td>/30</td><td>255.255.255.252</td><td>0.0.0.3</td><td>4</td><td>2</td></tr>
+              <tr><td>/29</td><td>255.255.255.248</td><td>0.0.0.7</td><td>8</td><td>6</td></tr>
+              <tr><td>/28</td><td>255.255.255.240</td><td>0.0.0.15</td><td>16</td><td>14</td></tr>
+              <tr><td>/27</td><td>255.255.255.224</td><td>0.0.0.31</td><td>32</td><td>30</td></tr>
+              <tr><td>/26</td><td>255.255.255.192</td><td>0.0.0.63</td><td>64</td><td>62</td></tr>
+              <tr><td>/25</td><td>255.255.255.128</td><td>0.0.0.127</td><td>128</td><td>126</td></tr>
+              <tr><td>/24</td><td>255.255.255.0</td><td>0.0.0.255</td><td>256</td><td>254</td></tr>
+              <tr><td>/23</td><td>255.255.254.0</td><td>0.0.1.255</td><td>512</td><td>510</td></tr>
+              <tr><td>/22</td><td>255.255.252.0</td><td>0.0.3.255</td><td>1,024</td><td>1,022</td></tr>
+              <tr><td>/21</td><td>255.255.248.0</td><td>0.0.7.255</td><td>2,048</td><td>2,046</td></tr>
+              <tr><td>/20</td><td>255.255.240.0</td><td>0.0.15.255</td><td>4,096</td><td>4,094</td></tr>
+              <tr><td>/19</td><td>255.255.224.0</td><td>0.0.31.255</td><td>8,192</td><td>8,190</td></tr>
+              <tr><td>/18</td><td>255.255.192.0</td><td>0.0.63.255</td><td>16,384</td><td>16,382</td></tr>
+              <tr><td>/17</td><td>255.255.128.0</td><td>0.0.127.255</td><td>32,768</td><td>32,766</td></tr>
+              <tr><td>/16</td><td>255.255.0.0</td><td>0.0.255.255</td><td>65,536</td><td>65,534</td></tr>
+              <tr><td>/8</td><td>255.0.0.0</td><td>0.255.255.255</td><td>16,777,216</td><td>16,777,214</td></tr>
+              <tr><td>/0</td><td>0.0.0.0</td><td>255.255.255.255</td><td>4,294,967,296</td><td>4,294,967,294</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="guide-sticky"><h2>CIDRの<em>基礎知識</em></h2></div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>使用可能ホスト数の算出式</h3>
+            <p>使用可能ホスト数 = 2<sup>(32 − プレフィックス)</sup> − 2。ネットワークアドレス（先頭）とブロードキャストアドレス（末尾）の2つが除外されます。</p>
+          </div>
+          <div class="guide-block">
+            <h3>リアルタイム計算</h3>
+            <p><a href="/ja/">IPv4サブネット計算機</a>を使用すると、AWS、Azure、GCPの予約IPを含めたネットワーク範囲を瞬時に計算できます。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/ja/about">{t.footer.about}</a>
+        <a href="/ja/contact">{t.footer.contact}</a>
+        <a href="/ja/privacy">{t.footer.privacy}</a>
+        <a href="/ja/terms">{t.footer.terms}</a>
+        <a href="/ja/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>

@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MainShell from '../../components/MainShell.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.de;
+---
+
+<Layout 
+  lang="de"
+  title="Visueller Subnetz-Splitter & CIDR-Partitionierer | DevSubnet"
+  description="Teilen Sie Netzwerkblöcke visuell in Subnetze auf. Dynamische Baumanzeige und IaC-Export für Terraform & Ansible."
+>
+  <MainShell activeTab="splitter" navPath="visual-subnet-splitter" lang="de" />
+</Layout>

@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.de;
+---
+<Layout
+  lang="de"
+  title="CIDR Spickzettel – Vollständige IPv4 Subnetz-Referenztabelle | DevSubnet"
+  description="Vollständiger IPv4 CIDR Spickzettel von /0 bis /32 mit Subnetzmasken, Wildcard-Masken, Gesamt-IPs und nutzbaren Hosts."
+>
+  <div class="app-shell">
+    <NavBar path="cheatsheet" lang="de" />
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">REFERENZ / CIDR SPICKZETTEL</div>
+        <h1 id="page-title">IPv4 CIDR Spickzettel</h1>
+        <p class="lede">Alle Präfixlängen von /0 bis /32 mit Subnetzmaske, Wildcard-Maske, Gesamtadressen und nutzbaren Hostzahlen auf einen Blick.</p>
+      </section>
+
+      <section class="calculator-panel" style="gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Vollständige Präfix-Referenz</h2></div>
+          <span class="live-label">/0 – /32</span>
+        </div>
+        <div class="guide-table-wrapper">
+          <table class="guide-table">
+            <thead>
+              <tr><th>CIDR</th><th>Subnetzmaske</th><th>Wildcard</th><th>Gesamt-IPs</th><th>Nutzbare Hosts</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1</td><td>1</td></tr>
+              <tr><td>/31</td><td>255.255.255.254</td><td>0.0.0.1</td><td>2</td><td>2</td></tr>
+              <tr><td>/30</td><td>255.255.255.252</td><td>0.0.0.3</td><td>4</td><td>2</td></tr>
+              <tr><td>/29</td><td>255.255.255.248</td><td>0.0.0.7</td><td>8</td><td>6</td></tr>
+              <tr><td>/28</td><td>255.255.255.240</td><td>0.0.0.15</td><td>16</td><td>14</td></tr>
+              <tr><td>/27</td><td>255.255.255.224</td><td>0.0.0.31</td><td>32</td><td>30</td></tr>
+              <tr><td>/26</td><td>255.255.255.192</td><td>0.0.0.63</td><td>64</td><td>62</td></tr>
+              <tr><td>/25</td><td>255.255.255.128</td><td>0.0.0.127</td><td>128</td><td>126</td></tr>
+              <tr><td>/24</td><td>255.255.255.0</td><td>0.0.0.255</td><td>256</td><td>254</td></tr>
+              <tr><td>/23</td><td>255.255.254.0</td><td>0.0.1.255</td><td>512</td><td>510</td></tr>
+              <tr><td>/22</td><td>255.255.252.0</td><td>0.0.3.255</td><td>1,024</td><td>1,022</td></tr>
+              <tr><td>/21</td><td>255.255.248.0</td><td>0.0.7.255</td><td>2,048</td><td>2,046</td></tr>
+              <tr><td>/20</td><td>255.255.240.0</td><td>0.0.15.255</td><td>4,096</td><td>4,094</td></tr>
+              <tr><td>/19</td><td>255.255.224.0</td><td>0.0.31.255</td><td>8,192</td><td>8,190</td></tr>
+              <tr><td>/18</td><td>255.255.192.0</td><td>0.0.63.255</td><td>16,384</td><td>16,382</td></tr>
+              <tr><td>/17</td><td>255.255.128.0</td><td>0.0.127.255</td><td>32,768</td><td>32,766</td></tr>
+              <tr><td>/16</td><td>255.255.0.0</td><td>0.0.255.255</td><td>65,536</td><td>65,534</td></tr>
+              <tr><td>/8</td><td>255.0.0.0</td><td>0.255.255.255</td><td>16,777,216</td><td>16,777,214</td></tr>
+              <tr><td>/0</td><td>0.0.0.0</td><td>255.255.255.255</td><td>4,294,967,296</td><td>4,294,967,294</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="guide-sticky"><h2>CIDR in der <em>Praxis</em></h2></div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>Formel für nutzbare Hosts</h3>
+            <p>Nutzbare Hosts = 2<sup>(32 − Präfix)</sup> − 2. Jedes Subnetz verliert standardmäßig 2 Adressen für die Netzwerkkennung und die Broadcast-Adresse.</p>
+          </div>
+          <div class="guide-block">
+            <h3>Interaktiver Rechner</h3>
+            <p>Nutzen Sie unseren <a href="/de/">IPv4 Subnetz-Rechner</a> für Echtzeit-Berechnungen inklusive VPC-Reservierungen für AWS, Azure und GCP.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/de/about">{t.footer.about}</a>
+        <a href="/de/contact">{t.footer.contact}</a>
+        <a href="/de/privacy">{t.footer.privacy}</a>
+        <a href="/de/terms">{t.footer.terms}</a>
+        <a href="/de/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>

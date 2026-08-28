@@ -1,6 +1,3 @@
-/* Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 /* CSS Variables & Design System */
 :root {
   /* Common System Tokens */
@@ -175,7 +172,7 @@ code, pre {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2rem;
+  padding: 1rem 2rem;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--panel-bg);
   backdrop-filter: blur(var(--glass-blur));
@@ -187,43 +184,79 @@ code, pre {
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   letter-spacing: -0.03em;
   color: var(--text-primary);
 }
 
-.brand-mark {
+.brand-badge {
   background: linear-gradient(135deg, var(--accent-network), var(--accent-host));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.brand-text {
+  color: var(--text-primary);
+  font-weight: 800;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.6rem;
 }
 
 .nav-tab {
-  background: none;
-  border: none;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
   color: var(--text-secondary);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.25rem;
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full); /* Sleek rounded pill shape */
   transition: all var(--transition-fast);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
-.nav-tab:hover, .nav-tab.active {
+.nav-tab:hover {
   color: var(--text-primary);
-  background-color: var(--border-color);
+  border-color: var(--accent-network);
+  background-color: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+}
+
+.nav-tab.active {
+  color: var(--text-primary);
+  border-color: var(--accent-network);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.18));
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25), inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+}
+
+:root[data-theme="light"] .nav-tab {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+:root[data-theme="light"] .nav-tab.active {
+  color: var(--text-primary);
+  border-color: var(--accent-network);
+  background: rgba(99, 102, 241, 0.12);
 }
 
 .nav-actions {
@@ -234,22 +267,24 @@ code, pre {
 
 /* Theme Switcher Button */
 .theme-toggle {
-  background: none;
+  background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 0.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--transition-fast);
-  width: 36px;
-  height: 36px;
+  transition: all var(--transition-fast);
+  width: 38px;
+  height: 38px;
 }
 
 .theme-toggle:hover {
-  background-color: var(--border-color);
+  border-color: var(--accent-network);
+  background-color: rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
 }
 
 .theme-toggle svg {
@@ -1209,8 +1244,19 @@ footer {
 }
 
 /* =============================================
-   RESPONSIVE BREAKPOINTS — Mobile Optimized
+   RESPONSIVE BREAKPOINTS — Mobile & Speed Optimized
    ============================================= */
+
+/* Global Overflow Protection */
+body, html {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.app-shell, main, .calculator-layout, .calculator-panel, .insight-panel {
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 /* Tablet: 1024px and below */
 @media (max-width: 1024px) {
@@ -1234,68 +1280,89 @@ footer {
     font-size: 15px;
   }
 
+  :root {
+    --glass-blur: 8px; /* Lighter blur for fast 60fps mobile GPU rendering */
+  }
+
+  .bg-blob {
+    opacity: 0.04;
+    filter: blur(50px);
+  }
+
   /* --- Topbar / Navigation --- */
   .topbar {
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 1rem;
     flex-direction: column;
     gap: 0.75rem;
     align-items: stretch;
-  }
-
-  .brand {
-    font-size: 1.25rem;
-    justify-content: space-between;
-  }
-
-  .nav-links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
-  }
-
-  .nav-tab {
-    font-size: 0.8rem;
-    padding: 0.45rem 0.5rem;
-    text-align: center;
-    border-radius: var(--radius-sm);
-    background-color: var(--bg-secondary);
-  }
-
-  .nav-tab.active {
-    background-color: rgba(var(--hsl-network), 0.12);
-    color: var(--accent-network);
-  }
-
-  .nav-actions {
-    justify-content: flex-end;
-    position: absolute;
-    top: 0.875rem;
-    right: 1rem;
-  }
-
-  .topbar {
     position: sticky;
     top: 0;
     z-index: 10;
   }
 
+  .brand {
+    font-size: 1.25rem;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    padding: 0.25rem 0;
+    margin: 0 -0.25rem;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--radius-full); /* Maintain rounded pill shape on mobile */
+    border: 1px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.03);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .nav-tab.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-color: var(--accent-network);
+    color: var(--text-primary);
+  }
+
+  .nav-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+  }
+
   /* --- Main layout --- */
   main {
     padding: 1.25rem 1rem;
+    max-width: 100%;
   }
 
   /* --- Intro / Hero --- */
   .intro {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
   }
 
   .intro h1 {
-    font-size: 2rem;
+    font-size: 1.85rem;
     letter-spacing: -0.03em;
+    word-break: break-word;
   }
 
   .lede {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .eyebrow {
@@ -1305,8 +1372,10 @@ footer {
   /* --- Calculator panels --- */
   .calculator-panel,
   .insight-panel > .calculator-panel {
-    padding: 1.25rem;
+    padding: 1.25rem 1rem;
     gap: 1.25rem;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .panel-heading h2,
@@ -1328,6 +1397,7 @@ footer {
 
   .ip-input {
     font-size: 1rem;
+    max-width: 100%;
   }
 
   .ip-input input#cidr,
@@ -1338,22 +1408,30 @@ footer {
   select {
     font-size: 0.9rem;
     padding: 0.65rem 2rem 0.65rem 0.875rem;
+    max-width: 100%;
   }
 
   /* --- Quick preset buttons row --- */
   .quick-row {
     gap: 0.4rem;
+    flex-wrap: wrap;
+    max-width: 100%;
   }
 
   .quick-row button {
     padding: 0.4rem 0.65rem;
     font-size: 0.75rem;
+    border-radius: var(--radius-full);
   }
 
   /* --- Binary grid --- */
   .binary-grid-wrapper {
     gap: 0.35rem;
     font-size: 0.8rem;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
   }
 
   .binary-bit {
@@ -1379,6 +1457,7 @@ footer {
 
   .summary-item strong {
     font-size: 1rem;
+    word-break: break-all;
   }
 
   .summary-item.primary strong {
@@ -1400,6 +1479,8 @@ footer {
   .export-tabs {
     gap: 0.5rem;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
   }
 
   .code-wrapper pre {
@@ -1407,12 +1488,16 @@ footer {
     padding: 1rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-all;
   }
 
   /* --- Copy button --- */
   .copy-button {
     font-size: 0.75rem;
     padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
   }
 
   /* --- K8s metrics --- */
@@ -1434,6 +1519,8 @@ footer {
 
   .subnet-block-row {
     min-height: 56px;
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .subnet-block {
@@ -1461,25 +1548,34 @@ footer {
     line-height: 1.5;
   }
 
-  /* --- Guide section --- */
+  /* --- Guide section & tables --- */
   .guide-section {
     margin-top: 2.5rem;
     padding-top: 2rem;
     gap: 1.5rem;
+    max-width: 100%;
   }
 
   .guide-sticky h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .guide-block h3 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+  }
+
+  .guide-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .guide-table td,
   .guide-table th {
     padding: 0.6rem 0.75rem;
     font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   /* --- Footer --- */
@@ -1495,6 +1591,7 @@ footer {
   .footer-links {
     justify-content: center;
     gap: 0.75rem 1rem;
+    flex-wrap: wrap;
   }
 }
 
@@ -1505,17 +1602,12 @@ footer {
   }
 
   .intro h1 {
-    font-size: 1.65rem;
-  }
-
-  .nav-links {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.35rem;
+    font-size: 1.55rem;
   }
 
   .nav-tab {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.35rem;
+    font-size: 0.78rem;
+    padding: 0.4rem 0.8rem;
   }
 
   /* Binary grid: wrap octets on very small screens */
@@ -1541,7 +1633,7 @@ footer {
   /* Make panels full bleed */
   .calculator-panel,
   .insight-panel > .calculator-panel {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
     border-radius: var(--radius-md);
   }
 
@@ -1551,11 +1643,11 @@ footer {
     font-size: 1rem;
   }
 
-  /* Bigger touch targets for buttons */
+  /* Touch targets for buttons */
   .subnet-btn,
   .copy-button,
   .quick-row button {
-    min-height: 36px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
   }

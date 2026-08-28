@@ -18,22 +18,22 @@ const {
 // Determine header titles for introduction sections
 const introData = {
   ipv4: {
-    title: "Make sense of your networks.",
-    eyebrow: "SUBNET CALCULATOR / IPv4",
-    lede: "Compute host ranges, wildcard boundaries, and network subnets dynamically. Natively supports custom rules for major public clouds."
+    title: "IPv4 Subnet Calculator & CIDR Planner",
+    eyebrow: "FREE NETWORK TOOL / IPv4",
+    lede: "Compute host ranges, subnet masks, broadcast addresses, wildcard boundaries, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly."
   },
   splitter: {
-    title: "Split blocks. Drag subnets.",
+    title: "Visual Subnet Splitter & CIDR Partitioner",
     eyebrow: "CIDR PARTITIONING / SPLITTER",
     lede: "Divide a network block visually into custom subnets with descriptive labels and export copy-pasteable IaC configurations."
   },
   k8s: {
-    title: "Calculate cluster host density.",
+    title: "Kubernetes Subnet Planner & Pod IP Calculator",
     eyebrow: "KUBERNETES PLANNER / PODS & NODES",
     lede: "Assess cluster size guidelines, node assignments, pod density constraints, and identify IP exhaustion risks early."
   },
   ipv6: {
-    title: "Navigate hexadecimal address spaces.",
+    title: "IPv6 Subnet Calculator & Prefix Delegation",
     eyebrow: "SUBNET CALCULATOR / IPv6",
     lede: "Compress, expand, and classify 128-bit addresses. Instantly generate prefix delegation block increments."
   }
@@ -43,8 +43,8 @@ const introData = {
 <div class="app-shell">
   <!-- Top Bar navigation -->
   <header class="topbar">
-    <a class="brand" href="/" aria-label="devsubnet.com home">
-      <span class="brand-mark">/</span> devsubnet.com
+    <a class="brand" href="/" aria-label="DevSubnet.com home">
+      <span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span>
     </a>
     
     <nav class="nav-links" aria-label="Primary navigation">
@@ -90,11 +90,7 @@ const introData = {
     <!-- Heading section -->
     <section class="intro" aria-labelledby="page-title">
       <div class="eyebrow">{introData.eyebrow}</div>
-      <h1 id="page-title">
-        {introData.title.split('. ').map((part, i) => (
-          i === 1 ? <span><em>{part}</em></span> : part
-        ))}
-      </h1>
+      <h1 id="page-title">{introData.title}</h1>
       <p class="lede">{introData.lede}</p>
     </section>
 

@@ -193,57 +193,63 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
 </style>
 
 <script>
-  const themeBtn = document.getElementById('theme-btn');
+  function setupNavBar() {
+    const themeBtn = document.getElementById('theme-btn');
+    if (themeBtn) {
+      themeBtn.onclick = () => {
+        const doc = document.documentElement;
+        const currentTheme = doc.getAttribute('data-theme');
+        const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+        doc.setAttribute('data-theme', targetTheme);
+        localStorage.setItem('devsubnet-theme', targetTheme);
+      };
+    }
 
-  if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-      const doc = document.documentElement;
-      const currentTheme = doc.getAttribute('data-theme');
-      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
-      doc.setAttribute('data-theme', targetTheme);
-      localStorage.setItem('devsubnet-theme', targetTheme);
-    });
+    const moreBtn = document.querySelector('.nav-more-btn');
+    const moreWrap = document.querySelector('.nav-more');
+
+    if (moreBtn && moreWrap) {
+      moreBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = moreWrap.classList.toggle('open');
+        moreBtn.setAttribute('aria-expanded', String(isOpen));
+        // Close lang picker if open
+        document.querySelector('.lang-picker')?.classList.remove('open');
+      };
+    }
+
+    // Language Dropdown Toggle
+    const langBtn = document.querySelector('.lang-btn');
+    const langPicker = document.querySelector('.lang-picker');
+
+    if (langBtn && langPicker) {
+      langBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = langPicker.classList.toggle('open');
+        langBtn.setAttribute('aria-expanded', String(isOpen));
+        // Close more tools if open
+        document.querySelector('.nav-more')?.classList.remove('open');
+      };
+    }
   }
 
-  const moreBtn = document.querySelector('.nav-more-btn');
-  const moreMenu = document.querySelector('.nav-more-menu');
-  const moreWrap = document.querySelector('.nav-more');
+  // Close menus on outside click (global single handler)
+  document.addEventListener('click', (e) => {
+    const moreWrap = document.querySelector('.nav-more');
+    const moreBtn = document.querySelector('.nav-more-btn');
+    const langPicker = document.querySelector('.lang-picker');
+    const langBtn = document.querySelector('.lang-btn');
 
-  if (moreBtn && moreMenu && moreWrap) {
-    moreBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = moreWrap.classList.toggle('open');
-      moreBtn.setAttribute('aria-expanded', String(isOpen));
-      // Close lang picker if open
-      document.querySelector('.lang-picker')?.classList.remove('open');
-    });
+    if (moreWrap && moreBtn && !moreWrap.contains(e.target as Node)) {
+      moreWrap.classList.remove('open');
+      moreBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (langPicker && langBtn && !langPicker.contains(e.target as Node)) {
+      langPicker.classList.remove('open');
+      langBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
 
-    document.addEventListener('click', (e) => {
-      if (!moreWrap.contains(e.target as Node)) {
-        moreWrap.classList.remove('open');
-        moreBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
-
-  // Language Dropdown Toggle
-  const langBtn = document.querySelector('.lang-btn');
-  const langPicker = document.querySelector('.lang-picker');
-
-  if (langBtn && langPicker) {
-    langBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = langPicker.classList.toggle('open');
-      langBtn.setAttribute('aria-expanded', String(isOpen));
-      // Close more tools if open
-      document.querySelector('.nav-more')?.classList.remove('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!langPicker.contains(e.target as Node)) {
-        langPicker.classList.remove('open');
-        langBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
+  document.addEventListener('astro:page-load', setupNavBar);
+  setupNavBar();
 </script>

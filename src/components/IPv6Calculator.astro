@@ -146,188 +146,180 @@ const {
 <script>
   import { expandIPv6, compressIPv6, classifyIPv6, splitIPv6Range } from '../utils/subnetMath';
 
-  // DOM
-  const v6IpInput = document.getElementById('v6-ip-address') as HTMLInputElement;
-  const v6PrefixInput = document.getElementById('v6-prefix') as HTMLInputElement;
-  const v6PrefixSlider = document.getElementById('v6-prefix-slider') as HTMLInputElement;
-  const errorBanner = document.getElementById('v6-ip-error');
-  const targetPrefixSelect = document.getElementById('v6-delegator-prefix') as HTMLSelectElement;
+  function initIPv6Calculator() {
+    // DOM
+    const v6IpInput = document.getElementById('v6-ip-address') as HTMLInputElement;
+    const v6PrefixInput = document.getElementById('v6-prefix') as HTMLInputElement;
+    const v6PrefixSlider = document.getElementById('v6-prefix-slider') as HTMLInputElement;
+    const errorBanner = document.getElementById('v6-ip-error');
+    const targetPrefixSelect = document.getElementById('v6-delegator-prefix') as HTMLSelectElement;
 
-  // Outputs
-  const compOutput = document.getElementById('v6-res-compressed');
-  const expOutput = document.getElementById('v6-res-expanded');
-  const typeOutput = document.getElementById('v6-res-type');
-  const rangeOutput = document.getElementById('v6-res-range');
-  const hostsOutput = document.getElementById('v6-res-hosts');
-  
-  const delegatedCount = document.getElementById('v6-delegated-count');
-  const delegatedList = document.getElementById('v6-delegated-list');
-  const copyBtn = document.getElementById('copy-ipv6-json');
+    if (!v6IpInput || !v6PrefixInput || !v6PrefixSlider || !targetPrefixSelect) return;
 
-  function validateIPv6(address: string): boolean {
-    // Regex matching standard compressed and uncompressed IPv6 formats
-    const regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{1,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-    return regex.test(address.trim());
-  }
+    // Outputs
+    const compOutput = document.getElementById('v6-res-compressed');
+    const expOutput = document.getElementById('v6-res-expanded');
+    const typeOutput = document.getElementById('v6-res-type');
+    const rangeOutput = document.getElementById('v6-res-range');
+    const hostsOutput = document.getElementById('v6-res-hosts');
+    
+    const delegatedCount = document.getElementById('v6-delegated-count');
+    const delegatedList = document.getElementById('v6-delegated-list');
+    const copyBtn = document.getElementById('copy-ipv6-json');
 
-  function getIPv6SubnetBounds(expanded: string, prefix: number): { start: string; end: string } {
-    const fields = expanded.split(':').map(val => parseInt(val, 16));
-    const startFields = [...fields];
-    const endFields = [...fields];
+    function validateIPv6(address: string): boolean {
+      const regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{1,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+      return regex.test(address.trim());
+    }
 
-    for (let i = 0; i < 8; i++) {
-      const fieldStartBit = i * 16;
-      const fieldEndBit = (i + 1) * 16;
+    function getIPv6SubnetBounds(expanded: string, prefix: number): { start: string; end: string } {
+      const fields = expanded.split(':').map(val => parseInt(val, 16));
+      const startFields = [...fields];
+      const endFields = [...fields];
 
-      if (prefix <= fieldStartBit) {
-        startFields[i] = 0x0000;
-        endFields[i] = 0xFFFF;
-      } else if (prefix < fieldEndBit) {
-        const fieldBits = prefix - fieldStartBit;
-        const mask = (~0 << (16 - fieldBits)) & 0xFFFF;
-        
-        startFields[i] = (fields[i] & mask) & 0xFFFF;
-        endFields[i] = (fields[i] | (~mask & 0xFFFF)) & 0xFFFF;
+      for (let i = 0; i < 8; i++) {
+        const fieldStartBit = i * 16;
+        const fieldEndBit = (i + 1) * 16;
+
+        if (prefix <= fieldStartBit) {
+          startFields[i] = 0x0000;
+          endFields[i] = 0xFFFF;
+        } else if (prefix < fieldEndBit) {
+          const fieldBits = prefix - fieldStartBit;
+          const mask = (~0 << (16 - fieldBits)) & 0xFFFF;
+          
+          startFields[i] = (fields[i] & mask) & 0xFFFF;
+          endFields[i] = (fields[i] | (~mask & 0xFFFF)) & 0xFFFF;
+        }
       }
-      // If prefix >= fieldEndBit, the field is fully part of the prefix and remains unchanged
+
+      const startHex = startFields.map(v => v.toString(16).padStart(4, '0')).join(':');
+      const endHex = endFields.map(v => v.toString(16).padStart(4, '0')).join(':');
+
+      return {
+        start: compressIPv6(startHex),
+        end: compressIPv6(endHex)
+      };
     }
 
-    const startHex = startFields.map(v => v.toString(16).padStart(4, '0')).join(':');
-    const endHex = endFields.map(v => v.toString(16).padStart(4, '0')).join(':');
+    function calculateIPv6() {
+      const ip = v6IpInput.value.trim();
+      const prefix = parseInt(v6PrefixInput.value, 10);
+      const targetPrefix = parseInt(targetPrefixSelect.value, 10);
 
-    return {
-      start: compressIPv6(startHex),
-      end: compressIPv6(endHex)
-    };
-  }
+      if (!validateIPv6(ip)) {
+        errorBanner?.classList.add('show');
+        return;
+      } else {
+        errorBanner?.classList.remove('show');
+      }
 
-  function calculateIPv6() {
-    const ip = v6IpInput.value.trim();
-    const prefix = parseInt(v6PrefixInput.value, 10);
-    const targetPrefix = parseInt(targetPrefixSelect.value, 10);
+      const expanded = expandIPv6(ip);
+      const compressed = compressIPv6(expanded);
+      const classification = classifyIPv6(expanded);
+      const bounds = getIPv6SubnetBounds(expanded, prefix);
+      
+      // Address Capacity
+      const hostBits = 128 - prefix;
+      let hostsDisplay = "";
+      if (hostBits >= 53) {
+        const log10 = hostBits * Math.log10(2);
+        const exponent = Math.floor(log10);
+        const mantissa = Math.pow(10, log10 - exponent);
+        hostsDisplay = `${mantissa.toFixed(3)}e+${exponent} IPs`;
+      } else {
+        hostsDisplay = `${Math.pow(2, hostBits).toLocaleString()} IPs`;
+      }
 
-    if (!validateIPv6(ip)) {
-      errorBanner?.classList.add('show');
-      return;
-    } else {
-      errorBanner?.classList.remove('show');
+      // Update fields
+      if (compOutput) compOutput.innerText = `${compressed}/${prefix}`;
+      if (expOutput) expOutput.innerText = expanded;
+      if (typeOutput) typeOutput.innerText = classification.type;
+      if (rangeOutput) rangeOutput.innerText = `${bounds.start} - ${bounds.end}`;
+      if (hostsOutput) hostsOutput.innerText = hostsDisplay;
+
+      // Delegations calculations
+      if (targetPrefix < prefix) {
+        const nextBound = Math.min(128, prefix + 8 - (prefix % 8 || 8));
+        targetPrefixSelect.value = nextBound.toString();
+        calculateIPv6();
+        return;
+      }
+
+      const difference = targetPrefix - prefix;
+      let subnetsCountDisplay = "";
+      if (difference >= 53) {
+        const log10 = difference * Math.log10(2);
+        const exponent = Math.floor(log10);
+        const mantissa = Math.pow(10, log10 - exponent);
+        subnetsCountDisplay = `${mantissa.toFixed(2)}e+${exponent}`;
+      } else {
+        subnetsCountDisplay = Math.pow(2, difference).toLocaleString();
+      }
+
+      if (delegatedCount) delegatedCount.innerText = subnetsCountDisplay;
+
+      // Split ranges to list
+      const rangesList = splitIPv6Range(compressed, prefix, targetPrefix);
+      if (delegatedList) {
+        delegatedList.innerHTML = rangesList.map(item => `
+          <li style="color:var(--text-secondary); padding: 0.15rem 0; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between;">
+            <span>${item}</span>
+          </li>
+        `).join('');
+      }
     }
 
-    const expanded = expandIPv6(ip);
-    const compressed = compressIPv6(expanded);
-    const classification = classifyIPv6(expanded);
-    const bounds = getIPv6SubnetBounds(expanded, prefix);
-    
-    // Address Capacity
-    const hostBits = 128 - prefix;
-    let hostsDisplay = "";
-    if (hostBits >= 53) {
-      // Big number, format scientifically
-      // Capacity = 2 ^ hostBits
-      const log10 = hostBits * Math.log10(2);
-      const exponent = Math.floor(log10);
-      const mantissa = Math.pow(10, log10 - exponent);
-      hostsDisplay = `${mantissa.toFixed(3)}e+${exponent} IPs`;
-    } else {
-      hostsDisplay = `${Math.pow(2, hostBits).toLocaleString()} IPs`;
-    }
-
-    // Update fields
-    if (compOutput) compOutput.innerText = `${compressed}/${prefix}`;
-    if (expOutput) expOutput.innerText = expanded;
-    if (typeOutput) typeOutput.innerText = classification.type;
-    if (rangeOutput) rangeOutput.innerText = `${bounds.start} - ${bounds.end}`;
-    if (hostsOutput) hostsOutput.innerText = hostsDisplay;
-
-    // Delegations calculations
-    // If targetPrefix is smaller than prefix, clamp targetPrefix select
-    if (targetPrefix < prefix) {
-      // Automatically adjust target to next boundary
-      const nextBound = Math.min(128, prefix + 8 - (prefix % 8 || 8));
-      targetPrefixSelect.value = nextBound.toString();
-      calculateIPv6();
-      return;
-    }
-
-    const difference = targetPrefix - prefix;
-    let subnetsCountDisplay = "";
-    if (difference >= 53) {
-      const log10 = difference * Math.log10(2);
-      const exponent = Math.floor(log10);
-      const mantissa = Math.pow(10, log10 - exponent);
-      subnetsCountDisplay = `${mantissa.toFixed(2)}e+${exponent}`;
-    } else {
-      subnetsCountDisplay = Math.pow(2, difference).toLocaleString();
-    }
-
-    if (delegatedCount) delegatedCount.innerText = subnetsCountDisplay;
-
-    // Split ranges to list
-    const rangesList = splitIPv6Range(compressed, prefix, targetPrefix);
-    if (delegatedList) {
-      delegatedList.innerHTML = rangesList.map(item => `
-        <li style="color:var(--text-secondary); padding: 0.15rem 0; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between;">
-          <span>${item}</span>
-        </li>
-      `).join('');
-    }
-
-    // Sync URL search params
-    const url = new URL(window.location.href);
-    url.searchParams.set('v6_ip', ip);
-    url.searchParams.set('v6_prefix', prefix.toString());
-    window.history.replaceState({}, '', url.toString());
-  }
-
-  // Bind Listeners
-  v6IpInput.addEventListener('input', calculateIPv6);
-  v6PrefixInput.addEventListener('input', (e) => {
-    const val = parseInt((e.target as HTMLInputElement).value, 10);
-    if (!isNaN(val) && val >= 0 && val <= 128) {
-      v6PrefixSlider.value = val.toString();
-      calculateIPv6();
-    }
-  });
-
-  v6PrefixSlider.addEventListener('input', (e) => {
-    const val = (e.target as HTMLInputElement).value;
-    v6PrefixInput.value = val;
-    calculateIPv6();
-  });
-
-  targetPrefixSelect.addEventListener('change', calculateIPv6);
-
-  // Copy JSON
-  copyBtn?.addEventListener('click', async () => {
-    const ip = v6IpInput.value.trim();
-    const prefix = parseInt(v6PrefixInput.value, 10);
-    if (!validateIPv6(ip)) return;
-    
-    const exp = expandIPv6(ip);
-    const bounds = getIPv6SubnetBounds(exp, prefix);
-    const classification = classifyIPv6(exp);
-
-    const data = {
-      ipv6_address: ip,
-      prefix_length: prefix,
-      expanded: exp,
-      compressed: compressIPv6(exp),
-      type: classification.type,
-      description: classification.description,
-      range: bounds
+    // Bind Listeners
+    v6IpInput.oninput = calculateIPv6;
+    v6PrefixInput.oninput = (e) => {
+      const val = parseInt((e.target as HTMLInputElement).value, 10);
+      if (!isNaN(val) && val >= 0 && val <= 128) {
+        v6PrefixSlider.value = val.toString();
+        calculateIPv6();
+      }
     };
 
-    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    copyBtn.innerText = 'Copied!';
-    copyBtn.classList.add('copied');
-    setTimeout(() => {
-      copyBtn.innerText = 'Copy JSON';
-      copyBtn.classList.remove('copied');
-    }, 2000);
-  });
+    v6PrefixSlider.oninput = (e) => {
+      const val = (e.target as HTMLInputElement).value;
+      v6PrefixInput.value = val;
+      calculateIPv6();
+    };
 
-  // Check URL params on mount
-  window.addEventListener('DOMContentLoaded', () => {
+    targetPrefixSelect.onchange = calculateIPv6;
+
+    // Copy JSON
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        const ip = v6IpInput.value.trim();
+        const prefix = parseInt(v6PrefixInput.value, 10);
+        if (!validateIPv6(ip)) return;
+        
+        const exp = expandIPv6(ip);
+        const bounds = getIPv6SubnetBounds(exp, prefix);
+        const classification = classifyIPv6(exp);
+
+        const data = {
+          ipv6_address: ip,
+          prefix_length: prefix,
+          expanded: exp,
+          compressed: compressIPv6(exp),
+          type: classification.type,
+          description: classification.description,
+          range: bounds
+        };
+
+        await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+        copyBtn.innerText = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.innerText = 'Copy JSON';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
+    // Check URL params on mount
     const params = new URLSearchParams(window.location.search);
     const v6Ip = params.get('v6_ip');
     const v6Prefix = params.get('v6_prefix');
@@ -342,5 +334,8 @@ const {
     }
     
     calculateIPv6();
-  });
+  }
+
+  document.addEventListener('astro:page-load', initIPv6Calculator);
+  initIPv6Calculator();
 </script>

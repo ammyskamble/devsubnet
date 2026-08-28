@@ -295,63 +295,61 @@ import NavBar from '../components/NavBar.astro';
 </style>
 
 <script>
-  function calculateK8sArchitecture() {
-    const nodeCount = parseInt((document.getElementById('k8s-nodes-count') as HTMLInputElement)?.value || '100', 10);
-    const maxPodsPerNode = parseInt((document.getElementById('k8s-pods-per-node') as HTMLSelectElement)?.value || '110', 10);
-    const cni = (document.getElementById('k8s-cni-type') as HTMLSelectElement)?.value || 'cilium';
-    const podCidr = (document.getElementById('k8s-base-pod-cidr') as HTMLInputElement)?.value || '10.244.0.0/16';
-    const svcCidr = (document.getElementById('k8s-service-cidr') as HTMLInputElement)?.value || '10.96.0.0/16';
+  function setupK8sArchitecture() {
+    function calculateK8sArchitecture() {
+      const nodeCount = parseInt((document.getElementById('k8s-nodes-count') as HTMLInputElement)?.value || '100', 10);
+      const maxPodsPerNode = parseInt((document.getElementById('k8s-pods-per-node') as HTMLSelectElement)?.value || '110', 10);
+      const cni = (document.getElementById('k8s-cni-type') as HTMLSelectElement)?.value || 'cilium';
+      const podCidr = (document.getElementById('k8s-base-pod-cidr') as HTMLInputElement)?.value || '10.244.0.0/16';
+      const svcCidr = (document.getElementById('k8s-service-cidr') as HTMLInputElement)?.value || '10.96.0.0/16';
 
-    const podPrefix = parseInt(podCidr.split('/')[1] || '16', 10);
-    const svcPrefix = parseInt(svcCidr.split('/')[1] || '16', 10);
+      const podPrefix = parseInt(podCidr.split('/')[1] || '16', 10);
+      const svcPrefix = parseInt(svcCidr.split('/')[1] || '16', 10);
 
-    // Determine node mask required
-    let nodeMask = 24; // 254 IPs
-    if (maxPodsPerNode <= 30) nodeMask = 26; // 62 IPs
-    else if (maxPodsPerNode <= 64) nodeMask = 25; // 126 IPs
-    else if (maxPodsPerNode <= 120) nodeMask = 24; // 254 IPs
-    else nodeMask = 23; // 510 IPs
+      let nodeMask = 24;
+      if (maxPodsPerNode <= 30) nodeMask = 26;
+      else if (maxPodsPerNode <= 64) nodeMask = 25;
+      else if (maxPodsPerNode <= 120) nodeMask = 24;
+      else nodeMask = 23;
 
-    const maxNodesCapacity = Math.pow(2, nodeMask - podPrefix);
-    const totalPodCapacity = maxNodesCapacity * (Math.pow(2, 32 - nodeMask) - 2);
-    const serviceIpsCapacity = Math.pow(2, 32 - svcPrefix) - 2;
+      const maxNodesCapacity = Math.pow(2, nodeMask - podPrefix);
+      const totalPodCapacity = maxNodesCapacity * (Math.pow(2, 32 - nodeMask) - 2);
+      const serviceIpsCapacity = Math.pow(2, 32 - svcPrefix) - 2;
 
-    const [svcBase] = svcCidr.split('/');
-    const svcParts = svcBase.split('.');
-    const dnsIp = `${svcParts[0]}.${svcParts[1]}.${svcParts[2]}.10`;
+      const [svcBase] = svcCidr.split('/');
+      const svcParts = svcBase.split('.');
+      const dnsIp = `${svcParts[0]}.${svcParts[1]}.${svcParts[2]}.10`;
 
-    // DOM updates
-    const diagNodeMask = document.getElementById('diag-node-mask');
-    const diagMaxNodes = document.getElementById('diag-max-nodes');
-    const diagTotalPods = document.getElementById('diag-total-pods');
-    const diagServiceIps = document.getElementById('diag-service-ips');
-    const diagDnsIp = document.getElementById('diag-dns-ip');
-    const warningEl = document.getElementById('diag-exhaustion-warning');
-    const badgeEl = document.getElementById('diag-status-badge');
+      const diagNodeMask = document.getElementById('diag-node-mask');
+      const diagMaxNodes = document.getElementById('diag-max-nodes');
+      const diagTotalPods = document.getElementById('diag-total-pods');
+      const diagServiceIps = document.getElementById('diag-service-ips');
+      const diagDnsIp = document.getElementById('diag-dns-ip');
+      const warningEl = document.getElementById('diag-exhaustion-warning');
+      const badgeEl = document.getElementById('diag-status-badge');
 
-    if (diagNodeMask) diagNodeMask.textContent = `/${nodeMask} (${Math.pow(2, 32 - nodeMask) - 2} Pod IPs per Node)`;
-    if (diagMaxNodes) diagMaxNodes.textContent = `${maxNodesCapacity.toLocaleString()} Nodes`;
-    if (diagTotalPods) diagTotalPods.textContent = `${totalPodCapacity.toLocaleString()} Pods`;
-    if (diagServiceIps) diagServiceIps.textContent = `${serviceIpsCapacity.toLocaleString()} ClusterIPs`;
-    if (diagDnsIp) diagDnsIp.textContent = dnsIp;
+      if (diagNodeMask) diagNodeMask.textContent = `/${nodeMask} (${Math.pow(2, 32 - nodeMask) - 2} Pod IPs per Node)`;
+      if (diagMaxNodes) diagMaxNodes.textContent = `${maxNodesCapacity.toLocaleString()} Nodes`;
+      if (diagTotalPods) diagTotalPods.textContent = `${totalPodCapacity.toLocaleString()} Pods`;
+      if (diagServiceIps) diagServiceIps.textContent = `${serviceIpsCapacity.toLocaleString()} ClusterIPs`;
+      if (diagDnsIp) diagDnsIp.textContent = dnsIp;
 
-    const isExhausted = nodeCount > maxNodesCapacity;
-    if (warningEl && badgeEl) {
-      if (isExhausted) {
-        warningEl.style.display = 'block';
-        badgeEl.textContent = 'EXHAUSTION RISK';
-        badgeEl.classList.add('warning');
-      } else {
-        warningEl.style.display = 'none';
-        badgeEl.textContent = 'HEALTHY CAPACITY';
-        badgeEl.classList.remove('warning');
+      const isExhausted = nodeCount > maxNodesCapacity;
+      if (warningEl && badgeEl) {
+        if (isExhausted) {
+          warningEl.style.display = 'block';
+          badgeEl.textContent = 'EXHAUSTION RISK';
+          badgeEl.classList.add('warning');
+        } else {
+          warningEl.style.display = 'none';
+          badgeEl.textContent = 'HEALTHY CAPACITY';
+          badgeEl.classList.remove('warning');
+        }
       }
-    }
 
-    // Generate Manifest
-    let manifest = '';
-    if (cni === 'cilium') {
-      manifest = `# Cilium Helm values.yaml
+      let manifest = '';
+      if (cni === 'cilium') {
+        manifest = `# Cilium Helm values.yaml
 cluster:
   name: "production-cluster"
   id: 1
@@ -364,8 +362,8 @@ k8sServiceHost: "127.0.0.1"
 k8sServicePort: 6443
 tunnel: "vxlan"
 kubeProxyReplacement: "true"`;
-    } else if (cni === 'calico') {
-      manifest = `# Calico Installation Manifest (values.yaml)
+      } else if (cni === 'calico') {
+        manifest = `# Calico Installation Manifest (values.yaml)
 kind: Installation
 apiVersion: operator.tigera.io/v1
 metadata:
@@ -378,8 +376,8 @@ spec:
         encapsulation: VXLAN
         natOutgoing: Enabled
         nodeSelector: all()`;
-    } else if (cni === 'awsvpc') {
-      manifest = `# AWS EKS Terraform & VPC CNI Configuration
+      } else if (cni === 'awsvpc') {
+        manifest = `# AWS EKS Terraform & VPC CNI Configuration
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "eks-prod"
@@ -401,8 +399,8 @@ resource "aws_eks_addon" "vpc_cni" {
     }
   })
 }`;
-    } else {
-      manifest = `# Kubeadm ClusterConfiguration YAML
+      } else {
+        manifest = `# Kubeadm ClusterConfiguration YAML
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 kubernetesVersion: v1.31.0
@@ -414,28 +412,34 @@ networking:
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 maxPods: ${maxPodsPerNode}`;
+      }
+
+      const codeEl = document.getElementById('k8s-manifest-output');
+      if (codeEl) codeEl.textContent = manifest;
     }
 
-    const codeEl = document.getElementById('k8s-manifest-output');
-    if (codeEl) codeEl.textContent = manifest;
-  }
-
-  // Attach event listeners
-  ['k8s-nodes-count', 'k8s-pods-per-node', 'k8s-cni-type', 'k8s-base-pod-cidr', 'k8s-service-cidr'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', calculateK8sArchitecture);
-    document.getElementById(id)?.addEventListener('change', calculateK8sArchitecture);
-  });
-
-  document.getElementById('copy-k8s-btn')?.addEventListener('click', () => {
-    const code = document.getElementById('k8s-manifest-output')?.textContent || '';
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = document.getElementById('copy-k8s-btn');
-      if (btn) {
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy Manifest'; }, 2000);
+    ['k8s-nodes-count', 'k8s-pods-per-node', 'k8s-cni-type', 'k8s-base-pod-cidr', 'k8s-service-cidr'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.oninput = calculateK8sArchitecture;
+        el.onchange = calculateK8sArchitecture;
       }
     });
-  });
 
-  calculateK8sArchitecture();
+    const copyBtn = document.getElementById('copy-k8s-btn');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        const code = document.getElementById('k8s-manifest-output')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = 'Copy Manifest'; }, 2000);
+        });
+      };
+    }
+
+    calculateK8sArchitecture();
+  }
+
+  document.addEventListener('astro:page-load', setupK8sArchitecture);
+  setupK8sArchitecture();
 </script>

@@ -1,5 +1,7 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import { getHrefLangAlternates, languages, type SupportedLanguage } from '../utils/i18n';
+import '../styles/global.css';
 
 interface Props {
   title?: string;
@@ -21,6 +23,7 @@ const currentLangInfo = languages[lang] || languages.en;
 <!doctype html>
 <html lang={lang} data-theme="dark">
   <head>
+    <ClientRouter />
     <!-- Google tag (gtag.js) -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V"></script>
     <script is:inline>
@@ -76,13 +79,15 @@ const currentLangInfo = languages[lang] || languages.en;
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={`${Astro.url.origin}/og-image.png`} />
  
-    <!-- Anti-Flash Theme Script -->
+    <!-- Anti-Flash Theme Script (runs inline & on astro:after-swap) -->
     <script is:inline>
-      (function() {
+      function applyTheme() {
         const theme = localStorage.getItem('devsubnet-theme') || 
           (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
         document.documentElement.setAttribute('data-theme', theme);
-      })();
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
     </script>
 
     <!-- WebApplication / SoftwareApplication Schema JSON-LD for Rich Results -->
@@ -218,7 +223,3 @@ const currentLangInfo = languages[lang] || languages.en;
     <slot />
   </body>
 </html>
-
-<script>
-  import '../styles/global.css';
-</script>

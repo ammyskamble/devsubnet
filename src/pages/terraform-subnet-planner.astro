@@ -286,160 +286,163 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
 </style>
 
 <script>
-  // Terraform cidrsubnet logic implementation in client-side script
-  function ipToLong(ip: string): number {
-    return ip.split('.').reduce((acc, octet) => ((acc << 8) + parseInt(octet, 10)) >>> 0, 0);
-  }
+  function setupTerraformPlanner() {
+    function ipToLong(ip: string): number {
+      return ip.split('.').reduce((acc, octet) => ((acc << 8) + parseInt(octet, 10)) >>> 0, 0);
+    }
 
-  function longToIp(long: number): string {
-    return [
-      (long >>> 24) & 255,
-      (long >>> 16) & 255,
-      (long >>> 8) & 255,
-      long & 255
-    ].join('.');
-  }
+    function longToIp(long: number): string {
+      return [
+        (long >>> 24) & 255,
+        (long >>> 16) & 255,
+        (long >>> 8) & 255,
+        long & 255
+      ].join('.');
+    }
 
-  function calcCidrSubnet(baseCidr: string, newbits: number, netnum: number): string {
-    const [baseIp, basePrefixStr] = baseCidr.split('/');
-    const basePrefix = parseInt(basePrefixStr, 10);
-    const targetPrefix = basePrefix + newbits;
+    function calcCidrSubnet(baseCidr: string, newbits: number, netnum: number): string {
+      const [baseIp, basePrefixStr] = baseCidr.split('/');
+      const basePrefix = parseInt(basePrefixStr, 10);
+      const targetPrefix = basePrefix + newbits;
 
-    if (targetPrefix > 32) return 'Invalid prefix';
+      if (targetPrefix > 32) return 'Invalid prefix';
 
-    const baseLong = ipToLong(baseIp);
-    const shift = 32 - targetPrefix;
-    const subnetLong = (baseLong + (netnum << shift)) >>> 0;
+      const baseLong = ipToLong(baseIp);
+      const shift = 32 - targetPrefix;
+      const subnetLong = (baseLong + (netnum << shift)) >>> 0;
 
-    return `${longToIp(subnetLong)}/${targetPrefix}`;
-  }
+      return `${longToIp(subnetLong)}/${targetPrefix}`;
+    }
 
-  function renderTerraformPlan() {
-    const baseCidrInput = (document.getElementById('tf-base-cidr') as HTMLInputElement)?.value || '10.0.0.0/16';
-    const azCount = parseInt((document.getElementById('tf-az-count') as HTMLSelectElement)?.value || '3', 10);
-    const newbits = parseInt((document.getElementById('tf-newbits') as HTMLSelectElement)?.value || '8', 10);
-    const provider = (document.getElementById('tf-cloud-provider') as HTMLSelectElement)?.value || 'aws';
+    function renderTerraformPlan() {
+      const baseCidrInput = (document.getElementById('tf-base-cidr') as HTMLInputElement)?.value || '10.0.0.0/16';
+      const azCount = parseInt((document.getElementById('tf-az-count') as HTMLSelectElement)?.value || '3', 10);
+      const newbits = parseInt((document.getElementById('tf-newbits') as HTMLSelectElement)?.value || '8', 10);
+      const provider = (document.getElementById('tf-cloud-provider') as HTMLSelectElement)?.value || 'aws';
 
-    const hasPublic = (document.getElementById('tier-public') as HTMLInputElement)?.checked;
-    const hasPrivate = (document.getElementById('tier-private') as HTMLInputElement)?.checked;
-    const hasData = (document.getElementById('tier-data') as HTMLInputElement)?.checked;
-    const hasMgmt = (document.getElementById('tier-mgmt') as HTMLInputElement)?.checked;
+      const hasPublic = (document.getElementById('tier-public') as HTMLInputElement)?.checked;
+      const hasPrivate = (document.getElementById('tier-private') as HTMLInputElement)?.checked;
+      const hasData = (document.getElementById('tier-data') as HTMLInputElement)?.checked;
+      const hasMgmt = (document.getElementById('tier-mgmt') as HTMLInputElement)?.checked;
 
-    const tiers: { name: string; key: string }[] = [];
-    if (hasPublic) tiers.push({ name: 'Public', key: 'public' });
-    if (hasPrivate) tiers.push({ name: 'Private App', key: 'private' });
-    if (hasData) tiers.push({ name: 'Database', key: 'database' });
-    if (hasMgmt) tiers.push({ name: 'Management', key: 'mgmt' });
+      const tiers: { name: string; key: string }[] = [];
+      if (hasPublic) tiers.push({ name: 'Public', key: 'public' });
+      if (hasPrivate) tiers.push({ name: 'Private App', key: 'private' });
+      if (hasData) tiers.push({ name: 'Database', key: 'database' });
+      if (hasMgmt) tiers.push({ name: 'Management', key: 'mgmt' });
 
-    let netnumIndex = 0;
-    const rows: Array<{ tier: string; az: number; cidr: string; expr: string; netnum: number; hosts: number }> = [];
+      let netnumIndex = 0;
+      const rows: Array<{ tier: string; az: number; cidr: string; expr: string; netnum: number; hosts: number }> = [];
 
-    const targetPrefix = parseInt(baseCidrInput.split('/')[1] || '16', 10) + newbits;
-    const usableHosts = Math.max(0, Math.pow(2, 32 - targetPrefix) - (provider === 'aws' ? 5 : 2));
+      const targetPrefix = parseInt(baseCidrInput.split('/')[1] || '16', 10) + newbits;
+      const usableHosts = Math.max(0, Math.pow(2, 32 - targetPrefix) - (provider === 'aws' ? 5 : 2));
 
-    tiers.forEach((tier) => {
-      for (let az = 0; az < azCount; az++) {
-        const currentNetnum = netnumIndex++;
-        const calculatedCidr = calcCidrSubnet(baseCidrInput, newbits, currentNetnum);
-        rows.push({
-          tier: tier.name,
-          az: az + 1,
-          cidr: calculatedCidr,
-          expr: `cidrsubnet(var.vpc_cidr, ${newbits}, ${currentNetnum})`,
-          netnum: currentNetnum,
-          hosts: usableHosts
+      tiers.forEach((tier) => {
+        for (let az = 0; az < azCount; az++) {
+          const currentNetnum = netnumIndex++;
+          const calculatedCidr = calcCidrSubnet(baseCidrInput, newbits, currentNetnum);
+          rows.push({
+            tier: tier.name,
+            az: az + 1,
+            cidr: calculatedCidr,
+            expr: `cidrsubnet(var.vpc_cidr, ${newbits}, ${currentNetnum})`,
+            netnum: currentNetnum,
+            hosts: usableHosts
+          });
+        }
+      });
+
+      const tbody = document.getElementById('tf-table-body');
+      if (tbody) {
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td><strong style="color: var(--text-primary);">${r.tier}</strong></td>
+            <td>AZ ${r.az}</td>
+            <td><code style="color: var(--accent-network); font-weight: 600;">${r.cidr}</code></td>
+            <td><code style="color: var(--text-secondary); font-size: 0.78rem;">${r.expr}</code></td>
+            <td>${r.netnum}</td>
+            <td>${r.hosts.toLocaleString()} IPs</td>
+          </tr>
+        `).join('');
+      }
+
+      let hcl = '';
+      if (provider === 'aws') {
+        hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\nvariable "azs" {\n  type    = list(string)\n  default = [${Array.from({length: azCount}, (_, i) => `"us-east-1${String.fromCharCode(97 + i)}"`).join(', ')}]\n}\n\n`;
+        
+        let offsetCounter = 0;
+        tiers.forEach(tier => {
+          hcl += `# ${tier.name} Subnets\n`;
+          hcl += `resource "aws_subnet" "${tier.key}" {\n`;
+          hcl += `  count             = length(var.azs)\n`;
+          hcl += `  vpc_id            = aws_vpc.main.id\n`;
+          hcl += `  cidr_block        = cidrsubnet(var.vpc_cidr, ${newbits}, count.index + ${offsetCounter})\n`;
+          hcl += `  availability_zone = var.azs[count.index]\n`;
+          hcl += `  tags = {\n`;
+          hcl += `    Name = "${tier.key}-\${var.azs[count.index]}"\n`;
+          hcl += `    Tier = "${tier.name}"\n`;
+          hcl += `  }\n`;
+          hcl += `}\n\n`;
+          offsetCounter += azCount;
+        });
+      } else if (provider === 'azure') {
+        hcl = `variable "vnet_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
+        let offsetCounter = 0;
+        tiers.forEach(tier => {
+          hcl += `resource "azurerm_subnet" "${tier.key}" {\n`;
+          hcl += `  name                 = "snet-${tier.key}"\n`;
+          hcl += `  resource_group_name  = azurerm_resource_group.main.name\n`;
+          hcl += `  virtual_network_name = azurerm_virtual_network.main.name\n`;
+          hcl += `  address_prefixes     = [\n`;
+          for (let i = 0; i < azCount; i++) {
+            hcl += `    cidrsubnet(var.vnet_cidr, ${newbits}, ${offsetCounter + i})${i < azCount - 1 ? ',' : ''}\n`;
+          }
+          hcl += `  ]\n`;
+          hcl += `}\n\n`;
+          offsetCounter += azCount;
+        });
+      } else {
+        hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
+        let offsetCounter = 0;
+        tiers.forEach(tier => {
+          for (let i = 0; i < azCount; i++) {
+            hcl += `resource "google_compute_subnetwork" "${tier.key}_az${i + 1}" {\n`;
+            hcl += `  name          = "sb-${tier.key}-az${i + 1}"\n`;
+            hcl += `  ip_cidr_range = cidrsubnet(var.vpc_cidr, ${newbits}, ${offsetCounter + i})\n`;
+            hcl += `  region        = "us-central1"\n`;
+            hcl += `  network       = google_compute_network.main.id\n`;
+            hcl += `}\n\n`;
+          }
+          offsetCounter += azCount;
         });
       }
-    });
 
-    // Populate Table
-    const tbody = document.getElementById('tf-table-body');
-    if (tbody) {
-      tbody.innerHTML = rows.map(r => `
-        <tr>
-          <td><strong style="color: var(--text-primary);">${r.tier}</strong></td>
-          <td>AZ ${r.az}</td>
-          <td><code style="color: var(--accent-network); font-weight: 600;">${r.cidr}</code></td>
-          <td><code style="color: var(--text-secondary); font-size: 0.78rem;">${r.expr}</code></td>
-          <td>${r.netnum}</td>
-          <td>${r.hosts.toLocaleString()} IPs</td>
-        </tr>
-      `).join('');
+      const codeEl = document.getElementById('tf-code-output');
+      if (codeEl) codeEl.textContent = hcl;
     }
 
-    // Generate HCL snippet
-    let hcl = '';
-    if (provider === 'aws') {
-      hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\nvariable "azs" {\n  type    = list(string)\n  default = [${Array.from({length: azCount}, (_, i) => `"us-east-1${String.fromCharCode(97 + i)}"`).join(', ')}]\n}\n\n`;
-      
-      let offsetCounter = 0;
-      tiers.forEach(tier => {
-        hcl += `# ${tier.name} Subnets\n`;
-        hcl += `resource "aws_subnet" "${tier.key}" {\n`;
-        hcl += `  count             = length(var.azs)\n`;
-        hcl += `  vpc_id            = aws_vpc.main.id\n`;
-        hcl += `  cidr_block        = cidrsubnet(var.vpc_cidr, ${newbits}, count.index + ${offsetCounter})\n`;
-        hcl += `  availability_zone = var.azs[count.index]\n`;
-        hcl += `  tags = {\n`;
-        hcl += `    Name = "${tier.key}-\${var.azs[count.index]}"\n`;
-        hcl += `    Tier = "${tier.name}"\n`;
-        hcl += `  }\n`;
-        hcl += `}\n\n`;
-        offsetCounter += azCount;
-      });
-    } else if (provider === 'azure') {
-      hcl = `variable "vnet_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
-      let offsetCounter = 0;
-      tiers.forEach(tier => {
-        hcl += `resource "azurerm_subnet" "${tier.key}" {\n`;
-        hcl += `  name                 = "snet-${tier.key}"\n`;
-        hcl += `  resource_group_name  = azurerm_resource_group.main.name\n`;
-        hcl += `  virtual_network_name = azurerm_virtual_network.main.name\n`;
-        hcl += `  address_prefixes     = [\n`;
-        for (let i = 0; i < azCount; i++) {
-          hcl += `    cidrsubnet(var.vnet_cidr, ${newbits}, ${offsetCounter + i})${i < azCount - 1 ? ',' : ''}\n`;
-        }
-        hcl += `  ]\n`;
-        hcl += `}\n\n`;
-        offsetCounter += azCount;
-      });
-    } else {
-      hcl = `variable "vpc_cidr" {\n  type    = string\n  default = "${baseCidrInput}"\n}\n\n`;
-      let offsetCounter = 0;
-      tiers.forEach(tier => {
-        for (let i = 0; i < azCount; i++) {
-          hcl += `resource "google_compute_subnetwork" "${tier.key}_az${i + 1}" {\n`;
-          hcl += `  name          = "sb-${tier.key}-az${i + 1}"\n`;
-          hcl += `  ip_cidr_range = cidrsubnet(var.vpc_cidr, ${newbits}, ${offsetCounter + i})\n`;
-          hcl += `  region        = "us-central1"\n`;
-          hcl += `  network       = google_compute_network.main.id\n`;
-          hcl += `}\n\n`;
-        }
-        offsetCounter += azCount;
-      });
-    }
-
-    const codeEl = document.getElementById('tf-code-output');
-    if (codeEl) codeEl.textContent = hcl;
-  }
-
-  // Attach event listeners
-  ['tf-base-cidr', 'tf-az-count', 'tf-newbits', 'tf-cloud-provider', 'tier-public', 'tier-private', 'tier-data', 'tier-mgmt'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', renderTerraformPlan);
-    document.getElementById(id)?.addEventListener('change', renderTerraformPlan);
-  });
-
-  document.getElementById('copy-tf-btn')?.addEventListener('click', () => {
-    const code = document.getElementById('tf-code-output')?.textContent || '';
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = document.getElementById('copy-tf-btn');
-      if (btn) {
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy HCL Code'; }, 2000);
+    ['tf-base-cidr', 'tf-az-count', 'tf-newbits', 'tf-cloud-provider', 'tier-public', 'tier-private', 'tier-data', 'tier-mgmt'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.oninput = renderTerraformPlan;
+        el.onchange = renderTerraformPlan;
       }
     });
-  });
 
-  // Initial render
-  renderTerraformPlan();
+    const copyBtn = document.getElementById('copy-tf-btn');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        const code = document.getElementById('tf-code-output')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = 'Copy HCL Code'; }, 2000);
+        });
+      };
+    }
+
+    renderTerraformPlan();
+  }
+
+  document.addEventListener('astro:page-load', setupTerraformPlanner);
+  setupTerraformPlanner();
 </script>

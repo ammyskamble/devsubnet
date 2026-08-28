@@ -68,97 +68,107 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
 <script>
   import { validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
 
-  const input = document.getElementById('supernet-input') as HTMLTextAreaElement;
-  const runBtn = document.getElementById('btn-run-supernet') as HTMLButtonElement;
-  const clearBtn = document.getElementById('btn-clear-supernet') as HTMLButtonElement;
-  const tableBody = document.getElementById('supernet-table-body') as HTMLTableSectionElement;
-  const codeOutput = document.getElementById('supernet-code-output') as HTMLElement;
-  const copyBtn = document.getElementById('copy-supernet-code') as HTMLButtonElement;
-  const errorBanner = document.getElementById('supernet-error');
+  function initSupernetter() {
+    const input = document.getElementById('supernet-input') as HTMLTextAreaElement;
+    const runBtn = document.getElementById('btn-run-supernet') as HTMLButtonElement;
+    const clearBtn = document.getElementById('btn-clear-supernet') as HTMLButtonElement;
+    const tableBody = document.getElementById('supernet-table-body') as HTMLTableSectionElement;
+    const codeOutput = document.getElementById('supernet-code-output') as HTMLElement;
+    const copyBtn = document.getElementById('copy-supernet-code') as HTMLButtonElement;
+    const errorBanner = document.getElementById('supernet-error');
 
-  function parseBlock(line: string): { network: number; cidr: number } | null {
-    const t = line.trim();
-    if (!t) return null;
-    const slash = t.lastIndexOf('/');
-    if (slash === -1) return null;
-    const ip = t.slice(0, slash).trim();
-    const cidr = parseInt(t.slice(slash + 1), 10);
-    if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32) return null;
-    const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
-    return { network: (ip2Long(ip) & mask) >>> 0, cidr };
-  }
+    if (!input || !runBtn || !tableBody) return;
 
-  function run() {
-    errorBanner?.classList.remove('show');
-    const blocks: { network: number; cidr: number }[] = [];
-    let valid = true;
-
-    input.value.split('\n').forEach(line => {
-      const b = parseBlock(line);
-      if (b) blocks.push(b);
-      else if (line.trim()) valid = false;
-    });
-
-    if (!valid || blocks.length === 0) {
-      errorBanner?.classList.add('show');
-      return;
+    function parseBlock(line: string): { network: number; cidr: number } | null {
+      const t = line.trim();
+      if (!t) return null;
+      const slash = t.lastIndexOf('/');
+      if (slash === -1) return null;
+      const ip = t.slice(0, slash).trim();
+      const cidr = parseInt(t.slice(slash + 1), 10);
+      if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32) return null;
+      const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
+      return { network: (ip2Long(ip) & mask) >>> 0, cidr };
     }
 
-    // Sort by network then prefix
-    blocks.sort((a, b) => a.network - b.network || a.cidr - b.cidr);
+    function run() {
+      errorBanner?.classList.remove('show');
+      const blocks: { network: number; cidr: number }[] = [];
+      let valid = true;
 
-    // Start from smallest prefix blocks, attempt to combine contiguous siblings
-    let aggregated = blocks.map(b => ({ ...b }));
-    let changed = true;
-    while (changed) {
-      changed = false;
-      const next: { network: number; cidr: number }[] = [];
-      for (let i = 0; i < aggregated.length; i++) {
-        const a = aggregated[i];
-        if (i + 1 < aggregated.length) {
-          const b = aggregated[i + 1];
-          // Can combine if a and b are adjacent /same prefix and aligned to parent boundary
-          const parentCidr = a.cidr - 1;
-          const parentStep = Math.pow(2, 32 - parentCidr);
-          if (a.cidr === b.cidr && a.cidr > 0 && (a.network % parentStep === 0) && b.network === a.network + Math.pow(2, 32 - a.cidr)) {
-            next.push({ network: a.network, cidr: parentCidr });
-            i++; // skip b
-            changed = true;
-            continue;
-          }
-        }
-        next.push(a);
+      input.value.split('\n').forEach(line => {
+        const b = parseBlock(line);
+        if (b) blocks.push(b);
+        else if (line.trim()) valid = false;
+      });
+
+      if (!valid || blocks.length === 0) {
+        errorBanner?.classList.add('show');
+        return;
       }
-      aggregated = next;
+
+      blocks.sort((a, b) => a.network - b.network || a.cidr - b.cidr);
+
+      let aggregated = blocks.map(b => ({ ...b }));
+      let changed = true;
+      while (changed) {
+        changed = false;
+        const next: { network: number; cidr: number }[] = [];
+        for (let i = 0; i < aggregated.length; i++) {
+          const a = aggregated[i];
+          if (i + 1 < aggregated.length) {
+            const b = aggregated[i + 1];
+            const parentCidr = a.cidr - 1;
+            const parentStep = Math.pow(2, 32 - parentCidr);
+            if (a.cidr === b.cidr && a.cidr > 0 && (a.network % parentStep === 0) && b.network === a.network + Math.pow(2, 32 - a.cidr)) {
+              next.push({ network: a.network, cidr: parentCidr });
+              i++;
+              changed = true;
+              continue;
+            }
+          }
+          next.push(a);
+        }
+        aggregated = next;
+      }
+
+      let html = '';
+      aggregated.forEach(a => {
+        const end = a.network + Math.pow(2, 32 - a.cidr) - 1;
+        html += `<tr><td><strong>${long2Ip(a.network)}/${a.cidr}</strong></td><td>${long2Ip(a.network)} - ${long2Ip(end)}</td></tr>`;
+      });
+      tableBody.innerHTML = html || '<tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No results.</td></tr>';
+
+      if (codeOutput) {
+        let code = '# Supernet summary routes\n';
+        aggregated.forEach(a => {
+          code += `ip route ${long2Ip(a.network)}/${a.cidr} Null0\n`;
+        });
+        codeOutput.innerText = code.trim();
+      }
     }
 
-    let html = '';
-    aggregated.forEach(a => {
-      const end = a.network + Math.pow(2, 32 - a.cidr) - 1;
-      html += `<tr><td><strong>${long2Ip(a.network)}/${a.cidr}</strong></td><td>${long2Ip(a.network)} - ${long2Ip(end)}</td></tr>`;
-    });
-    tableBody.innerHTML = html || '<tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No results.</td></tr>';
-
-    let code = '# Supernet summary routes\n';
-    aggregated.forEach(a => {
-      code += `ip route ${long2Ip(a.network)}/${a.cidr} Null0\n`;
-    });
-    codeOutput.innerText = code.trim();
+    runBtn.onclick = run;
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        input.value = '';
+        tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Aggregate.</td></tr>';
+        if (codeOutput) codeOutput.innerText = '# Summary route export';
+      };
+    }
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        if (!codeOutput) return;
+        await navigator.clipboard.writeText(codeOutput.innerText);
+        copyBtn.innerText = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.classList.remove('copied'); }, 2000);
+      };
+    }
   }
 
-  runBtn?.addEventListener('click', run);
-  clearBtn?.addEventListener('click', () => {
-    input.value = '';
-    tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Aggregate.</td></tr>';
-    codeOutput.innerText = '# Summary route export';
-  });
-  copyBtn?.addEventListener('click', async () => {
-    if (!codeOutput) return;
-    await navigator.clipboard.writeText(codeOutput.innerText);
-    copyBtn.innerText = 'Copied!';
-    copyBtn.classList.add('copied');
-    setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.classList.remove('copied'); }, 2000);
-  });
+  document.addEventListener('astro:page-load', initSupernetter);
+  initSupernetter();
 </script>
 
 <style>

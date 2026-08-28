@@ -175,194 +175,182 @@ const {
 <script>
   import { validateIPv4, ip2Long } from '../utils/subnetMath';
 
-  // DOM elements
-  const podCidrInput = document.getElementById('k8s-pod-cidr') as HTMLInputElement;
-  const podPrefixInput = document.getElementById('k8s-pod-cidr-prefix') as HTMLInputElement;
-  const podsPerNodeSelect = document.getElementById('k8s-pods-per-node') as HTMLSelectElement;
-  const nodesInput = document.getElementById('k8s-nodes-count') as HTMLInputElement;
-  const nodesLabel = document.getElementById('k8s-nodes-label');
-  
-  const svcIpInput = document.getElementById('k8s-service-cidr') as HTMLInputElement;
-  const svcPrefixInput = document.getElementById('k8s-service-cidr-prefix') as HTMLInputElement;
-  
-  // Display elements
-  const nodeBlockDisplay = document.getElementById('k8s-res-node-block');
-  const nodeIpsDisplay = document.getElementById('k8s-res-node-ips');
-  const maxNodesDisplay = document.getElementById('k8s-res-max-nodes');
-  const nodesStatusDisplay = document.getElementById('k8s-res-nodes-status');
-  const maxPodsDisplay = document.getElementById('k8s-res-max-pods');
-  const warningBox = document.getElementById('k8s-warning-box');
-  
-  const totalIpsDisplay = document.getElementById('k8s-total-ips');
-  const utilPctDisplay = document.getElementById('k8s-util-pct');
-  const utilStatusDisplay = document.getElementById('k8s-util-status');
-  const scaleFill = document.getElementById('k8s-scale-fill');
-  const scaleLabel = document.getElementById('k8s-scale-label');
-  const copyBtn = document.getElementById('copy-k8s-json');
-
-  function checkCidrOverlap(ip1: string, prefix1: number, ip2: string, prefix2: number): boolean {
-    if (!validateIPv4(ip1) || !validateIPv4(ip2)) return false;
+  function initK8sPlanner() {
+    // DOM elements
+    const podCidrInput = document.getElementById('k8s-pod-cidr') as HTMLInputElement;
+    const podPrefixInput = document.getElementById('k8s-pod-cidr-prefix') as HTMLInputElement;
+    const podsPerNodeSelect = document.getElementById('k8s-pods-per-node') as HTMLSelectElement;
+    const nodesInput = document.getElementById('k8s-nodes-count') as HTMLInputElement;
+    const nodesLabel = document.getElementById('k8s-nodes-label');
     
-    const long1 = ip2Long(ip1);
-    const long2 = ip2Long(ip2);
-    
-    const minPrefix = Math.min(prefix1, prefix2);
-    const minMask = minPrefix === 0 ? 0 : (~0 << (32 - minPrefix)) >>> 0;
-    
-    return (long1 & minMask) === (long2 & minMask);
-  }
+    const svcIpInput = document.getElementById('k8s-service-cidr') as HTMLInputElement;
+    const svcPrefixInput = document.getElementById('k8s-service-cidr-prefix') as HTMLInputElement;
 
-  function calculateK8sPlanner() {
-    const podIp = podCidrInput.value.trim();
-    const podPrefix = parseInt(podPrefixInput.value, 10);
-    const podsPerNode = parseInt(podsPerNodeSelect.value, 10);
-    const expectedNodes = parseInt(nodesInput.value, 10);
+    if (!podCidrInput || !podPrefixInput || !podsPerNodeSelect || !nodesInput || !svcIpInput || !svcPrefixInput) return;
     
-    const svcIp = svcIpInput.value.trim();
-    const svcPrefix = parseInt(svcPrefixInput.value, 10);
+    // Display elements
+    const nodeBlockDisplay = document.getElementById('k8s-res-node-block');
+    const nodeIpsDisplay = document.getElementById('k8s-res-node-ips');
+    const maxNodesDisplay = document.getElementById('k8s-res-max-nodes');
+    const nodesStatusDisplay = document.getElementById('k8s-res-nodes-status');
+    const maxPodsDisplay = document.getElementById('k8s-res-max-pods');
+    const warningBox = document.getElementById('k8s-warning-box');
+    
+    const totalIpsDisplay = document.getElementById('k8s-total-ips');
+    const utilPctDisplay = document.getElementById('k8s-util-pct');
+    const utilStatusDisplay = document.getElementById('k8s-util-status');
+    const scaleFill = document.getElementById('k8s-scale-fill');
+    const scaleLabel = document.getElementById('k8s-scale-label');
+    const copyBtn = document.getElementById('copy-k8s-json');
 
-    // Dynamic slider label update
-    if (nodesLabel) nodesLabel.innerText = `${expectedNodes} Nodes`;
+    function checkCidrOverlap(ip1: string, prefix1: number, ip2: string, prefix2: number): boolean {
+      if (!validateIPv4(ip1) || !validateIPv4(ip2)) return false;
+      
+      const long1 = ip2Long(ip1);
+      const long2 = ip2Long(ip2);
+      
+      const minPrefix = Math.min(prefix1, prefix2);
+      const minMask = minPrefix === 0 ? 0 : (~0 << (32 - minPrefix)) >>> 0;
+      
+      return (long1 & minMask) === (long2 & minMask);
+    }
 
-    // Validate inputs
-    if (!validateIPv4(podIp) || isNaN(podPrefix)) {
-      if (warningBox) {
-        warningBox.className = 'k8s-warning-panel danger';
-        warningBox.innerHTML = '<strong>Error:</strong> Invalid Pod Network Address or CIDR.';
+    function calculateK8sPlanner() {
+      const podIp = podCidrInput.value.trim();
+      const podPrefix = parseInt(podPrefixInput.value, 10);
+      const podsPerNode = parseInt(podsPerNodeSelect.value, 10);
+      const expectedNodes = parseInt(nodesInput.value, 10);
+      
+      const svcIp = svcIpInput.value.trim();
+      const svcPrefix = parseInt(svcPrefixInput.value, 10);
+
+      // Dynamic slider label update
+      if (nodesLabel) nodesLabel.innerText = `${expectedNodes} Nodes`;
+
+      // Validate inputs
+      if (!validateIPv4(podIp) || isNaN(podPrefix)) {
+        if (warningBox) {
+          warningBox.className = 'k8s-warning-panel danger';
+          warningBox.innerHTML = '<strong>Error:</strong> Invalid Pod Network Address or CIDR.';
+        }
+        return;
       }
-      return;
+
+      let nodeSubnetPrefix = 24;
+      if (podsPerNode <= 30) nodeSubnetPrefix = 26;
+      else if (podsPerNode <= 64) nodeSubnetPrefix = 25;
+      else if (podsPerNode <= 110) nodeSubnetPrefix = 24;
+      else if (podsPerNode <= 250) nodeSubnetPrefix = 23;
+
+      // Calculations
+      const totalPodIps = Math.pow(2, 32 - podPrefix);
+      const ipsPerNode = Math.pow(2, 32 - nodeSubnetPrefix);
+      const maxNodesSupported = Math.floor(totalPodIps / ipsPerNode);
+      const maxPodsSupported = expectedNodes * podsPerNode;
+      
+      // Utilization
+      const utilizedIps = expectedNodes * ipsPerNode;
+      const utilizationRate = Math.min(100, (utilizedIps / totalPodIps) * 100);
+      
+      // Update simple outputs
+      if (nodeBlockDisplay) nodeBlockDisplay.innerText = `/${nodeSubnetPrefix}`;
+      if (nodeIpsDisplay) nodeIpsDisplay.innerText = `${ipsPerNode} IPs per Node`;
+      if (maxNodesDisplay) maxNodesDisplay.innerText = maxNodesSupported.toLocaleString();
+      if (maxPodsDisplay) maxPodsDisplay.innerText = maxPodsSupported.toLocaleString();
+      if (totalIpsDisplay) totalIpsDisplay.innerText = totalPodIps.toLocaleString();
+      if (utilPctDisplay) utilPctDisplay.innerText = `${utilizationRate.toFixed(1)}%`;
+      
+      if (scaleFill) scaleFill.style.width = `${utilizationRate}%`;
+      if (scaleLabel) scaleLabel.innerText = `IP Utilization: ${utilizationRate.toFixed(1)}%`;
+
+      // Warnings and overlapping validations
+      let overlaps = false;
+      if (validateIPv4(svcIp) && !isNaN(svcPrefix)) {
+        overlaps = checkCidrOverlap(podIp, podPrefix, svcIp, svcPrefix);
+      }
+
+      let warningHtml = '';
+      let statusClass = 'safe';
+      let statusText = 'Supported';
+
+      if (expectedNodes > maxNodesSupported) {
+        statusClass = 'danger';
+        statusText = 'IP Exhaustion';
+        warningHtml += `<p style="margin-bottom: 0.5rem;">🚨 <strong>IP Exhaustion Warning:</strong> Your expected cluster node scale (${expectedNodes} nodes) exceeds the maximum nodes supported (${maxNodesSupported}) by a <code>/${podPrefix}</code> pod network block. Expand the CIDR block or reduce max pods per node.</p>`;
+      } else if (utilizationRate > 80) {
+        statusClass = 'warn';
+        statusText = 'Tight Capacity';
+        warningHtml += `<p style="margin-bottom: 0.5rem;">⚠️ <strong>High Utilization:</strong> Cluster is utilizing ${utilizationRate.toFixed(1)}% of available IP space. Minimal headroom left for auto-scaling.</p>`;
+      }
+
+      if (overlaps) {
+        warningHtml += `<p>🚫 <strong>Critical Overlap:</strong> Pod Network (<code>${podIp}/${podPrefix}</code>) overlaps with Service CIDR (<code>${svcIp}/${svcPrefix}</code>). This will cause routing failures in the cluster.</p>`;
+        statusClass = 'danger';
+      }
+
+      if (warningHtml === '') {
+        warningHtml = '<p>✅ <strong>Cluster Configuration Safe:</strong> Pod network has sufficient IP allocation capacity for expected scaling and node density rules.</p>';
+      }
+
+      if (warningBox) {
+        warningBox.className = `k8s-warning-panel ${statusClass === 'danger' ? 'danger' : 'safe'}`;
+        warningBox.innerHTML = warningHtml;
+      }
+
+      if (nodesStatusDisplay) {
+        nodesStatusDisplay.innerText = statusText;
+        nodesStatusDisplay.className = `status-indicator ${statusClass}`;
+      }
+
+      if (utilStatusDisplay) {
+        utilStatusDisplay.innerText = statusText;
+        utilStatusDisplay.className = `capacity-unit status-indicator ${statusClass}`;
+      }
     }
 
-    // Determine required Subnet Size per Node based on Pod density
-    // Standard rule: Usable hosts in subnet >= Max Pods.
-    // E.g. Pods = 110 -> Usable >= 110. Subnet size /24 has 256 - 2 = 254 usable IPs (safe). /25 has 128 - 2 = 126 usable (safe).
-    // Usually, Kubernetes systems (like standard kubenet / Calico / AWS VPC CNI) allocate:
-    // - pods <= 30: /26 range (64 addresses)
-    // - pods <= 64: /25 range (128 addresses)
-    // - pods <= 110: /24 range (256 addresses)
-    // - pods <= 250: /23 range (512 addresses)
-    let nodeSubnetPrefix = 24;
-    if (podsPerNode <= 30) nodeSubnetPrefix = 26;
-    else if (podsPerNode <= 64) nodeSubnetPrefix = 25;
-    else if (podsPerNode <= 110) nodeSubnetPrefix = 24;
-    else if (podsPerNode <= 250) nodeSubnetPrefix = 23;
+    // Bind Listeners
+    podCidrInput.oninput = calculateK8sPlanner;
+    podPrefixInput.oninput = calculateK8sPlanner;
+    podsPerNodeSelect.onchange = calculateK8sPlanner;
+    nodesInput.oninput = calculateK8sPlanner;
+    svcIpInput.oninput = calculateK8sPlanner;
+    svcPrefixInput.oninput = calculateK8sPlanner;
 
-    // Calculations
-    const totalPodIps = Math.pow(2, 32 - podPrefix);
-    const ipsPerNode = Math.pow(2, 32 - nodeSubnetPrefix);
-    const maxNodesSupported = Math.floor(totalPodIps / ipsPerNode);
-    const maxPodsSupported = expectedNodes * podsPerNode;
-    
-    // Utilization
-    const utilizedIps = expectedNodes * ipsPerNode;
-    const utilizationRate = Math.min(100, (utilizedIps / totalPodIps) * 100);
-    
-    // Update simple outputs
-    if (nodeBlockDisplay) nodeBlockDisplay.innerText = `/${nodeSubnetPrefix}`;
-    if (nodeIpsDisplay) nodeIpsDisplay.innerText = `${ipsPerNode} IPs per Node`;
-    if (maxNodesDisplay) maxNodesDisplay.innerText = maxNodesSupported.toLocaleString();
-    if (maxPodsDisplay) maxPodsDisplay.innerText = maxPodsSupported.toLocaleString();
-    if (totalIpsDisplay) totalIpsDisplay.innerText = totalPodIps.toLocaleString();
-    if (utilPctDisplay) utilPctDisplay.innerText = `${utilizationRate.toFixed(1)}%`;
-    
-    if (scaleFill) scaleFill.style.width = `${utilizationRate}%`;
-    if (scaleLabel) scaleLabel.innerText = `IP Utilization: ${utilizationRate.toFixed(1)}%`;
+    // Copy JSON
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        const podIp = podCidrInput.value.trim();
+        const podPrefix = parseInt(podPrefixInput.value, 10);
+        const podsPerNode = parseInt(podsPerNodeSelect.value, 10);
+        const expectedNodes = parseInt(nodesInput.value, 10);
+        
+        let nodeSubnetPrefix = 24;
+        if (podsPerNode <= 30) nodeSubnetPrefix = 26;
+        else if (podsPerNode <= 64) nodeSubnetPrefix = 25;
+        else if (podsPerNode <= 110) nodeSubnetPrefix = 24;
+        else if (podsPerNode <= 250) nodeSubnetPrefix = 23;
 
-    // Warnings and overlapping validations
-    let overlaps = false;
-    if (validateIPv4(svcIp) && !isNaN(svcPrefix)) {
-      overlaps = checkCidrOverlap(podIp, podPrefix, svcIp, svcPrefix);
+        const data = {
+          pod_cidr: `${podIp}/${podPrefix}`,
+          pods_per_node: podsPerNode,
+          node_subnet_size: `/${nodeSubnetPrefix}`,
+          expected_nodes: expectedNodes,
+          max_nodes_supported: Math.floor(Math.pow(2, 32 - podPrefix) / Math.pow(2, 32 - nodeSubnetPrefix)),
+          total_cluster_pod_ips_capacity: expectedNodes * podsPerNode,
+          utilization_rate: `${((expectedNodes * Math.pow(2, 32 - nodeSubnetPrefix)) / Math.pow(2, 32 - podPrefix) * 100).toFixed(1)}%`
+        };
+
+        await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+        copyBtn.innerText = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.innerText = 'Copy JSON';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      };
     }
 
-    let warningHtml = '';
-    let statusClass = 'safe';
-    let statusText = 'Supported';
-
-    if (expectedNodes > maxNodesSupported) {
-      statusClass = 'danger';
-      statusText = 'IP Exhaustion';
-      warningHtml += `<p style="margin-bottom: 0.5rem;">🚨 <strong>IP Exhaustion Warning:</strong> Your expected cluster node scale (${expectedNodes} nodes) exceeds the maximum nodes supported (${maxNodesSupported}) by a <code>/${podPrefix}</code> pod network block. Expand the CIDR block or reduce max pods per node.</p>`;
-    } else if (utilizationRate > 80) {
-      statusClass = 'warn';
-      statusText = 'Tight Capacity';
-      warningHtml += `<p style="margin-bottom: 0.5rem;">⚠️ <strong>High Utilization:</strong> Cluster is utilizing ${utilizationRate.toFixed(1)}% of available IP space. Minimal headroom left for auto-scaling.</p>`;
-    }
-
-    if (overlaps) {
-      warningHtml += `<p>🚫 <strong>Critical Overlap:</strong> Pod Network (<code>${podIp}/${podPrefix}</code>) overlaps with Service CIDR (<code>${svcIp}/${svcPrefix}</code>). This will cause routing failures in the cluster.</p>`;
-      statusClass = 'danger';
-    }
-
-    if (warningHtml === '') {
-      warningHtml = '<p>✅ <strong>Cluster Configuration Safe:</strong> Pod network has sufficient IP allocation capacity for expected scaling and node density rules.</p>';
-    }
-
-    if (warningBox) {
-      warningBox.className = `k8s-warning-panel ${statusClass === 'danger' ? 'danger' : 'safe'}`;
-      warningBox.innerHTML = warningHtml;
-    }
-
-    if (nodesStatusDisplay) {
-      nodesStatusDisplay.innerText = statusText;
-      nodesStatusDisplay.className = `status-indicator ${statusClass}`;
-    }
-
-    if (utilStatusDisplay) {
-      utilStatusDisplay.innerText = statusText;
-      utilStatusDisplay.className = `capacity-unit status-indicator ${statusClass}`;
-    }
-
-    // Sync URL search params
-    const url = new URL(window.location.href);
-    url.searchParams.set('pod_ip', podIp);
-    url.searchParams.set('pod_prefix', podPrefix.toString());
-    url.searchParams.set('pods_per_node', podsPerNode.toString());
-    url.searchParams.set('nodes', expectedNodes.toString());
-    window.history.replaceState({}, '', url.toString());
-  }
-
-  // Bind Listeners
-  podCidrInput.addEventListener('input', calculateK8sPlanner);
-  podPrefixInput.addEventListener('input', calculateK8sPlanner);
-  podsPerNodeSelect.addEventListener('change', calculateK8sPlanner);
-  nodesInput.addEventListener('input', calculateK8sPlanner);
-  svcIpInput.addEventListener('input', calculateK8sPlanner);
-  svcPrefixInput.addEventListener('input', calculateK8sPlanner);
-
-  // Copy JSON
-  copyBtn?.addEventListener('click', async () => {
-    const podIp = podCidrInput.value.trim();
-    const podPrefix = parseInt(podPrefixInput.value, 10);
-    const podsPerNode = parseInt(podsPerNodeSelect.value, 10);
-    const expectedNodes = parseInt(nodesInput.value, 10);
-    
-    let nodeSubnetPrefix = 24;
-    if (podsPerNode <= 30) nodeSubnetPrefix = 26;
-    else if (podsPerNode <= 64) nodeSubnetPrefix = 25;
-    else if (podsPerNode <= 110) nodeSubnetPrefix = 24;
-    else if (podsPerNode <= 250) nodeSubnetPrefix = 23;
-
-    const data = {
-      pod_cidr: `${podIp}/${podPrefix}`,
-      pods_per_node: podsPerNode,
-      node_subnet_size: `/${nodeSubnetPrefix}`,
-      expected_nodes: expectedNodes,
-      max_nodes_supported: Math.floor(Math.pow(2, 32 - podPrefix) / Math.pow(2, 32 - nodeSubnetPrefix)),
-      total_cluster_pod_ips_capacity: expectedNodes * podsPerNode,
-      utilization_rate: `${((expectedNodes * Math.pow(2, 32 - nodeSubnetPrefix)) / Math.pow(2, 32 - podPrefix) * 100).toFixed(1)}%`
-    };
-
-    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    copyBtn.innerText = 'Copied!';
-    copyBtn.classList.add('copied');
-    setTimeout(() => {
-      copyBtn.innerText = 'Copy JSON';
-      copyBtn.classList.remove('copied');
-    }, 2000);
-  });
-
-  // Check URL params on mount
-  window.addEventListener('DOMContentLoaded', () => {
+    // Check URL params on mount
     const params = new URLSearchParams(window.location.search);
     const podIp = params.get('pod_ip');
     const podPrefix = params.get('pod_prefix');
@@ -378,5 +366,8 @@ const {
     }
     
     calculateK8sPlanner();
-  });
+  }
+
+  document.addEventListener('astro:page-load', initK8sPlanner);
+  initK8sPlanner();
 </script>

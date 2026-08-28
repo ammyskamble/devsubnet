@@ -297,122 +297,125 @@ resource "aws_subnet" "subnet_1" &#123;
 </div>
 
 <script>
-  import { calculateSubnet, getBinaryBits, validateIPv4, long2Ip, ip2Long } from '../utils/subnetMath';
+  import { calculateSubnet, getBinaryBits, validateIPv4 } from '../utils/subnetMath';
 
-  // DOM Elements
-  const ipInput = document.getElementById('ip-address') as HTMLInputElement;
-  const cidrInput = document.getElementById('cidr') as HTMLInputElement;
-  const cidrSlider = document.getElementById('cidr-slider') as HTMLInputElement;
-  const cloudSelector = document.getElementById('cloud-provider') as HTMLSelectElement;
-  const errorBanner = document.getElementById('ip-error');
-  
-  // Results Display Elements
-  const resNetwork = document.getElementById('res-network');
-  const resHostRange = document.getElementById('res-host-range');
-  const resMask = document.getElementById('res-mask');
-  const resWildcard = document.getElementById('res-wildcard');
-  const resBroadcast = document.getElementById('res-broadcast');
-  const resTotalHosts = document.getElementById('res-total-hosts');
-  const resUsableHosts = document.getElementById('res-usable-hosts');
-  const resDetails = document.getElementById('res-details');
-  const binaryGrid = document.getElementById('binary-grid');
-  
-  // Aside elements
-  const resAsideTitle = document.getElementById('res-aside-title');
-  const resAsideDesc = document.getElementById('res-aside-desc');
-  const resScaleFill = document.getElementById('res-scale-fill');
-  const resScaleLabel = document.getElementById('res-scale-label');
-  
-  // Exporters
-  const iacOutput = document.getElementById('iac-code-output');
-  const copyIacBtn = document.getElementById('copy-iac-code');
-  const copyJsonBtn = document.getElementById('copy-ipv4-json');
-  
-  let currentLang = 'tf';
-
-  function updateAll() {
-    const ip = ipInput.value.trim();
-    const cidr = parseInt(cidrInput.value, 10);
-    const cloud = cloudSelector.value as 'standard' | 'aws' | 'azure' | 'gcp';
-
-    // Format validation
-    if (!validateIPv4(ip)) {
-      errorBanner?.classList.add('show');
-      return;
-    } else {
-      errorBanner?.classList.remove('show');
-    }
-
-    // Run math
-    const result = calculateSubnet(ip, cidr, cloud);
-    const bits = getBinaryBits(ip, cidr);
-
-    // Update display text fields
-    if (resNetwork) resNetwork.innerText = `${result.network}/${cidr}`;
-    if (resHostRange) resHostRange.innerText = `${result.firstUsable} - ${result.lastUsable}`;
-    if (resMask) resMask.innerText = result.netmask;
-    if (resWildcard) resWildcard.innerText = result.wildcard;
-    if (resBroadcast) resBroadcast.innerText = result.broadcast;
-    if (resTotalHosts) resTotalHosts.innerText = result.totalHosts.toLocaleString();
-    if (resUsableHosts) resUsableHosts.innerText = result.usableHosts.toLocaleString();
+  function initIPv4Calculator() {
+    // DOM Elements
+    const ipInput = document.getElementById('ip-address') as HTMLInputElement;
+    const cidrInput = document.getElementById('cidr') as HTMLInputElement;
+    const cidrSlider = document.getElementById('cidr-slider') as HTMLInputElement;
+    const cloudSelector = document.getElementById('cloud-provider') as HTMLSelectElement;
+    const errorBanner = document.getElementById('ip-error');
     
-    // Update aside elements
-    if (resAsideTitle) resAsideTitle.innerText = `Your /${cidr} Subnet`;
-    if (resAsideDesc) {
-      resAsideDesc.innerText = `A subnet with a mask of ${result.netmask} provides ${result.usableHosts.toLocaleString()} usable IP addresses for devices.`;
-    }
-    if (resScaleFill) {
-      resScaleFill.style.width = `${(cidr / 32) * 100}%`;
-    }
-    if (resScaleLabel) {
-      resScaleLabel.innerText = `Prefix Sizing: /${cidr}`;
-    }
+    if (!ipInput || !cidrInput || !cidrSlider || !cloudSelector) return;
 
-    // Re-render Details List
-    if (resDetails) {
-      resDetails.innerHTML = result.reservedDetails.map(detail => `
-        <li style="color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
-          <span style="color: var(--accent-host); font-weight: bold;">•</span> ${detail}
-        </li>
-      `).join('');
-    }
+    // Results Display Elements
+    const resNetwork = document.getElementById('res-network');
+    const resHostRange = document.getElementById('res-host-range');
+    const resMask = document.getElementById('res-mask');
+    const resWildcard = document.getElementById('res-wildcard');
+    const resBroadcast = document.getElementById('res-broadcast');
+    const resTotalHosts = document.getElementById('res-total-hosts');
+    const resUsableHosts = document.getElementById('res-usable-hosts');
+    const resDetails = document.getElementById('res-details');
+    const binaryGrid = document.getElementById('binary-grid');
+    
+    // Aside elements
+    const resAsideTitle = document.getElementById('res-aside-title');
+    const resAsideDesc = document.getElementById('res-aside-desc');
+    const resScaleFill = document.getElementById('res-scale-fill');
+    const resScaleLabel = document.getElementById('res-scale-label');
+    
+    // Exporters
+    const iacOutput = document.getElementById('iac-code-output');
+    const copyIacBtn = document.getElementById('copy-iac-code');
+    const copyJsonBtn = document.getElementById('copy-ipv4-json');
+    
+    let currentLang = 'tf';
 
-    // Re-render Binary grid
-    if (binaryGrid) {
-      let html = '';
-      for (let oIndex = 0; oIndex < 4; oIndex++) {
-        html += '<div class="binary-octet">';
-        const slice = bits.slice(oIndex * 8, (oIndex + 1) * 8);
-        slice.forEach(bit => {
-          html += `
-            <span 
-              class="binary-bit ${bit.type}" 
-              title="Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit"
-            >${bit.val}</span>
-          `;
-        });
-        html += '</div>';
+    function updateAll() {
+      const ip = ipInput.value.trim();
+      const cidr = parseInt(cidrInput.value, 10);
+      const cloud = cloudSelector.value as 'standard' | 'aws' | 'azure' | 'gcp';
+
+      // Format validation
+      if (!validateIPv4(ip)) {
+        errorBanner?.classList.add('show');
+        return;
+      } else {
+        errorBanner?.classList.remove('show');
       }
-      binaryGrid.innerHTML = html;
+
+      // Run math
+      const result = calculateSubnet(ip, cidr, cloud);
+      const bits = getBinaryBits(ip, cidr);
+
+      // Update display text fields
+      if (resNetwork) resNetwork.innerText = `${result.network}/${cidr}`;
+      if (resHostRange) resHostRange.innerText = `${result.firstUsable} - ${result.lastUsable}`;
+      if (resMask) resMask.innerText = result.netmask;
+      if (resWildcard) resWildcard.innerText = result.wildcard;
+      if (resBroadcast) resBroadcast.innerText = result.broadcast;
+      if (resTotalHosts) resTotalHosts.innerText = result.totalHosts.toLocaleString();
+      if (resUsableHosts) resUsableHosts.innerText = result.usableHosts.toLocaleString();
+      
+      // Update aside elements
+      if (resAsideTitle) resAsideTitle.innerText = `Your /${cidr} Subnet`;
+      if (resAsideDesc) {
+        resAsideDesc.innerText = `A subnet with a mask of ${result.netmask} provides ${result.usableHosts.toLocaleString()} usable IP addresses for devices.`;
+      }
+      if (resScaleFill) {
+        resScaleFill.style.width = `${(cidr / 32) * 100}%`;
+      }
+      if (resScaleLabel) {
+        resScaleLabel.innerText = `Prefix Sizing: /${cidr}`;
+      }
+
+      // Re-render Details List
+      if (resDetails) {
+        resDetails.innerHTML = result.reservedDetails.map(detail => `
+          <li style="color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: var(--accent-host); font-weight: bold;">•</span> ${detail}
+          </li>
+        `).join('');
+      }
+
+      // Re-render Binary grid
+      if (binaryGrid) {
+        let html = '';
+        for (let oIndex = 0; oIndex < 4; oIndex++) {
+          html += '<div class="binary-octet">';
+          const slice = bits.slice(oIndex * 8, (oIndex + 1) * 8);
+          slice.forEach(bit => {
+            html += `
+              <span 
+                class="binary-bit ${bit.type}" 
+                title="Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit"
+              >${bit.val}</span>
+            `;
+          });
+          html += '</div>';
+        }
+        binaryGrid.innerHTML = html;
+      }
+
+      // Update IaC Snippet Code block
+      updateIaCCode(result.network, cidr, cloud);
     }
 
-    // Update IaC Snippet Code block
-    updateIaCCode(result.network, cidr, cloud);
-  }
+    // Non-blocking rAF scheduler
+    let updateRaf: number | null = null;
+    function scheduledUpdate() {
+      if (updateRaf) cancelAnimationFrame(updateRaf);
+      updateRaf = requestAnimationFrame(updateAll);
+    }
 
-  // Non-blocking rAF scheduler for 60fps TBT optimization
-  let updateRaf: number | null = null;
-  function scheduledUpdate() {
-    if (updateRaf) cancelAnimationFrame(updateRaf);
-    updateRaf = requestAnimationFrame(updateAll);
-  }
-
-  function updateIaCCode(network: string, cidr: number, cloud: string) {
-    if (!iacOutput) return;
-    
-    if (currentLang === 'tf') {
-      if (cloud === 'aws') {
-        iacOutput.innerText = `# AWS VPC Subnet IaC snippet
+    function updateIaCCode(network: string, cidr: number, cloud: string) {
+      if (!iacOutput) return;
+      
+      if (currentLang === 'tf') {
+        if (cloud === 'aws') {
+          iacOutput.innerText = `# AWS VPC Subnet IaC snippet
 resource "aws_subnet" "subnet_aws" {
   vpc_id            = "vpc-12345678"
   cidr_block        = "${network}/${cidr}"
@@ -423,24 +426,23 @@ resource "aws_subnet" "subnet_aws" {
     Environment = "production"
   }
 }`;
-      } else if (cloud === 'azure') {
-        iacOutput.innerText = `# Microsoft Azure VNet Subnet
+        } else if (cloud === 'azure') {
+          iacOutput.innerText = `# Microsoft Azure VNet Subnet
 resource "azurerm_subnet" "subnet_azure" {
   name                 = "subnet-${cidr}"
   resource_group_name  = "rg-prod"
   virtual_network_name = "vnet-prod"
   address_prefixes     = ["${network}/${cidr}"]
 }`;
-      } else {
-        iacOutput.innerText = `# Standard Terraform Subnet Allocation
+        } else {
+          iacOutput.innerText = `# Standard Terraform Subnet Allocation
 resource "terraform_subnet" "subnet_generic" {
   cidr_block = "${network}/${cidr}"
   description = "Assigned IP Block"
 }`;
-      }
-    } else {
-      // Ansible/YAML Configuration
-      iacOutput.innerText = `# Ansible Network Subnet Settings
+        }
+      } else {
+        iacOutput.innerText = `# Ansible Network Subnet Settings
 network_config:
   subnet_ip: "${network}"
   cidr_prefix: ${cidr}
@@ -448,107 +450,108 @@ network_config:
     metadata:
       description: "Calculated via devsubnet.com"
       host_capacity: ${cidr}`;
+      }
     }
-  }
 
-  // Bind Listeners
-  ipInput.addEventListener('input', scheduledUpdate);
-  
-  cidrInput.addEventListener('input', (e) => {
-    const val = parseInt((e.target as HTMLInputElement).value, 10);
-    if (!isNaN(val) && val >= 0 && val <= 32) {
-      cidrSlider.value = val.toString();
-      scheduledUpdate();
-    }
-  });
-
-  cidrSlider.addEventListener('input', (e) => {
-    const val = (e.target as HTMLInputElement).value;
-    cidrInput.value = val;
-    scheduledUpdate();
-  });
-
-  cloudSelector.addEventListener('change', scheduledUpdate);
-
-  // Preset Buttons
-  document.querySelectorAll('[data-fill]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const [ip, cidr] = (e.currentTarget as HTMLButtonElement).getAttribute('data-fill')!.split('/');
-      ipInput.value = ip;
-      cidrInput.value = cidr;
-      cidrSlider.value = cidr;
-      updateAll();
-    });
-  });
-
-  // IaC Lang tab selection
-  document.querySelectorAll('.export-tab-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.export-tab-btn').forEach(b => b.classList.remove('active'));
-      const target = e.currentTarget as HTMLButtonElement;
-      target.classList.add('active');
-      currentLang = target.getAttribute('data-lang') || 'tf';
-      
-      const ip = ipInput.value.trim();
-      const cidr = parseInt(cidrInput.value, 10);
-      const result = calculateSubnet(ip, cidr, cloudSelector.value as any);
-      updateIaCCode(result.network, cidr, cloudSelector.value);
-    });
-  });
-
-  // Copy Buttons
-  copyJsonBtn?.addEventListener('click', async () => {
-    const ip = ipInput.value.trim();
-    const cidr = parseInt(cidrInput.value, 10);
-    const cloud = cloudSelector.value as any;
-    if (!validateIPv4(ip)) return;
-    const res = calculateSubnet(ip, cidr, cloud);
+    // Bind Listeners
+    ipInput.oninput = scheduledUpdate;
     
-    await navigator.clipboard.writeText(JSON.stringify(res, null, 2));
-    copyJsonBtn.innerText = 'Copied!';
-    copyJsonBtn.classList.add('copied');
-    setTimeout(() => {
-      copyJsonBtn.innerText = 'Copy JSON';
-      copyJsonBtn.classList.remove('copied');
-    }, 2000);
-  });
+    cidrInput.oninput = (e) => {
+      const val = parseInt((e.target as HTMLInputElement).value, 10);
+      if (!isNaN(val) && val >= 0 && val <= 32) {
+        cidrSlider.value = val.toString();
+        scheduledUpdate();
+      }
+    };
 
-  copyIacBtn?.addEventListener('click', async () => {
-    if (!iacOutput) return;
-    await navigator.clipboard.writeText(iacOutput.innerText);
-    copyIacBtn.innerText = 'Copied!';
-    copyIacBtn.classList.add('copied');
-    setTimeout(() => {
-      copyIacBtn.innerText = 'Copy Code';
-      copyIacBtn.classList.remove('copied');
-    }, 2000);
-  });
+    cidrSlider.oninput = (e) => {
+      const val = (e.target as HTMLInputElement).value;
+      cidrInput.value = val;
+      scheduledUpdate();
+    };
 
-  // Check URL params on mount & strip query string to keep URL clean
-  window.addEventListener('DOMContentLoaded', () => {
+    cloudSelector.onchange = scheduledUpdate;
+
+    // Preset Buttons
+    document.querySelectorAll('[data-fill]').forEach(btn => {
+      (btn as HTMLButtonElement).onclick = (e) => {
+        const [ip, cidr] = (e.currentTarget as HTMLButtonElement).getAttribute('data-fill')!.split('/');
+        ipInput.value = ip;
+        cidrInput.value = cidr;
+        cidrSlider.value = cidr;
+        updateAll();
+      };
+    });
+
+    // IaC Lang tab selection
+    document.querySelectorAll('.export-tab-btn').forEach(btn => {
+      (btn as HTMLButtonElement).onclick = (e) => {
+        document.querySelectorAll('.export-tab-btn').forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('active');
+        currentLang = target.getAttribute('data-lang') || 'tf';
+        
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        const result = calculateSubnet(ip, cidr, cloudSelector.value as any);
+        updateIaCCode(result.network, cidr, cloudSelector.value);
+      };
+    });
+
+    // Copy Buttons
+    if (copyJsonBtn) {
+      copyJsonBtn.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        const cloud = cloudSelector.value as any;
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, cloud);
+        
+        await navigator.clipboard.writeText(JSON.stringify(res, null, 2));
+        copyJsonBtn.innerText = 'Copied!';
+        copyJsonBtn.classList.add('copied');
+        setTimeout(() => {
+          copyJsonBtn.innerText = 'Copy JSON';
+          copyJsonBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
+    if (copyIacBtn) {
+      copyIacBtn.onclick = async () => {
+        if (!iacOutput) return;
+        await navigator.clipboard.writeText(iacOutput.innerText);
+        copyIacBtn.innerText = 'Copied!';
+        copyIacBtn.classList.add('copied');
+        setTimeout(() => {
+          copyIacBtn.innerText = 'Copy Code';
+          copyIacBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
+    // Check URL params on mount
     const params = new URLSearchParams(window.location.search);
-    const ip = params.get('ip');
-    const cidr = params.get('cidr');
-    const cloud = params.get('cloud');
+    const ipParam = params.get('ip');
+    const cidrParam = params.get('cidr');
+    const cloudParam = params.get('cloud');
 
-    if (ip && validateIPv4(ip)) ipInput.value = ip;
-    if (cidr) {
-      const cNum = parseInt(cidr, 10);
+    if (ipParam && validateIPv4(ipParam)) ipInput.value = ipParam;
+    if (cidrParam) {
+      const cNum = parseInt(cidrParam, 10);
       if (cNum >= 0 && cNum <= 32) {
         cidrInput.value = cNum.toString();
         cidrSlider.value = cNum.toString();
       }
     }
-    if (cloud) {
-      if (['standard', 'aws', 'azure', 'gcp'].includes(cloud)) {
-        cloudSelector.value = cloud;
+    if (cloudParam) {
+      if (['standard', 'aws', 'azure', 'gcp'].includes(cloudParam)) {
+        cloudSelector.value = cloudParam;
       }
     }
     updateAll();
+  }
 
-    // Clean URL bar to strictly display devsubnet.com without query strings
-    if (window.location.search) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  });
+  document.addEventListener('astro:page-load', initIPv4Calculator);
+  initIPv4Calculator();
 </script>

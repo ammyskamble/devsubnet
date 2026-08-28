@@ -32,38 +32,69 @@ const currentLangInfo = languages[lang] || languages.en;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google Fonts Non-blocking Load for Maximum FCP/LCP Speed -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Critical Local Font Preloads (Zero CDN Latency, Zero Layout Shift) -->
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      media="print"
-      onload="this.media='all'"
+      rel="preload"
+      href="/fonts/inter-latin-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
     />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      />
-    </noscript>
+    <link
+      rel="preload"
+      href="/fonts/outfit-latin-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
 
-    <!-- Deferred Google Analytics (Zero Render Blocking) -->
+    <!-- Resilient Non-blocking Google Analytics & Telemetry (Safe from Ad-blocker Rejections) -->
     <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      function initGA() {
-        const script = document.createElement("script");
-        script.async = true;
-        script.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
-        document.head.appendChild(script);
-        gtag("js", new Date());
-        gtag("config", "G-F2T4WC5Y9V");
-      }
-      if ("requestIdleCallback" in window) {
-        requestIdleCallback(initGA, { timeout: 4000 });
-      } else {
-        setTimeout(initGA, 2000);
+      try {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          try {
+            window.dataLayer.push(arguments);
+          } catch (e) {
+            // Silently suppress telemetry exceptions
+          }
+        }
+        window.gtag = gtag;
+
+        function initAnalytics() {
+          try {
+            const gaScript = document.createElement("script");
+            gaScript.async = true;
+            gaScript.defer = true;
+            gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
+            gaScript.onerror = function () {
+              // Gracefully swallow ad-blocker (uBlock, Brave, Pi-hole) net::ERR_BLOCKED_BY_CLIENT
+            };
+            document.head.appendChild(gaScript);
+
+            gtag("js", new Date());
+            gtag("config", "G-F2T4WC5Y9V", {
+              transport_url: window.location.origin + "/api/collect"
+            });
+          } catch (e) {
+            // Silently swallow analytics init errors
+          }
+        }
+
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(initAnalytics, { timeout: 4000 });
+        } else {
+          setTimeout(initAnalytics, 2000);
+        }
+      } catch (e) {
+        // Telemetry fail-safe
       }
     </script>
 

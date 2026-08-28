@@ -1,7 +1,11 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-import { getHrefLangAlternates, languages, type SupportedLanguage } from '../utils/i18n';
-import '../styles/global.css';
+import { ClientRouter } from "astro:transitions";
+import {
+  getHrefLangAlternates,
+  languages,
+  type SupportedLanguage,
+} from "../utils/i18n";
+import "../styles/global.css";
 
 interface Props {
   title?: string;
@@ -10,38 +14,59 @@ interface Props {
   lang?: SupportedLanguage;
 }
 
-const { 
-  lang = 'en',
-  title = "Free IP Subnet Calculator & CIDR Planner | DevSubnet", 
+const {
+  lang = "en",
+  title = "Free IP Subnet Calculator & CIDR Planner | DevSubnet",
   description = "Free online IPv4 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly.",
-  canonicalUrl = Astro.url.href
+  canonicalUrl = Astro.url.href,
 } = Astro.props;
 
 const hreflangLinks = getHrefLangAlternates(Astro.url.pathname);
 const currentLangInfo = languages[lang] || languages.en;
 ---
+
 <!doctype html>
 <html lang={lang} data-theme="dark">
   <head>
     <ClientRouter />
-    <!-- Google tag (gtag.js) -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-F2T4WC5Y9V');
-    </script>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google Fonts Preconnect for Page Speed -->
+    <!-- Google Fonts Non-blocking Load for Maximum FCP/LCP Speed -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-    
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      />
+    </noscript>
+
+    <!-- Deferred Google Analytics (Zero Render Blocking) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      function initGA() {
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
+        document.head.appendChild(script);
+        gtag("js", new Date());
+        gtag("config", "G-F2T4WC5Y9V");
+      }
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(initGA, { timeout: 4000 });
+      } else {
+        setTimeout(initGA, 2000);
+      }
+    </script>
+
     <!-- Primary SEO Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />
@@ -51,9 +76,11 @@ const currentLangInfo = languages[lang] || languages.en;
     <meta name="generator" content={Astro.generator} />
 
     <!-- Multi-Language Hreflang Tags for International SEO -->
-    {hreflangLinks.map((item) => (
-      <link rel="alternate" hreflang={item.lang} href={item.href} />
-    ))}
+    {
+      hreflangLinks.map((item) => (
+        <link rel="alternate" hreflang={item.lang} href={item.href} />
+      ))
+    }
 
     <!-- Favicon & Web App Icons -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -62,7 +89,7 @@ const currentLangInfo = languages[lang] || languages.en;
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="devsubnet.com" />
     <link rel="manifest" href="/site.webmanifest" />
- 
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
@@ -71,146 +98,157 @@ const currentLangInfo = languages[lang] || languages.en;
     <meta property="og:site_name" content="devsubnet.com" />
     <meta property="og:locale" content={currentLangInfo.locale} />
     <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
- 
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={`${Astro.url.origin}/og-image.png`} />
- 
+    <meta
+      property="twitter:image"
+      content={`${Astro.url.origin}/og-image.png`}
+    />
+
     <!-- Anti-Flash Theme Script (runs inline & on astro:after-swap) -->
     <script is:inline>
       function applyTheme() {
-        const theme = localStorage.getItem('devsubnet-theme') || 
-          (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
+        const theme =
+          localStorage.getItem("devsubnet-theme") ||
+          (window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
       }
       applyTheme();
-      document.addEventListener('astro:after-swap', applyTheme);
+      document.addEventListener("astro:after-swap", applyTheme);
     </script>
 
     <!-- WebApplication / SoftwareApplication Schema JSON-LD for Rich Results -->
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
-      "url": "https://devsubnet.com/",
-      "inLanguage": lang,
-      "applicationCategory": "UtilitiesApplication",
-      "applicationSubCategory": "Networking & Cloud Infrastructure",
-      "operatingSystem": "All (Web Browser, Linux, macOS, Windows, iOS, Android)",
-      "browserRequirements": "Requires JavaScript. Compatible with all modern browsers.",
-      "description": description,
-      "author": {
-        "@type": "Organization",
-        "name": "DevSubnet",
-        "url": "https://devsubnet.com/"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "DevSubnet",
-        "url": "https://devsubnet.com/"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "ratingCount": "148",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "featureList": [
-        "IPv4 & IPv6 subnet calculation",
-        "CIDR prefix planning and binary visualization",
-        "Cloud-aware reserved IP calculation for AWS VPC, Azure VNet, and GCP",
-        "Visual Subnet Splitter with live partition tree",
-        "Terraform cidrsubnet() planner and HCL exporter",
-        "Kubernetes CIDR calculator (Cilium, Calico, AWS VPC CNI, Azure CNI)",
-        "VLSM hierarchical subnet segmenter",
-        "Subnet overlap conflict detector",
-        "CIDR supernetting and route aggregation",
-        "Complete CIDR cheat sheet reference"
-      ]
-    })} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
+        url: "https://devsubnet.com/",
+        inLanguage: lang,
+        applicationCategory: "UtilitiesApplication",
+        applicationSubCategory: "Networking & Cloud Infrastructure",
+        operatingSystem:
+          "All (Web Browser, Linux, macOS, Windows, iOS, Android)",
+        browserRequirements:
+          "Requires JavaScript. Compatible with all modern browsers.",
+        description: description,
+        author: {
+          "@type": "Organization",
+          name: "DevSubnet",
+          url: "https://devsubnet.com/",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "DevSubnet",
+          url: "https://devsubnet.com/",
+        },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: "4.9",
+          ratingCount: "148",
+          bestRating: "5",
+          worstRating: "1",
+        },
+        featureList: [
+          "IPv4 & IPv6 subnet calculation",
+          "CIDR prefix planning and binary visualization",
+          "Cloud-aware reserved IP calculation for AWS VPC, Azure VNet, and GCP",
+          "Visual Subnet Splitter with live partition tree",
+          "Terraform cidrsubnet() planner and HCL exporter",
+          "Kubernetes CIDR calculator (Cilium, Calico, AWS VPC CNI, Azure CNI)",
+          "VLSM hierarchical subnet segmenter",
+          "Subnet overlap conflict detector",
+          "CIDR supernetting and route aggregation",
+          "Complete CIDR cheat sheet reference",
+        ],
+      })}
+    />
 
     <!-- FAQ Schema JSON-LD for SEO -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is a subnet mask and how does it work?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion.</p>"
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a subnet mask and how does it work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion.</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate subnets from an IP address?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. The number of hosts per subnet is 2^h - 2, where h is the number of remaining host bits.</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is CIDR notation and how is it used?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix (e.g., /24 implies 24 network bits).</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many usable hosts are in a /24 subnet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>A /24 subnet has 256 total IP addresses. Subtracting 2 addresses for the network address (first IP) and the broadcast address (last IP) leaves exactly 254 usable host IP addresses.</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between network address and broadcast address?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>The network address is the first IP in a subnet range and represents the network itself, used by routers to forward packets. The broadcast address is the last IP in the subnet range, used to send data packets to all hosts connected to that subnet simultaneously.</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What IP addresses does AWS reserve in a VPC subnet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>AWS reserves 5 IP addresses in each subnet: the first four IPs (x.x.x.0 for network, x.x.x.1 for the VPC router, x.x.x.2 for DNS, x.x.x.3 for future use) and the last IP address (x.x.x.255 for network broadcast).</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I plan IP ranges for a Kubernetes cluster?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>To plan Kubernetes IP ranges, allocate non-overlapping CIDR blocks for Nodes, Pods, and Services. Ensure the Pod CIDR is large enough to allocate a subnet (usually /24 or /26) per Node depending on the max pods per node configured.</p>"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does Terraform cidrsubnet() calculate subnet ranges?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "<p>Terraform's cidrsubnet(prefix, newbits, netnum) function calculates a subnet address within a given IP network prefix. 'prefix' is the base CIDR, 'newbits' is the number of additional network bits to add, and 'netnum' is the zero-based index of the subnet to generate.</p>"
+            }
           }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I calculate subnets from an IP address?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. The number of hosts per subnet is 2^h - 2, where h is the number of remaining host bits.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is CIDR notation and how is it used?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix (e.g., /24 implies 24 network bits).</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How many usable hosts are in a /24 subnet?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>A /24 subnet has 256 total IP addresses. Subtracting 2 addresses for the network address (first IP) and the broadcast address (last IP) leaves exactly 254 usable host IP addresses.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between network address and broadcast address?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>The network address is the first IP in a subnet range and represents the network itself, used by routers to forward packets. The broadcast address is the last IP in the subnet range, used to send data packets to all hosts connected to that subnet simultaneously.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What IP addresses does AWS reserve in a VPC subnet?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>AWS reserves 5 IP addresses in each subnet: the first four IPs (x.x.x.0 for network, x.x.x.1 for the VPC router, x.x.x.2 for DNS, x.x.x.3 for future use) and the last IP address (x.x.x.255 for network broadcast).</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I plan IP ranges for a Kubernetes cluster?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>To plan Kubernetes IP ranges, allocate non-overlapping CIDR blocks for Nodes, Pods, and Services. Ensure the Pod CIDR is large enough to allocate a subnet (usually /24 or /26) per Node depending on the max pods per node configured.</p>"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How does Terraform cidrsubnet() calculate subnet ranges?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "<p>Terraform's cidrsubnet(prefix, newbits, netnum) function calculates a subnet address within a given IP network prefix. 'prefix' is the base CIDR, 'newbits' is the number of additional network bits to add, and 'netnum' is the zero-based index of the subnet to generate.</p>"
-          }
-        }
-      ]
-    }
+        ]
+      }
     </script>
   </head>
   <body>
@@ -218,8 +256,10 @@ const currentLangInfo = languages[lang] || languages.en;
     <div class="bg-decor" aria-hidden="true">
       <div class="bg-blob bg-blob-1"></div>
       <div class="bg-blob bg-blob-2"></div>
+      <div class="bg-blob bg-blob-3"></div>
+      <div class="bg-blob bg-blob-4"></div>
     </div>
-    
+
     <slot />
   </body>
 </html>

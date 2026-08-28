@@ -48,10 +48,21 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
 <header class="topbar">
   <div class="topbar-row">
     <a class="brand" href={langPrefix || "/"} aria-label="DevSubnet.com home">
-      <span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span>
+      <span class="brand-badge">
+        <svg class="brand-navicon" viewBox="0 0 512 512" width="18" height="18" aria-hidden="true">
+          <circle cx="256" cy="140" r="40" fill="#ffffff"/>
+          <path d="M256 180 v70 M150 290 h212 M150 250 v40 M362 250 v40 M150 290 v60 M362 290 v60" fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round"/>
+          <circle cx="150" cy="370" r="32" fill="#ffffff"/>
+          <circle cx="362" cy="370" r="32" fill="#ffffff"/>
+          <path d="M280 190 l-48 80" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+        </svg>
+        Dev
+      </span>
+      <span class="brand-text">Subnet.com</span>
     </a>
 
     <nav class="nav-links" aria-label="Primary navigation">
+      <div class="mac-pill-indicator" id="mac-nav-pill"></div>
       {primaryLinks.map((link) => (
         <a class={`nav-tab ${isActive(link) ? 'active' : ''}`} href={link.href}>
           {link.label}
@@ -192,16 +203,105 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
   }
 </style>
 
-<script>
+<script is:inline>
+  function setupMacDockMagnifier() {
+    const navContainer = document.querySelector('.nav-links');
+    if (!navContainer) return;
+
+    const tabs = Array.from(navContainer.querySelectorAll('.nav-tab'));
+    if (tabs.length === 0) return;
+
+    const maxScale = 1.35; // Center hovered tab scales up to 135%
+    const maxDistance = 130; // Pixel radius for neighbor wave expansion
+
+    function resetScales() {
+      tabs.forEach(function(tab) {
+        tab.style.transform = 'scale(1)';
+        tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
+      });
+    }
+
+    navContainer.addEventListener('mousemove', function(e) {
+      const mouseX = e.clientX;
+
+      tabs.forEach(function(tab) {
+        const rect = tab.getBoundingClientRect();
+        const tabCenterX = rect.left + rect.width / 2;
+        const distance = Math.abs(mouseX - tabCenterX);
+
+        if (distance < maxDistance) {
+          // Cosine squared wave formula for macOS Dock Magnification
+          const factor = Math.cos((distance / maxDistance) * (Math.PI / 2));
+          const scale = 1 + (maxScale - 1) * Math.pow(factor, 2);
+          tab.style.transform = 'scale(' + scale.toFixed(3) + ')';
+          tab.style.zIndex = '10';
+        } else {
+          tab.style.transform = 'scale(1)';
+          tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
+        }
+      });
+    });
+
+    navContainer.addEventListener('mouseleave', function() {
+      resetScales();
+    });
+  }
+
+  function setupMacPill() {
+    const navContainer = document.querySelector('.nav-links');
+    const pill = document.getElementById('mac-nav-pill');
+    if (!navContainer || !pill) return;
+
+    const tabs = Array.from(navContainer.querySelectorAll('.nav-tab'));
+    if (tabs.length === 0) return;
+
+    const activeTab = navContainer.querySelector('.nav-tab.active') || tabs[0];
+
+    function movePillTo(target) {
+      if (!target) return;
+      const containerRect = navContainer.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const left = targetRect.left - containerRect.left;
+      const top = targetRect.top - containerRect.top;
+      const width = targetRect.width;
+      const height = targetRect.height;
+
+      pill.style.transform = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
+      pill.style.width = width + 'px';
+      pill.style.height = height + 'px';
+      pill.style.opacity = '1';
+    }
+
+    if (activeTab) movePillTo(activeTab);
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('mouseenter', function() { movePillTo(tab); });
+    });
+
+    navContainer.addEventListener('mouseleave', function() {
+      const currentActive = navContainer.querySelector('.nav-tab.active') || tabs[0];
+      if (currentActive) movePillTo(currentActive);
+    });
+
+    window.addEventListener('resize', function() {
+      const currentActive = navContainer.querySelector('.nav-tab.active') || tabs[0];
+      if (currentActive) movePillTo(currentActive);
+    }, { passive: true });
+  }
+
   function setupNavBar() {
+    setupMacPill();
+    setupMacDockMagnifier();
+
     const themeBtn = document.getElementById('theme-btn');
     if (themeBtn) {
-      themeBtn.onclick = () => {
+      themeBtn.onclick = function() {
         const doc = document.documentElement;
         const currentTheme = doc.getAttribute('data-theme');
         const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
         doc.setAttribute('data-theme', targetTheme);
         localStorage.setItem('devsubnet-theme', targetTheme);
+        setTimeout(setupMacPill, 50);
       };
     }
 
@@ -209,47 +309,49 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
     const moreWrap = document.querySelector('.nav-more');
 
     if (moreBtn && moreWrap) {
-      moreBtn.onclick = (e) => {
+      moreBtn.onclick = function(e) {
         e.stopPropagation();
         const isOpen = moreWrap.classList.toggle('open');
         moreBtn.setAttribute('aria-expanded', String(isOpen));
-        // Close lang picker if open
-        document.querySelector('.lang-picker')?.classList.remove('open');
+        const langP = document.querySelector('.lang-picker');
+        if (langP) langP.classList.remove('open');
       };
     }
 
-    // Language Dropdown Toggle
     const langBtn = document.querySelector('.lang-btn');
     const langPicker = document.querySelector('.lang-picker');
 
     if (langBtn && langPicker) {
-      langBtn.onclick = (e) => {
+      langBtn.onclick = function(e) {
         e.stopPropagation();
         const isOpen = langPicker.classList.toggle('open');
         langBtn.setAttribute('aria-expanded', String(isOpen));
-        // Close more tools if open
-        document.querySelector('.nav-more')?.classList.remove('open');
+        const moreW = document.querySelector('.nav-more');
+        if (moreW) moreW.classList.remove('open');
       };
     }
   }
 
-  // Close menus on outside click (global single handler)
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', function(e) {
     const moreWrap = document.querySelector('.nav-more');
     const moreBtn = document.querySelector('.nav-more-btn');
     const langPicker = document.querySelector('.lang-picker');
     const langBtn = document.querySelector('.lang-btn');
 
-    if (moreWrap && moreBtn && !moreWrap.contains(e.target as Node)) {
+    if (moreWrap && moreBtn && !moreWrap.contains(e.target)) {
       moreWrap.classList.remove('open');
       moreBtn.setAttribute('aria-expanded', 'false');
     }
-    if (langPicker && langBtn && !langPicker.contains(e.target as Node)) {
+    if (langPicker && langBtn && !langPicker.contains(e.target)) {
       langPicker.classList.remove('open');
       langBtn.setAttribute('aria-expanded', 'false');
     }
   });
 
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupNavBar);
+  } else {
+    setupNavBar();
+  }
   document.addEventListener('astro:page-load', setupNavBar);
-  setupNavBar();
 </script>

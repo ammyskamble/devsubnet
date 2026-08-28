@@ -1,0 +1,113 @@
+---
+interface Props {
+  path?: string;
+}
+
+const { path = "" } = Astro.props;
+
+const primaryLinks = [
+  { href: "/", label: "IPv4 Calculator", key: "ipv4" },
+  { href: "/visual-subnet-splitter", label: "Visual Splitter", key: "splitter" },
+  { href: "/kubernetes-subnet-planner", label: "K8s IP Planner", key: "k8s" },
+  { href: "/ipv6-subnet-calculator", label: "IPv6 Calculator", key: "ipv6" }
+];
+
+const moreTools = [
+  { href: "/vlsm-calculator", label: "VLSM Calculator", key: "vlsm" },
+  { href: "/subnet-overlap-checker", label: "Subnet Overlap Checker", key: "overlap" },
+  { href: "/cidr-supernet-calculator", label: "CIDR Supernet Calculator", key: "supernet" },
+  { href: "/cidr-cheat-sheet", label: "CIDR Cheat Sheet", key: "cheatsheet" },
+  { href: "/aws-vpc-subnet-calculator", label: "AWS VPC Calculator", key: "aws" },
+  { href: "/azure-vnet-subnet-calculator", label: "Azure VNet Calculator", key: "azure" },
+  { href: "/gcp-vpc-subnet-calculator", label: "GCP VPC Calculator", key: "gcp" }
+];
+
+// Resolve the current path to a key for active-state highlighting
+const pathKey = path.split('/').filter(Boolean)[0] || 'ipv4';
+function isActive(item: { href: string; key: string }): boolean {
+  if (pathKey === 'ipv4') return item.key === 'ipv4';
+  return item.key === pathKey;
+}
+---
+
+<header class="topbar">
+  <div class="topbar-row">
+    <a class="brand" href="/" aria-label="DevSubnet.com home">
+      <span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary navigation">
+      {primaryLinks.map((link) => (
+        <a class={`nav-tab ${isActive(link) ? 'active' : ''}`} href={link.href}>
+          {link.label}
+        </a>
+      ))}
+
+      <div class="nav-more">
+        <button class="nav-tab nav-more-btn" type="button" aria-haspopup="true" aria-expanded="false">
+          More Tools
+          <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="nav-more-menu">
+          {moreTools.map((tool) => (
+            <a class={`nav-more-item ${isActive(tool) ? 'active' : ''}`} href={tool.href}>
+              {tool.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const themeBtn = document.getElementById('theme-btn');
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const currentTheme = doc.getAttribute('data-theme');
+      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+      doc.setAttribute('data-theme', targetTheme);
+      localStorage.setItem('devsubnet-theme', targetTheme);
+    });
+  }
+
+  const moreBtn = document.querySelector('.nav-more-btn');
+  const moreMenu = document.querySelector('.nav-more-menu');
+  const moreWrap = document.querySelector('.nav-more');
+
+  if (moreBtn && moreMenu && moreWrap) {
+    moreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = moreWrap.classList.toggle('open');
+      moreBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!moreWrap.contains(e.target as Node)) {
+        moreWrap.classList.remove('open');
+        moreBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+</script>

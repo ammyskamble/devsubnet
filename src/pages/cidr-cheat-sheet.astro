@@ -1,21 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
 ---
 <Layout
   title="CIDR Cheat Sheet – Complete IPv4 Subnet Reference Table | DevSubnet"
   description="Complete IPv4 CIDR cheat sheet covering all 33 prefix lengths from /0 to /32 with subnet masks, wildcard masks, total addresses, and usable hosts. Free reference for network engineers."
 >
   <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="DevSubnet.com home"><span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span></a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a class="nav-tab" href="/">IPv4 Calculator</a>
-        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
-        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
-        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
-      </nav>
-      <div class="nav-actions"></div>
-    </header>
+    <NavBar path="cheatsheet" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">REFERENCE / CIDR CHEAT SHEET</div>

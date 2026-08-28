@@ -1,25 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Supernetter from '../components/Supernetter.astro';
+import NavBar from '../components/NavBar.astro';
 ---
 <Layout
   title="CIDR Supernetting Calculator – Route Summarization Tool | DevSubnet"
   description="Free online CIDR supernetting / route summarization calculator. Combine contiguous networks into a single summary route to reduce routing table size and improve convergence."
 >
   <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="DevSubnet.com home"><span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span></a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a class="nav-tab" href="/">IPv4 Calculator</a>
-        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
-        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
-        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
-        <a class="nav-tab" href="/vlsm-calculator">VLSM</a>
-        <a class="nav-tab" href="/subnet-overlap-checker">Overlap</a>
-        <a class="nav-tab active" href="/cidr-supernet-calculator">Supernetting</a>
-      </nav>
-      <div class="nav-actions"></div>
-    </header>
+    <NavBar path="supernet" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">SUPERNETTING / ROUTE SUMMARIZATION</div>

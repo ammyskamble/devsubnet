@@ -4,15 +4,18 @@ import VisualSplitter from './VisualSplitter.astro';
 import KubernetesPlanner from './KubernetesPlanner.astro';
 import IPv6Calculator from './IPv6Calculator.astro';
 import SubnetGuide from './SubnetGuide.astro';
+import NavBar from './NavBar.astro';
 
 interface Props {
   activeTab: 'ipv4' | 'splitter' | 'k8s' | 'ipv6';
   defaultCloud?: 'standard' | 'aws' | 'azure' | 'gcp';
+  navPath?: string;
 }
 
 const { 
   activeTab, 
-  defaultCloud = "standard" 
+  defaultCloud = "standard",
+  navPath = activeTab
 } = Astro.props;
 
 // Determine header titles for introduction sections
@@ -42,57 +45,7 @@ const introData = {
 
 <div class="app-shell">
   <!-- Top Bar navigation -->
-  <header class="topbar">
-    <a class="brand" href="/" aria-label="DevSubnet.com home">
-      <span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span>
-    </a>
-    
-    <nav class="nav-links" aria-label="Primary navigation">
-      <a class={`nav-tab ${activeTab === 'ipv4' ? 'active' : ''}`} href="/">
-        IPv4 Calculator
-      </a>
-      <a class={`nav-tab ${activeTab === 'splitter' ? 'active' : ''}`} href="/visual-subnet-splitter">
-        Visual Splitter
-      </a>
-      <a class={`nav-tab ${activeTab === 'k8s' ? 'active' : ''}`} href="/kubernetes-subnet-planner">
-        K8s IP Planner
-      </a>
-      <a class={`nav-tab ${activeTab === 'ipv6' ? 'active' : ''}`} href="/ipv6-subnet-calculator">
-        IPv6 Calculator
-      </a>
-      <a class="nav-tab" href="/vlsm-calculator">
-        VLSM
-      </a>
-      <a class="nav-tab" href="/subnet-overlap-checker">
-        Overlap
-      </a>
-      <a class="nav-tab" href="/cidr-supernet-calculator">
-        Supernetting
-      </a>
-    </nav>
-    
-    <div class="nav-actions">
-      <!-- Dark/Light Theme toggler -->
-      <button class="theme-toggle" id="theme-btn" aria-label="Toggle visual theme" type="button">
-        <!-- Sun icon (shown in light mode) -->
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <!-- Moon icon (shown in dark mode) -->
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </div>
-  </header>
+  <NavBar path={navPath} />
 
   <!-- Main section -->
   <main>
@@ -128,19 +81,3 @@ const introData = {
     <span>NO DATA LEAVES YOUR DEVICE</span>
   </footer>
 </div>
-
-<script>
-  // Theme Switching functionality
-  const themeBtn = document.getElementById('theme-btn');
-  
-  if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-      const doc = document.documentElement;
-      const currentTheme = doc.getAttribute('data-theme');
-      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
-      
-      doc.setAttribute('data-theme', targetTheme);
-      localStorage.setItem('devsubnet-theme', targetTheme);
-    });
-  }
-</script>

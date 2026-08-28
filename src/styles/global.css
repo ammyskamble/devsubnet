@@ -169,16 +169,22 @@ code, pre {
 
 /* Top Navigation Bar */
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--panel-bg);
   backdrop-filter: blur(var(--glass-blur));
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.topbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
 }
 
 .brand {
@@ -215,6 +221,80 @@ code, pre {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+/* "More Tools" dropdown */
+.nav-more {
+  position: relative;
+}
+
+.nav-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-more-caret {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.nav-more.open .nav-more-caret {
+  transform: rotate(180deg);
+}
+
+.nav-more-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 220px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+  z-index: 20;
+}
+
+.nav-more.open .nav-more-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+:root[data-theme="light"] .nav-more-menu {
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+}
+
+.nav-more-item {
+  display: block;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-more-item:hover {
+  color: var(--text-primary);
+  background-color: rgba(99, 102, 241, 0.08);
+}
+
+.nav-more-item.active {
+  color: var(--accent-network);
+  background-color: rgba(99, 102, 241, 0.12);
 }
 
 .nav-tab {
@@ -1292,21 +1372,28 @@ body, html {
   /* --- Topbar / Navigation --- */
   .topbar {
     padding: 0.75rem 1rem;
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
     position: sticky;
     top: 0;
     z-index: 10;
   }
 
+  .topbar-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    padding: 0;
+  }
+
   .brand {
     font-size: 1.25rem;
-    justify-content: space-between;
-    width: 100%;
+  }
+
+  .nav-actions {
+    margin-left: auto;
   }
 
   .nav-links {
+    order: 3;
+    flex-basis: 100%;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1338,10 +1425,21 @@ body, html {
     color: var(--text-primary);
   }
 
-  .nav-actions {
-    position: absolute;
-    top: 0.75rem;
-    right: 1rem;
+  /* Mobile "More Tools": fixed dropdown sheet to avoid scroll-clipping */
+  .nav-more-menu {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    top: auto;
+    bottom: 0.75rem;
+    transform: translateY(calc(100% + 1rem));
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .nav-more.open .nav-more-menu {
+    transform: translateY(0);
   }
 
   /* --- Main layout --- */

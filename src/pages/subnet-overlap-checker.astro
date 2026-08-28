@@ -1,24 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import OverlapChecker from '../components/OverlapChecker.astro';
+import NavBar from '../components/NavBar.astro';
 ---
 <Layout
   title="Subnet Overlap Checker – CIDR Conflict Detector | DevSubnet"
   description="Free online subnet overlap checker. Detect identical, overlapping, contained, and separate CIDR ranges before VPC peering, VPN routing, and firewall changes."
 >
   <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="DevSubnet.com home"><span class="brand-badge">Dev</span><span class="brand-text">Subnet.com</span></a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a class="nav-tab" href="/">IPv4 Calculator</a>
-        <a class="nav-tab" href="/visual-subnet-splitter">Visual Splitter</a>
-        <a class="nav-tab" href="/kubernetes-subnet-planner">K8s IP Planner</a>
-        <a class="nav-tab" href="/ipv6-subnet-calculator">IPv6 Calculator</a>
-        <a class="nav-tab" href="/vlsm-calculator">VLSM</a>
-        <a class="nav-tab active" href="/subnet-overlap-checker">Overlap</a>
-      </nav>
-      <div class="nav-actions"></div>
-    </header>
+    <NavBar path="overlap" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">CONFLICT DETECTION / CIDR OVERLAP CHECKER</div>

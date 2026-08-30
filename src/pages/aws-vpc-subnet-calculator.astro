@@ -5,7 +5,71 @@ import MainShell from '../components/MainShell.astro';
 
 <Layout 
   title="AWS VPC Subnet Calculator – CIDR Planner | DevSubnet"
-  description="Calculate AWS VPC subnets with all 5 reserved IPs accounted for. Plan CIDR blocks across Availability Zones and export ready-to-use Terraform and Ansible configurations."
+  description="AWS VPC subnet calculator with all 5 reserved IPs accounted for. Plan CIDR blocks across Availability Zones, generate Terraform and Ansible configurations, and calculate usable host ranges with cloud-aware reservations for production VPCs."
 >
-  <MainShell activeTab="ipv4" defaultCloud="aws" navPath="aws" />
+  <MainShell activeTab="ipv4" defaultCloud="aws" navPath="aws">
+    <div class="related-tools" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+      <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Related Tools</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem;">
+        <a href="/" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">IPv4 Calculator</a>
+        <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Terraform Planner</a>
+        <a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">K8s Planner</a>
+        <a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Visual Splitter</a>
+        <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Overlap Checker</a>
+        <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">VLSM Calc</a>
+        <a href="/ipv6-subnet-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">IPv6 Calc</a>
+        <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">CIDR Sheet</a>
+      </div>
+    </div>
+  </MainShell>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What IP addresses does AWS reserve in a VPC subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AWS reserves 5 IP addresses in every VPC subnet: x.x.x.0 (network address), x.x.x.1 (VPC router), x.x.x.2 (DNS resolver), x.x.x.3 (reserved for future use), and x.x.x.255 (broadcast address)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I plan IP ranges for a Kubernetes cluster?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Allocate three non-overlapping CIDR blocks: one for Node IPs, one for Pod IPs, and one for Service IPs. The Pod CIDR must be large enough to give each Node a subnet (usually /24 or /26) based on the max pods per node setting in your kubelet configuration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /24 subnet contains 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between network address and broadcast address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The network address is the first IP in a subnet range and represents the network itself – routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate subnets from an IP address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. Usable hosts per subnet is 2^h - 2."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>

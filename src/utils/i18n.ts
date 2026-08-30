@@ -61,6 +61,18 @@ export interface HreflangAlternate {
  * Generates regional and global reciprocal hreflang links covering all priority countries:
  * US, India, UK, Canada, Australia, Germany, Philippines, Singapore, Netherlands, South Africa, Spain, Japan
  */
+
+// Routes that have localized versions available. Pages outside this set only
+// have an English version, so no /lang/ hreflang alternates are emitted for them.
+const LOCALIZED_ROUTES = new Set([
+  '/',
+  '/faq',
+  '/cidr-cheat-sheet',
+  '/visual-subnet-splitter',
+  '/kubernetes-subnet-planner',
+  '/ipv6-subnet-calculator'
+]);
+
 export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https://devsubnet.com'): HreflangAlternate[] {
   let cleanPath = pathname;
   for (const lang of ['de', 'es', 'ja', 'nl']) {
@@ -76,20 +88,29 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
 
   const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
   const pathWithoutRootSlash = normalizedPath === '/' ? '' : normalizedPath;
+  const route = pathWithoutRootSlash === '' ? '/' : pathWithoutRootSlash.replace(/\/$/, '');
+  const hasLocalizedVersion = LOCALIZED_ROUTES.has(route);
   const enUrl = `${siteUrl}${pathWithoutRootSlash || '/'}`;
   const deUrl = `${siteUrl}/de${pathWithoutRootSlash}`;
   const esUrl = `${siteUrl}/es${pathWithoutRootSlash}`;
   const jaUrl = `${siteUrl}/ja${pathWithoutRootSlash}`;
   const nlUrl = `${siteUrl}/nl${pathWithoutRootSlash}`;
 
-  return [
+  const alternates: HreflangAlternate[] = [
     // Global generic languages
     { lang: 'en', href: enUrl },
-    { lang: 'de', href: deUrl },
-    { lang: 'es', href: esUrl },
-    { lang: 'ja', href: jaUrl },
-    { lang: 'nl', href: nlUrl },
+  ];
 
+  if (hasLocalizedVersion) {
+    alternates.push(
+      { lang: 'de', href: deUrl },
+      { lang: 'es', href: esUrl },
+      { lang: 'ja', href: jaUrl },
+      { lang: 'nl', href: nlUrl },
+    );
+  }
+
+  alternates.push(
     // Priority Country-Specific English Regions
     { lang: 'en-US', href: enUrl }, // United States
     { lang: 'en-IN', href: enUrl }, // India
@@ -99,16 +120,22 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
     { lang: 'en-SG', href: enUrl }, // Singapore
     { lang: 'en-PH', href: enUrl }, // Philippines
     { lang: 'en-ZA', href: enUrl }, // South Africa
+  );
 
-    // Priority Regional European & Asian Locales
-    { lang: 'de-DE', href: deUrl }, // Germany
-    { lang: 'nl-NL', href: nlUrl }, // Netherlands (AMS-IX)
-    { lang: 'es-ES', href: esUrl }, // Spain
-    { lang: 'ja-JP', href: jaUrl }, // Japan
+  if (hasLocalizedVersion) {
+    alternates.push(
+      // Priority Regional European & Asian Locales
+      { lang: 'de-DE', href: deUrl }, // Germany
+      { lang: 'nl-NL', href: nlUrl }, // Netherlands (AMS-IX)
+      { lang: 'es-ES', href: esUrl }, // Spain
+      { lang: 'ja-JP', href: jaUrl }, // Japan
+    );
+  }
 
-    // Fallback default
-    { lang: 'x-default', href: enUrl }
-  ];
+  // Fallback default
+  alternates.push({ lang: 'x-default', href: enUrl });
+
+  return alternates;
 }
 
 /**
@@ -128,11 +155,15 @@ export function getLocalizedPath(currentPath: string, targetLang: SupportedLangu
   }
 
   const normalizedPath = cleanPath === '/' ? '' : (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`);
-  
-  if (targetLang === 'en') {
-    return normalizedPath || '/';
+  const route = normalizedPath.length > 1 && normalizedPath.endsWith('/') ? normalizedPath.slice(0, -1) : (normalizedPath || '/');
+
+  if (targetLang === 'en' || !LOCALIZED_ROUTES.has(route)) {
+    return route === '/' ? '/' : route;
   }
-  return `/dev${normalizedPath}`.replace('/dev', `/${targetLang}`) || `/${targetLang}/`;
+  if (route === '/') {
+    return `/${targetLang}/`;
+  }
+  return `/${targetLang}${route}`;
 }
 
 export interface TranslationDictionary {

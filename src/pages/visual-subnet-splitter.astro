@@ -5,7 +5,70 @@ import MainShell from '../components/MainShell.astro';
 
 <Layout 
   title="Visual Subnet Splitter – CIDR Partitioner | DevSubnet"
-  description="Split and partition IP network blocks visually into custom CIDR subnets. Label segments, merge ranges, and export Terraform-ready infrastructure configurations instantly."
+  description="Visual Subnet Splitter for CIDR partitioning and network division. Divide IP blocks visually with descriptive labels, merge ranges, and export Terraform-ready HCL configurations for AWS, Azure, and GCP infrastructure planning."
 >
-  <MainShell activeTab="splitter" />
+  <MainShell activeTab="splitter">
+    <div class="related-tools" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+      <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Related Tools</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem;">
+        <a href="/" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">IPv4 Calc</a>
+        <a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">K8s Planner</a>
+        <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">VLSM Calc</a>
+        <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Overlap Checker</a>
+        <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">CIDR Sheet</a>
+        <a href="/ipv6-subnet-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">IPv6 Calc</a>
+        <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Terraform Planner</a>
+      </div>
+    </div>
+  </MainShell>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is CIDR supernetting and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CIDR supernetting (also called route summarization) combines multiple contiguous networks into a single larger prefix. For example, 192.168.0.0/24 through 192.168.3.0/24 collapse into a single 192.168.0.0/22 summary route, reducing routing table size and improving router performance."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I split a network into smaller subnets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To split a network, increase the CIDR prefix length by borrowing host bits. For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25 – creating two subnets each containing 128 total IPs (126 usable each)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a /16 and /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /16 subnet allocates 16 bits to the network portion and 16 bits to host addresses, supporting up to 65,534 usable hosts. A /24 subnet allocates 24 bits to the network portion and 8 bits to hosts, supporting up to 254 usable hosts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /24 subnet has 256 total IP addresses. Subtracting 2 addresses for the network and broadcast leaves exactly 254 usable host IP addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use the Visual Subnet Splitter for Terraform planning?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, the Visual Subnet Splitter allows you to divide network blocks visually and export copy-pasteable IaC configurations for Terraform, AWS, Azure, and GCP without CIDR overlap bugs."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>

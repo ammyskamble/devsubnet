@@ -5,7 +5,73 @@ import MainShell from '../components/MainShell.astro';
 
 <Layout 
   title="Free IP Subnet Calculator & CIDR Planner | DevSubnet"
-  description="Free online IPv4 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly."
+  description="Free online IPv4 & IPv6 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, cloud VPC reservations for AWS/Azure/GCP, and Terraform cidrsubnet planning instantly."
 >
-  <MainShell activeTab="ipv4" defaultCloud="standard" />
+  <MainShell activeTab="ipv4" defaultCloud="standard">
+    <div class="related-tools" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+      <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Related Tools</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+        <a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none;">Visual Subnet Splitter</a>
+        <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none;">VLSM Calculator</a>
+        <a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none;">K8s IP Planner</a>
+        <a href="/k8s-cidr-calculator" style="color: var(--text-primary); text-decoration: none;">K8s CIDR Calculator</a>
+        <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none;">Terraform Subnet Planner</a>
+        <a href="/aws-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">AWS VPC Calculator</a>
+        <a href="/azure-vnet-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">Azure VNet Calculator</a>
+        <a href="/gcp-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">GCP VPC Calculator</a>
+        <a href="/ipv6-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">IPv6 Calculator</a>
+        <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none;">CIDR Cheat Sheet</a>
+      </div>
+    </div>
+  </MainShell>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a subnet mask and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate subnets from an IP address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. Usable hosts per subnet is 2^h - 2."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is CIDR notation and how is it used?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix (e.g., /24 implies 24 network bits)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /24 subnet has 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between network address and broadcast address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The network address is the first IP in a subnet range and represents the network itself – routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>

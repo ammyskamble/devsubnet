@@ -1,0 +1,174 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout 
+  title="How to Calculate Subnet Mask & CIDR | Complete Guide | DevSubnet"
+  description="Learn how to calculate subnet masks, determine usable host ranges, and plan CIDR blocks for networks. Step-by-step guide with examples for IPv4 and IPv6 subnetting."
+>
+  <div class="app-shell">
+    <NavBar path='guide' />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>How to Calculate a Subnet</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">STEP-BY-STEP</div>
+          <h1>How to Calculate a Subnet</h1>
+          <p class="lede">
+            Subnetting is simply dividing an IP network into smaller, logical pieces. Learn the math, the formula, and a repeatable process that works for any IPv4 block.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="text-block">
+            <h2>What Is a Subnet Mask?</h2>
+            <p>
+              A subnet mask is a 32-bit number that separates an IP address into the <strong>network portion</strong> (first bits, marked with binary 1s) and the <strong>host portion</strong> (remaining bits, marked with 0s). The mask is what tells a router how much of the address identifies the network and how much identifies a device on it. In CIDR notation the same information is written as a slash and the number of 1 bits: a mask of <code>255.255.255.0</code> is written <code>/24</code>.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>The Only Formula You Need</h2>
+            <p>
+              Every subnetting calculation comes down to two numbers:
+            </p>
+            <ul class="step-list">
+              <li><strong>Total addresses</strong> in a block = 2<sup>h</sup>, where h is the number of host bits (32 &minus; prefix length).</li>
+              <li><strong>Usable hosts</strong> = 2<sup>h</sup> &minus; 2. Two addresses are always subtracted: the network address (first IP, all host bits 0) and the broadcast address (last IP, all host bits 1).</li>
+            </ul>
+            <p>Example: a <code>/24</code> has 8 host bits, so it holds 2<sup>8</sup> = 256 total addresses and 256 &minus; 2 = <strong>254 usable hosts</strong>.</p>
+          </div>
+
+          <div class="text-block">
+            <h2>Step-by-Step Calculation</h2>
+            <ol class="ordered-list">
+              <li>
+                <strong>Write the address and mask in binary.</strong> Convert each octet to 8 bits. For <code>192.168.1.10/24</code>, the network bits are the first 24 bits and the last 8 bits are host bits.
+              </li>
+              <li>
+                <strong>Find the network address.</strong> AND the IP with the mask (1 AND anything = itself, 0 AND anything = 0). The result is the network address, e.g. <code>192.168.1.0</code>.
+              </li>
+              <li>
+                <strong>Find the broadcast address.</strong> Set every host bit to 1. For a <code>/24</code> that gives <code>192.168.1.255</code>.
+              </li>
+              <li>
+                <strong>Identify the usable range.</strong> Every address between network and broadcast is usable: <code>192.168.1.1</code> through <code>192.168.1.254</code>.
+              </li>
+              <li>
+                <strong>State the result in CIDR form.</strong> Network address, slash, prefix length: <code>192.168.1.0/24</code>.
+              </li>
+            </ol>
+          </div>
+
+          <div class="text-block">
+            <h2>Common CIDR Blocks Cheat Table</h2>
+            <table class="cheat-table">
+              <thead>
+                <tr><th>Prefix</th><th>Mask</th><th>Total IPs</th><th>Usable Hosts</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>/30</td><td>255.255.255.252</td><td>4</td><td>2 (point-to-point links)</td></tr>
+                <tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr>
+                <tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr>
+                <tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr>
+                <tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr>
+                <tr><td>/23</td><td>255.255.254.0</td><td>512</td><td>510</td></tr>
+                <tr><td>/22</td><td>255.255.252.0</td><td>1,024</td><td>1,022</td></tr>
+                <tr><td>/16</td><td>255.255.0.0</td><td>65,536</td><td>65,534</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tips-box">
+            <h3>Quick Rule of Thumb</h3>
+            <p>
+              Want support for N hosts? Double N to cover the two subtracted addresses, round up to the next power of two, count the bits, and subtract from 32. For example 200 hosts &rarr; ~200 + 2 = 256 total &rarr; 2<sup>8</sup> = 256 &rarr; 8 host bits &rarr; <code>/24</code>.
+            </p>
+          </div>
+        </section>
+
+        <div class="try-tool">
+          <a href="/" class="btn-return">Try the IPv4 Subnet Calculator &rarr;</a>
+        </div>
+
+        <div class="related-tools">
+          <h3>Related Tools</h3>
+          <div class="tools-grid">
+            <a href="/vlsm-calculator">VLSM Calculator</a>
+            <a href="/cidr-cheat-sheet">CIDR Cheat Sheet</a>
+            <a href="/" >IPv4 Calculator</a>
+            <a href="/ipv6-subnet-calculator">IPv6 Calculator</a>
+            <a href="/subnet-overlap-checker">Overlap Checker</a>
+          </div>
+        </div>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page-main { flex: 1; padding: 3rem 1.5rem 5rem; }
+  .content-container { max-width: 54rem; margin: 0 auto; text-align: left; }
+
+  .breadcrumb { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.4rem; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header { margin-bottom: 3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 2.5rem; }
+  .page-header .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text-primary); letter-spacing: -0.03em; margin: 0 0 1rem; line-height: 1.1; }
+  .page-header .lede { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.65; max-width: 40rem; margin: 0; }
+
+  .page-body { display: flex; flex-direction: column; gap: 3rem; }
+  .text-block h2 { font-size: 1.5rem; font-weight: 600; margin: 0 0 1rem; color: var(--text-primary); }
+  .text-block p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 1rem; }
+  .text-block p:last-child { margin-bottom: 0; }
+  .text-block code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; background: var(--bg-secondary); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent); }
+
+  .step-list, .ordered-list { margin: 0 0 1rem; padding-left: 1.5rem; }
+  .ordered-list li, .step-list li { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 0.5rem; }
+
+  .cheat-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .cheat-table th, .cheat-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+  .cheat-table th { color: var(--text-primary); font-weight: 600; background: var(--bg-secondary, rgba(255,255,255,0.03)); }
+  .cheat-table code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.82rem; color: var(--accent); }
+
+  .tips-box { background: var(--card-bg, rgba(255, 255, 255, 0.03)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem 2rem; }
+  .tips-box h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem; color: var(--text-primary); }
+  .tips-box p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+
+  .try-tool { margin-top: 3rem; }
+
+  .related-tools { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+  .related-tools h3 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-primary); }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+  .tools-grid a { color: var(--accent); text-decoration: none; }
+  .tools-grid a:hover { text-decoration: underline; }
+
+  .page-cta { margin-top: 3rem; }
+  .btn-return { display: inline-block; background: var(--text-primary); color: var(--bg-primary); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: opacity var(--transition-fast); }
+  .btn-return:hover { opacity: 0.85; }
+</style>

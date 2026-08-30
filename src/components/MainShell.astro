@@ -49,16 +49,17 @@ const langPrefix = lang === 'en' ? '' : `/${lang}`;
 
     <!-- General detailed guide content -->
     <SubnetGuide lang={lang} />
+    <slot />
   </main>
 
   <!-- Footer -->
   <footer>
     <span>{t.footer.tagline}</span>
     <div class="footer-links">
-      <a href={`${langPrefix}/about`}>{t.footer.about}</a>
-      <a href={`${langPrefix}/contact`}>{t.footer.contact}</a>
-      <a href={`${langPrefix}/privacy`}>{t.footer.privacy}</a>
-      <a href={`${langPrefix}/terms`}>{t.footer.terms}</a>
+      <a href="/about">{t.footer.about}</a>
+      <a href="/contact">{t.footer.contact}</a>
+      <a href="/privacy">{t.footer.privacy}</a>
+      <a href="/terms">{t.footer.terms}</a>
       <a href={`${langPrefix}/faq`}>{t.footer.faq}</a>
     </div>
     <span>{t.footer.noData}</span>

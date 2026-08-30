@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar.astro';
 
 <Layout
   title="K8s CIDR Calculator – Kubernetes Pod & Service Subnet Sizer | DevSubnet"
-  description="Free Kubernetes CIDR calculator. Size Pod and Service CIDR blocks for Cilium, Calico, AWS VPC CNI, and Azure CNI without IP exhaustion or pod scheduling failures."
+  description="Kubernetes CIDR calculator for Pod, Service, and Node subnet sizing with IP exhaustion diagnostics. Size CIDR blocks for Cilium eBPF, Calico BGP, AWS VPC CNI, and Azure CNI. Export Kubernetes manifests and detect capacity risks."
 >
   <div class="app-shell">
     <NavBar path="k8s-cidr" />
@@ -144,6 +144,19 @@ import NavBar from '../components/NavBar.astro';
           </div>
         </div>
       </section>
+      <div class="related-tools" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Related Tools</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+          <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none;">Terraform Subnet Planner</a>
+          <a href="/aws-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">AWS VPC Calculator</a>
+          <a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none;">K8s Subnet Planner</a>
+          <a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none;">Visual Subnet Splitter</a>
+          <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none;">Overlap Checker</a>
+          <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none;">VLSM Calculator</a>
+          <a href="/ipv6-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">IPv6 Calculator</a>
+          <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none;">CIDR Cheat Sheet</a>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -159,6 +172,56 @@ import NavBar from '../components/NavBar.astro';
       <span>NO DATA LEAVES YOUR DEVICE</span>
     </footer>
   </div>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I plan IP ranges for a Kubernetes cluster?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Allocate three non-overlapping CIDR blocks: one for Node IPs, one for Pod IPs, and one for Service IPs. The Pod CIDR must be large enough to give each Node a subnet (usually /24 or /26) based on the max pods per node setting in your kubelet configuration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What IP addresses does AWS reserve in a VPC subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AWS reserves 5 IP addresses in every VPC subnet: x.x.x.0 (network address), x.x.x.1 (VPC router), x.x.x.2 (DNS resolver), x.x.x.3 (reserved for future use), and x.x.x.255 (broadcast address)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /24 subnet contains 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a /16 and /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /16 subnet allocates 16 bits to the network portion and 16 bits to host addresses, supporting up to 65,534 usable hosts. A /24 subnet allocates 24 bits to the network portion and 8 bits to hosts, supporting up to 254 usable hosts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Terraform cidrsubnet() calculate subnet ranges?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Terraform's cidrsubnet(prefix, newbits, netnum) function calculates a subnet address within a given IP network prefix. 'prefix' is the base CIDR, 'newbits' is the number of additional network bits to add, and 'netnum' is the zero-based index of the subnet to generate."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>
 
 <style>

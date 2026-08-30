@@ -5,7 +5,71 @@ import MainShell from '../components/MainShell.astro';
 
 <Layout 
   title="IPv6 Subnet Calculator – CIDR & Prefix Tool | DevSubnet"
-  description="Expand, compress, and classify IPv6 addresses instantly. Split /48, /56, and /64 prefix delegations, identify address types, and calculate exact subnet boundaries."
+  description="IPv6 subnet calculator for 128-bit address compression, expansion, and prefix delegation. Classify address types, calculate /48 /56 /64 subnet boundaries, and generate IPv6 prefix delegation blocks for cloud VPCs."
 >
-  <MainShell activeTab="ipv6" />
+  <MainShell activeTab="ipv6">
+    <div class="related-tools" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+      <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Related Tools</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem;">
+        <a href="/" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">IPv4 Calc</a>
+        <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">CIDR Sheet</a>
+        <a href="/cidr-supernet-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Supernetter</a>
+        <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Overlap Checker</a>
+        <a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Visual Splitter</a>
+        <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">VLSM Calc</a>
+        <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">Terraform Planner</a>
+        <a href="/k8s-cidr-calculator" style="color: var(--text-primary); text-decoration: none; font-size: 0.85rem;">K8s CIDR</a>
+      </div>
+    </div>
+  </MainShell>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is IPv6 and how is it different from IPv4?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IPv6 is the next-generation internet protocol using a 128-bit address format (written in hexadecimal) to provide 3.4 × 10^38 unique addresses. IPv4 uses a 32-bit dotted-decimal format with only 4.3 billion addresses — a pool that is essentially exhausted globally."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate IPv6 subnet boundaries?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IPv6 subnetting works similarly to IPv4 but with 128-bit addresses. To calculate subnet boundaries, convert the prefix length to binary, identify the network and interface ID portions, and split the interface ID bits to create subnets. Common prefix lengths are /48 (for end sites), /56 (for subnets within an site), and /64 (for individual links)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is prefix delegation in IPv6?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Prefix delegation is a method where an ISP or network administrator delegates a portion of their IPv6 prefix to another network segment. This allows automatic assignment of /64 subnets to customer sites, which is the standard IPv6 link-layer size for Ethernet networks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many hosts are in an IPv6 /64 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An IPv6 /64 subnet provides 2^64 (approximately 1.8 × 10^19) addresses, which is practically unlimited for any real-world network segment and is the recommended prefix length for individual links and LANs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I compress and expand IPv6 addresses with this calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, the IPv6 Subnet Calculator can compress full IPv6 addresses (e.g., 2001:0db8:0000:0000:0000:0000:0000:0001 → 2001:db8::1) and expand compressed addresses back to full 32-digit hexadecimal format."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>

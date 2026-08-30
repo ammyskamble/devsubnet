@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar.astro';
 ---
 <Layout
   title="VLSM Calculator – Variable-Length Subnet Masking Tool | DevSubnet"
-  description="Free online VLSM calculator. Divide a CIDR block into variable-length subnets sized to exact host requirements, minimizing IP address waste for real-world network design."
+  description="VLSM calculator for variable-length subnet masking that minimizes IP waste. Divide CIDR blocks into subnets sized to exact host requirements for real network designs, supporting VLSM segmentation and IP address optimization."
 >
   <div class="app-shell">
     <NavBar path="vlsm" />
@@ -31,6 +31,19 @@ import NavBar from '../components/NavBar.astro';
           </div>
         </div>
       </section>
+      <div class="related-tools" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Related Tools</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+          <a href="/" style="color: var(--text-primary); text-decoration: none;">IPv4 Calculator</a>
+          <a href="/k8s-cidr-calculator" style="color: var(--text-primary); text-decoration: none;">K8s CIDR Calculator</a>
+          <a href="/aws-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">AWS VPC Calculator</a>
+          <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none;">VLSM Calculator</a>
+          <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none;">CIDR Cheat Sheet</a>
+          <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none;">Overlap Checker</a>
+          <a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none;">Terraform Planner</a>
+          <a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none;">K8s Planner</a>
+        </div>
+      </div>
     </main>
     <footer>
       <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
@@ -38,4 +51,54 @@ import NavBar from '../components/NavBar.astro';
       <span>NO DATA LEAVES YOUR DEVICE</span>
     </footer>
   </div>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is VLSM and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "VLSM (Variable-Length Subnet Masking) allocates subnets of different sizes within a single network based on how many hosts each segment actually needs. Instead of splitting a block into equal-sized pieces, a /24 can be divided into, for example, one /26 (62 hosts), two /27 (30 hosts each), and one /28 (14 hosts) — using only the addresses each LAN requires."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between VLSM and FLSM?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fixed-Length Subnet Masking (FLSM) divides a network into equal-sized subnets, which often wastes large amounts of address space. VLSM is preferred in modern networks because it matches prefix size to the actual host count per segment, making far more efficient use of limited IPv4 address space."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate usable hosts in a subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usable hosts = 2^(32 − prefix) − 2. The subnet always loses two addresses: the network identifier (first) and the broadcast address (last). For example, a /24 gives 2^8 − 2 = 254 usable hosts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the smallest subnet mask that supports 200 hosts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The smallest subnet mask that supports 200 hosts is /24 (255.255.255.0). A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts — not enough."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can VLSM minimize IP address waste?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, VLSM is specifically designed to minimize IP address waste by allocating subnet sizes that match the actual host count per segment, making it far more efficient than FLSM in modern network designs."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>

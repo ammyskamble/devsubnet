@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar.astro';
 
 <Layout
   title="Terraform Subnet Planner – cidrsubnet() VPC Calculator | DevSubnet"
-  description="Free Terraform subnet planner and cidrsubnet() calculator. Generate HCL code for AWS, Azure, and GCP multi-AZ subnets without CIDR overlaps or state drift."
+  description="Terraform subnet planner and cidrsubnet() calculator for AWS, Azure, and GCP VPCs. Generate HCL code, visualize AZ distributions, and calculate subnet offsets to prevent CIDR overlaps and state drift in infrastructure as code."
 >
   <div class="app-shell">
     <NavBar path="terraform" />
@@ -167,6 +167,19 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
           </div>
         </div>
       </section>
+      <div class="related-tools" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Related Tools</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+          <a href="/k8s-cidr-calculator" style="color: var(--text-primary); text-decoration: none;">K8s CIDR Calculator</a>
+          <a href="/aws-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">AWS VPC Calculator</a>
+          <a href="/azure-vnet-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">Azure VNet Calculator</a>
+          <a href="/gcp-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">GCP VPC Calculator</a>
+          <a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none;">Visual Subnet Splitter</a>
+          <a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none;">VLSM Calculator</a>
+          <a href="/subnet-overlap-checker" style="color: var(--text-primary); text-decoration: none;">Overlap Checker</a>
+          <a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none;">CIDR Cheat Sheet</a>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -182,6 +195,56 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
       <span>NO DATA LEAVES YOUR DEVICE</span>
     </footer>
   </div>
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does Terraform cidrsubnet() calculate subnet ranges?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Terraform's cidrsubnet(prefix, newbits, netnum) function calculates a subnet address within a given IP network prefix. 'prefix' is the base CIDR, 'newbits' is the number of additional network bits to add, and 'netnum' is the zero-based index of the subnet to generate."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many subnets can a /16 VPC accommodate with /24 subnets?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "With newbits = 8 (expanding /16 to /24), you can generate exactly 2^8 = 256 unique /24 subnets (indexes 0 through 255), each with 251-254 usable hosts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I resize a VPC CIDR block in Terraform without downtime?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can add secondary CIDR blocks to an existing AWS VPC via aws_vpc_ipv4_cidr_block_association without recreating the VPC or destroying existing subnets."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between cidrsubnet() and cidrsubnets()?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "While cidrsubnet() calculates individual subnets with uniform bit shifts, cidrsubnets(prefix, newbits...) calculates multiple contiguous subnets of varying prefix lengths simultaneously."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I prevent subnet state drift in Terraform?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Always fix your netnum ranges with reserved headroom. If you insert a new subnet index between existing subnets, Terraform will attempt to destroy and recreate all downstream subnets, causing critical downtime for databases and running instances!"
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>
 
 <style>

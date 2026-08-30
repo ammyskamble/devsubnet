@@ -1545,6 +1545,8 @@ main,
     position: sticky;
     top: 0;
     z-index: 10;
+    backdrop-filter: none !important;
+    background-color: var(--bg-secondary) !important;
   }
 
   .topbar-row {
@@ -1573,6 +1575,7 @@ main,
     max-width: 100%;
     padding: 0.25rem 0;
     margin: 0 -0.25rem;
+    backdrop-filter: none !important;
   }
 
   .nav-links::-webkit-scrollbar {
@@ -1607,10 +1610,16 @@ main,
     max-height: 70vh;
     overflow-y: auto;
     border-radius: var(--radius-md);
+    background-color: var(--bg-secondary) !important;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid var(--border-color) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s, visibility 0.15s !important;
   }
 
   .nav-more.open .nav-more-menu {
     transform: translateY(0);
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   /* --- Main layout --- */

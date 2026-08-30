@@ -1,0 +1,143 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout 
+  title="How to Plan IP Addresses for Kubernetes Cluster | CIDR Sizing Guide | DevSubnet"
+  description="Step-by-step guide to planning IP ranges for Kubernetes clusters. Calculate Pod CIDRs, Service CIDRs, and Node allocations for Cilium, Calico, AWS VPC CNI, and Azure CNI to avoid IP exhaustion."
+>
+  <div class="app-shell">
+    <NavBar path='guide' />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>How to Plan Kubernetes IPs</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">KUBERNETES NETWORKING</div>
+          <h1>How to Plan IP Addresses for a Kubernetes Cluster</h1>
+          <p class="lede">
+            A healthy cluster needs three non-overlapping CIDR blocks &mdash; one for Pods, one for Services, and one for node traffic &mdash; sized so they never run out. Here is how to plan them.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="text-block">
+            <h2>The Three CIDRs</h2>
+            <ul class="step-list">
+              <li><strong>Node/Instance CIDR</strong> &mdash; the real network your VMs live in. Sourced from your cloud VPC. Its size is governed by how many nodes you run, not pods.</li>
+              <li><strong>Pod CIDR</strong> &mdash; addresses handed to containers. Each node is allocated a slice of the Pod CIDR (usually a <code>/24</code>), and every pod on that node gets one IP from that slice.</li>
+              <li><strong>Service CIDR</strong> &mdash; stable virtual IPs for ClusterIP services. Clusters rarely need more than a few thousand at once, so small blocks like <code>/16</code> or even <code>/18</code> are plenty.</li>
+            </ul>
+          </div>
+
+          <div class="text-block">
+            <h2>Step-by-Step Sizing</h2>
+            <ol class="ordered-list">
+              <li><strong>Fix the max pods per node.</strong> kubelet&rsquo;s <code>--max-pods</code>/<code>maxPods</code> setting decides how many pod IPs each node burns. 110 is a common AWS/EKS default; 30&ndash;60 is typical for smaller nodes.</li>
+              <li><strong>Choose the per-node pod subnet.</strong> A <code>/24</code> per node supports 256&minus;2 = 254 pods &mdash; enough for up to ~110 pods. On very small nodes a <code>/26</code> (62 pods) works.</li>
+              <li><strong>Size the Pod CIDR from the node count.</strong> If each node gets a <code>/24</code>, N nodes need a Pod CIDR with at least N <code>/24</code>s. Three nodes &rarr; <code>/23</code>. Ten nodes &rarr; <code>/21</code> (8 blocks) won&rsquo;t be enough &mdash; use <code>/20</code>.</li>
+              <li><strong>Pick a Service CIDR.</strong> A <code>/12</code> (1,048,574 usable) covers even hyperscale clusters; <code>/16</code> is a safe default. Services use few addresses &mdash; don&rsquo;t waste a huge block here.</li>
+              <li><strong>Verify no overlaps.</strong> Pod, Service, and node CIDRs must be disjoint, and all must avoid the VPC ranges of peered networks.</li>
+            </ol>
+          </div>
+
+          <div class="text-block">
+            <h2>Container Network Interface (CNI) Differences</h2>
+            <p>
+              Your CNI decides how many IPs each node actually consumes:
+            </p>
+            <ul class="step-list">
+              <li><strong>Calico / Cilium (overlay)</strong> &mdash; pods get IPs from the Pod CIDR independent of the cloud network. The Pod CIDR is a purely logical block: pick anything non-overlapping.</li>
+              <li><strong>AWS VPC CNI</strong> &mdash; pods reuse the node&rsquo;s VPC IPs (ENI secondary IPs). You do not consume a separate Pod CIDR; sizing is really about the VPC secondary IP space and ENI limits.</li>
+              <li><strong>Azure CNI (advanced mode)</strong> &mdash; pods use VNet addresses directly via subnets. Every pod IP comes straight out of the node&rsquo;s VNet subnet, so the subnet must be sized to pods &times; nodes.</li>
+            </ul>
+          </div>
+
+          <div class="tips-box">
+            <h3>Worked Example</h3>
+            <p>
+              A 3-node overlay cluster with 110 max pods per node: per-node pod subnet <code>/24</code>, Pod CIDR = <code>10.200.0.0/23</code> (two <code>/24</code> blocks &mdash; enough for 4 nodes, with headroom), Service CIDR = <code>10.96.0.0/16</code>, Node CIDR = <code>10.0.0.0/16</code> from the VPC. Non-overlapping and provisioned for growth.
+            </p>
+          </div>
+        </section>
+
+        <div class="try-tool">
+          <a href="/k8s-cidr-calculator" class="btn-return">Try the K8s CIDR Calculator &rarr;</a>
+        </div>
+
+        <div class="related-tools">
+          <h3>Related Tools</h3>
+          <div class="tools-grid">
+            <a href="/k8s-cidr-calculator">K8s CIDR Calculator</a>
+            <a href="/terraform-subnet-planner">Terraform Subnet Planner</a>
+            <a href="/aws-vpc-subnet-calculator">AWS VPC Calculator</a>
+            <a href="/kubernetes-subnet-planner">K8s Subnet Planner</a>
+            <a href="/cidr-cheat-sheet">CIDR Cheat Sheet</a>
+          </div>
+        </div>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page-main { flex: 1; padding: 3rem 1.5rem 5rem; }
+  .content-container { max-width: 54rem; margin: 0 auto; text-align: left; }
+
+  .breadcrumb { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.4rem; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header { margin-bottom: 3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 2.5rem; }
+  .page-header .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text-primary); letter-spacing: -0.03em; margin: 0 0 1rem; line-height: 1.1; }
+  .page-header .lede { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.65; max-width: 40rem; margin: 0; }
+
+  .page-body { display: flex; flex-direction: column; gap: 3rem; }
+  .text-block h2 { font-size: 1.5rem; font-weight: 600; margin: 0 0 1rem; color: var(--text-primary); }
+  .text-block p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 1rem; }
+  .text-block p:last-child { margin-bottom: 0; }
+  .text-block code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; background: var(--bg-secondary); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent); }
+
+  .step-list, .ordered-list { margin: 0 0 1rem; padding-left: 1.5rem; }
+  .ordered-list li, .step-list li { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 0.5rem; }
+  .step-list code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); }
+
+  .tips-box { background: var(--card-bg, rgba(255, 255, 255, 0.03)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem 2rem; }
+  .tips-box h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem; color: var(--text-primary); }
+  .tips-box p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+
+  .try-tool { margin-top: 3rem; }
+
+  .related-tools { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+  .related-tools h3 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-primary); }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+  .tools-grid a { color: var(--accent); text-decoration: none; }
+  .tools-grid a:hover { text-decoration: underline; }
+
+  .page-cta { margin-top: 3rem; }
+  .btn-return { display: inline-block; background: var(--text-primary); color: var(--bg-primary); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: opacity var(--transition-fast); }
+  .btn-return:hover { opacity: 0.85; }
+</style>

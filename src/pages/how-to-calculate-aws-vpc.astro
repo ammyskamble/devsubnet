@@ -1,0 +1,154 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout 
+  title="How to Calculate AWS VPC Subnet Sizes | CIDR Planning Guide | DevSubnet"
+  description="Learn how to calculate AWS VPC subnet sizes with all 5 reserved IPs accounted for. Plan CIDR blocks across Availability Zones, generate Terraform and Ansible configurations, and avoid CIDR overlap issues."
+>
+  <div class="app-shell">
+    <NavBar path='guide' />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>How to Calculate AWS VPC Subnet Sizes</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">AWS NETWORKING</div>
+          <h1>How to Calculate AWS VPC Subnet Sizes</h1>
+          <p class="lede">
+            AWS does not give you every IP in a subnet back. Learn the 5 reserved addresses per subnet and a repeatable process for planning VPC CIDRs across multiple Availability Zones.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="text-block">
+            <h2>AWS Reserves 5 IPs in Every Subnet</h2>
+            <p>
+              Within each VPC subnet, AWS reserves the first four addresses and the last address for internal use. For a subnet <code>x.x.x.0/24</code> those are:
+            </p>
+            <ul class="step-list">
+              <li><code>x.x.x.0</code> &mdash; network address</li>
+              <li><code>x.x.x.1</code> &mdash; VPC router</li>
+              <li><code>x.x.x.2</code> &mdash; Amazon-provided DNS</li>
+              <li><code>x.x.x.3</code> &mdash; reserved for future use</li>
+              <li><code>x.x.x.255</code> &mdash; broadcast address</li>
+            </ul>
+            <p>
+              That means an AWS subnet gives you <strong>2<sup>h</sup> &minus; 5 usable addresses</strong> &mdash; not the standard &minus;2 used for on-premises networks. A <code>/24</code> subnet therefore provides 256 &minus; 5 = <strong>251 usable IPs</strong>.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Step-by-Step VPC Planning</h2>
+            <ol class="ordered-list">
+              <li><strong>Size the VPC.</strong> Allocate one large CIDR for the whole VPC. A <code>/16</code> gives 65,536 addresses and is the most common starting point.</li>
+              <li><strong>Plan for 3 Availability Zones.</strong> For production resilience, spread subnets across at least three AZs. Divide the VPC into three equal chunks &mdash; e.g. a <code>/16</code> VPC split into three <code>/18</code> zones, or use a dedicated <code>/16</code> per zone.</li>
+              <li><strong>Decide subnet sizes per workload.</strong> Public-facing load balancers often use <code>/24</code>, internal microservices use <code>/20</code>&ndash;<code>/22</code>, and databases use <code>/26</code>&ndash;<code>/24</code>. Always check the 2<sup>h</sup> &minus; 5 rule against peak instance count.</li>
+              <li><strong>Keep ranges non-overlapping.</strong> Overlapping subnets in the same route table cause traffic black holes. If you use the same placeholder CIDR in staging and production, VPC peering will fail.</li>
+              <li><strong>Leave room to grow.</strong> Reserve one spare <code>/24</code> per AZ for lambda-in-VPC, NAT gateways, or new service tiers before you extend the VPC.</li>
+            </ol>
+          </div>
+
+          <div class="text-block">
+            <h2>Worked Example</h2>
+            <p>
+              A 3-AZ production VPC using <code>10.0.0.0/16</code> with a <code>/22</code> subnet per AZ per tier gives 1,024 total addresses (1,019 usable) per subnet &mdash; room for hundreds of instances. A common layout:
+            </p>
+            <ul class="step-list">
+              <li>Public subnets: <code>10.0.0.0/24</code>, <code>10.0.4.0/24</code>, <code>10.0.8.0/24</code></li>
+              <li>Private app subnets: <code>10.0.16.0/21</code>, <code>10.0.24.0/21</code>, <code>10.0.32.0/21</code></li>
+              <li>Data subnets: <code>10.0.64.0/24</code>, <code>10.0.65.0/24</code>, <code>10.0.66.0/24</code></li>
+            </ul>
+            <p>
+              When you plan on paper, the calculator below applies the 5-IP AWS rule for you, so you never under-provision a subnet by ignoring reserved addresses.
+            </p>
+          </div>
+
+          <div class="tips-box">
+            <h3>VPC Peering Rule</h3>
+            <p>
+              You cannot peer two VPCs with overlapping CIDRs. Before peering prod and staging, verify their ranges with the overlap checker &mdash; catching a collision before the peering connection is created saves hours of routing debugging.
+            </p>
+          </div>
+        </section>
+
+        <div class="try-tool">
+          <a href="/aws-vpc-subnet-calculator" class="btn-return">Try the AWS VPC Subnet Calculator &rarr;</a>
+        </div>
+
+        <div class="related-tools">
+          <h3>Related Tools</h3>
+          <div class="tools-grid">
+            <a href="/aws-vpc-subnet-calculator">AWS VPC Calculator</a>
+            <a href="/terraform-subnet-planner">Terraform Subnet Planner</a>
+            <a href="/kubernetes-subnet-planner">K8s Subnet Planner</a>
+            <a href="/visual-subnet-splitter">Visual Subnet Splitter</a>
+            <a href="/subnet-overlap-checker">Overlap Checker</a>
+          </div>
+        </div>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page-main { flex: 1; padding: 3rem 1.5rem 5rem; }
+  .content-container { max-width: 54rem; margin: 0 auto; text-align: left; }
+
+  .breadcrumb { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.4rem; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header { margin-bottom: 3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 2.5rem; }
+  .page-header .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text-primary); letter-spacing: -0.03em; margin: 0 0 1rem; line-height: 1.1; }
+  .page-header .lede { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.65; max-width: 40rem; margin: 0; }
+
+  .page-body { display: flex; flex-direction: column; gap: 3rem; }
+  .text-block h2 { font-size: 1.5rem; font-weight: 600; margin: 0 0 1rem; color: var(--text-primary); }
+  .text-block p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 1rem; }
+  .text-block p:last-child { margin-bottom: 0; }
+  .text-block code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; background: var(--bg-secondary); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent); }
+
+  .step-list, .ordered-list { margin: 0 0 1rem; padding-left: 1.5rem; }
+  .ordered-list li, .step-list li { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 0.5rem; }
+  .step-list code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); }
+
+  .tips-box { background: var(--card-bg, rgba(255, 255, 255, 0.03)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem 2rem; }
+  .tips-box h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem; color: var(--text-primary); }
+  .tips-box p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+
+  .try-tool { margin-top: 3rem; }
+
+  .related-tools { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+  .related-tools h3 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-primary); }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+  .tools-grid a { color: var(--accent); text-decoration: none; }
+  .tools-grid a:hover { text-decoration: underline; }
+
+  .page-cta { margin-top: 3rem; }
+  .btn-return { display: inline-block; background: var(--text-primary); color: var(--bg-primary); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: opacity var(--transition-fast); }
+  .btn-return:hover { opacity: 0.85; }
+</style>

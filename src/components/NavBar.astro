@@ -35,7 +35,7 @@ const moreTools = [
 ];
 
 // Resolve the current path to a key for active-state highlighting
-const pathKey = path.split('/').filter(p => !['de', 'es', 'ja'].includes(p))[0] || 'ipv4';
+const pathKey = path.split('/').filter(p => !['de', 'es', 'ja', 'nl'].includes(p))[0] || 'ipv4';
 function isActive(item: { href: string; key: string }): boolean {
   if (pathKey === 'ipv4' || pathKey === '') return item.key === 'ipv4';
   return item.key === pathKey;

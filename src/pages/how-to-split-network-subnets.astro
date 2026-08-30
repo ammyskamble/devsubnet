@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout 
+  title="How to Split Network into Subnets | CIDR Partitioning Guide | DevSubnet"
+  description="Learn how to split a network into smaller subnets using CIDR notation. Increase prefix length, borrow host bits, and create multiple subnets from a single network block for VPC design, Kubernetes clusters, and on-premises networking."
+>
+  <div class="app-shell">
+    <NavBar path='guide' />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>How to Split a Network into Subnets</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">SUBNETTING BASICS</div>
+          <h1>How to Split a Network into Subnets</h1>
+          <p class="lede">
+            Splitting a network is just increasing its prefix length by borrowing host bits. With a one-line formula you can divide any block into 2, 4, 8, or more equal subnets &mdash; by hand or with a tool.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="text-block">
+            <h2>The Borrowing Rule</h2>
+            <p>
+              To split a network into smaller subnets you <strong>increase the CIDR prefix length</strong>. Every extra network bit doubles the number of subnets and halves the number of hosts per subnet:
+            </p>
+            <ul class="step-list">
+              <li>Borrow 1 bit &rarr; 2<sup>1</sup> = <strong>2 subnets</strong></li>
+              <li>Borrow 2 bits &rarr; 2<sup>2</sup> = <strong>4 subnets</strong></li>
+              <li>Borrow 3 bits &rarr; 2<sup>3</sup> = <strong>8 subnets</strong></li>
+            </ul>
+            <p>
+              The new prefix length is the old one plus the number of borrowed bits. Splitting a <code>/24</code> into four pieces means each piece is <code>/26</code> (24 + 2), with 2<sup>6</sup> = 64 total addresses and 62 usable hosts each.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Step-by-Step Process</h2>
+            <ol class="ordered-list">
+              <li><strong>Count how many subnets you need.</strong> Round up to the next power of two. 3 subnets &rarr; 4, 5 subnets &rarr; 8.</li>
+              <li><strong>Compute borrowed bits.</strong> Subnets needed = 2<sup>n</sup>, so n = log<sub>2</sub>(subnets rounded up). Four subnets &rarr; n = 2.</li>
+              <li><strong>Set the new prefix.</strong> Add n to the original prefix. Original <code>/24</code> + 2 = <code>/26</code>.</li>
+              <li><strong>Walk the blocks.</strong> Each subnet owns 2<sup>26-24</sup> &times; ... &mdash; in practice, each block grows by <em>32 - new prefix</em> host bits. For a <code>/24</code> split into <code>/26</code>s, each block is 64 addresses: <code>0-63</code>, <code>64-127</code>, <code>128-191</code>, <code>192-255</code>.</li>
+              <li><strong>Write down the ranges.</strong> For <code>192.168.1.0/24</code> you get exactly <code>192.168.1.0/26</code>, <code>192.168.1.64/26</code>, <code>192.168.1.128/26</code>, <code>192.168.1.192/26</code>.</li>
+            </ol>
+          </div>
+
+          <div class="text-block">
+            <h2>Fixed-Length vs. VLSM</h2>
+            <p>
+              The method above splits a network into <strong>equal-sized</strong> blocks (FLSM &mdash; fixed-length subnet masking). Real networks rarely need equal blocks: an office of 200 hosts and a point-to-point link of 2 hosts waste address space if forced to the same size.
+            </p>
+            <p>
+              <strong>VLSM</strong> (Variable Length Subnet Masking) sizes each subnet to its actual host count &mdash; a <code>/24</code> for the office, a <code>/30</code> for the link &mdash; while keeping the ranges non-overlapping. VLSM is what production VPC design and the visual splitter implement: start with the largest subnets first, then fit the smaller ones into the remaining space.
+            </p>
+          </div>
+
+          <div class="tips-box">
+            <h3>Overlap Trap</h3>
+            <p>
+              It is easy to reuse a block you already assigned when planning by hand, especially with VLSM. After any split, run the blocks through the overlap checker &mdash; two subnets sharing an address is the #1 cause of silent routing failures.
+            </p>
+          </div>
+        </section>
+
+        <div class="try-tool">
+          <a href="/visual-subnet-splitter" class="btn-return">Try the Visual Subnet Splitter &rarr;</a>
+        </div>
+
+        <div class="related-tools">
+          <h3>Related Tools</h3>
+          <div class="tools-grid">
+            <a href="/visual-subnet-splitter">Visual Subnet Splitter</a>
+            <a href="/vlsm-calculator">VLSM Calculator</a>
+            <a href="/cidr-cheat-sheet">CIDR Cheat Sheet</a>
+            <a href="/subnet-overlap-checker">Overlap Checker</a>
+            <a href="/k8s-cidr-calculator">K8s CIDR Calculator</a>
+          </div>
+        </div>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page-main { flex: 1; padding: 3rem 1.5rem 5rem; }
+  .content-container { max-width: 54rem; margin: 0 auto; text-align: left; }
+
+  .breadcrumb { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.4rem; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header { margin-bottom: 3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 2.5rem; }
+  .page-header .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text-primary); letter-spacing: -0.03em; margin: 0 0 1rem; line-height: 1.1; }
+  .page-header .lede { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.65; max-width: 40rem; margin: 0; }
+
+  .page-body { display: flex; flex-direction: column; gap: 3rem; }
+  .text-block h2 { font-size: 1.5rem; font-weight: 600; margin: 0 0 1rem; color: var(--text-primary); }
+  .text-block p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 1rem; }
+  .text-block p:last-child { margin-bottom: 0; }
+  .text-block code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; background: var(--bg-secondary); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent); }
+
+  .step-list, .ordered-list { margin: 0 0 1rem; padding-left: 1.5rem; }
+  .ordered-list li, .step-list li { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 0.5rem; }
+
+  .tips-box { background: var(--card-bg, rgba(255, 255, 255, 0.03)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem 2rem; }
+  .tips-box h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem; color: var(--text-primary); }
+  .tips-box p { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+
+  .try-tool { margin-top: 3rem; }
+
+  .related-tools { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+  .related-tools h3 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-primary); }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+  .tools-grid a { color: var(--accent); text-decoration: none; }
+  .tools-grid a:hover { text-decoration: underline; }
+
+  .page-cta { margin-top: 3rem; }
+  .btn-return { display: inline-block; background: var(--text-primary); color: var(--bg-primary); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: opacity var(--transition-fast); }
+  .btn-return:hover { opacity: 0.85; }
+</style>

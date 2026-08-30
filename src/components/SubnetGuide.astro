@@ -26,7 +26,7 @@ const langPrefix = lang === 'en' ? '' : `/${lang}`;
             <h4>{card.title}</h4>
             <p>{card.desc}</p>
           </div>
-          <a href={card.href.startsWith('/') && lang !== 'en' ? `${langPrefix}${card.href}` : card.href} class="card-link">
+          <a href={card.href} class="card-link">
             {card.linkText}
           </a>
         </div>

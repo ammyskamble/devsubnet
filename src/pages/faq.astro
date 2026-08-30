@@ -4,7 +4,7 @@ import NavBar from '../components/NavBar.astro';
 ---
 
 <Layout 
-  title="IP Subnetting & CIDR FAQ â€“ Common Questions | DevSubnet"
+  title="IP Subnetting & CIDR FAQ – Common Questions | DevSubnet"
   description="Answers to common IP subnetting, CIDR, and cloud networking questions. Learn how to calculate subnet ranges, understand AWS reserved IPs, and plan Kubernetes clusters."
 >
   <div class="app-shell">
@@ -65,7 +65,7 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix â€” for example, /24 implies 24 network bits.</p>
+              <p>CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix — for example, /24 implies 24 network bits.</p>
             </div>
           </details>
 
@@ -91,7 +91,7 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>The network address is the first IP in a subnet range and represents the network itself â€” routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet.</p>
+              <p>The network address is the first IP in a subnet range and represents the network itself — routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet.</p>
             </div>
           </details>
 
@@ -130,7 +130,7 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>To split a network, increase the CIDR prefix length by borrowing host bits. For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25 â€” creating two subnets each containing 128 total IPs (126 usable each).</p>
+              <p>To split a network, increase the CIDR prefix length by borrowing host bits. For example, splitting a /24 network into two subnets requires borrowing 1 bit, which increases the prefix to /25 — creating two subnets each containing 128 total IPs (126 usable each).</p>
             </div>
           </details>
 
@@ -169,7 +169,7 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>IPv6 is the next-generation internet protocol using a 128-bit address format (written in hexadecimal) to provide 3.4 &times; 10<sup>38</sup> unique addresses. IPv4 uses a 32-bit dotted-decimal format with only 4.3 billion addresses â€” a pool that is essentially exhausted globally.</p>
+              <p>IPv6 is the next-generation internet protocol using a 128-bit address format (written in hexadecimal) to provide 3.4 &times; 10<sup>38</sup> unique addresses. IPv4 uses a 32-bit dotted-decimal format with only 4.3 billion addresses — a pool that is essentially exhausted globally.</p>
             </div>
           </details>
 
@@ -195,7 +195,7 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>The smallest subnet mask that supports 200 hosts is <strong>/24 (255.255.255.0)</strong>. A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts â€” not enough.</p>
+              <p>The smallest subnet mask that supports 200 hosts is <strong>/24 (255.255.255.0)</strong>. A /24 supports up to 254 usable hosts, whereas the next smaller size (/25) only supports 126 usable hosts — not enough.</p>
             </div>
           </details>
 
@@ -221,14 +221,14 @@ import NavBar from '../components/NavBar.astro';
               </span>
             </summary>
             <div class="faq-answer">
-              <p>Subnetting divides a single large network into multiple smaller sub-networks. Supernetting (CIDR aggregation) is the opposite â€” combining multiple small contiguous networks into a single larger prefix to simplify routing tables and reduce the number of routing entries.</p>
+              <p>Subnetting divides a single large network into multiple smaller sub-networks. Supernetting (CIDR aggregation) is the opposite — combining multiple small contiguous networks into a single larger prefix to simplify routing tables and reduce the number of routing entries.</p>
             </div>
           </details>
 
         </div><!-- /.faq-accordion -->
 
         <div class="faq-cta">
-          <a href="/" class="btn-return">â† Return to Calculator</a>
+          <a href="/" class="btn-return">← Return to Calculator</a>
         </div>
 
       </div><!-- /.faq-container -->
@@ -249,7 +249,7 @@ import NavBar from '../components/NavBar.astro';
 </Layout>
 
 <style>
-  /* â”€â”€â”€ FAQ Page Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── FAQ Page Layout ─────────────────────────────────────────── */
   .faq-main {
     flex: 1;
     padding: 3rem 1.5rem 5rem;
@@ -260,7 +260,7 @@ import NavBar from '../components/NavBar.astro';
     margin: 0 auto;
   }
 
-  /* â”€â”€â”€ Breadcrumb â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Breadcrumb ──────────────────────────────────────────────── */
   .breadcrumb {
     font-size: 0.82rem;
     color: var(--text-secondary);
@@ -278,7 +278,7 @@ import NavBar from '../components/NavBar.astro';
   .breadcrumb a:hover { text-decoration: underline; }
   .breadcrumb .sep { color: var(--text-secondary); }
 
-  /* â”€â”€â”€ Intro / Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Intro / Header ──────────────────────────────────────────── */
   .faq-intro {
     margin-bottom: 3rem;
     border-bottom: 1px solid var(--border-color);
@@ -312,7 +312,7 @@ import NavBar from '../components/NavBar.astro';
     margin: 0;
   }
 
-  /* â”€â”€â”€ Accordion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Accordion ───────────────────────────────────────────────── */
   .faq-accordion {
     display: flex;
     flex-direction: column;
@@ -352,7 +352,7 @@ import NavBar from '../components/NavBar.astro';
     color: var(--accent);
   }
 
-  /* â”€â”€â”€ +/âˆ’ icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── +/âˆ’ icons ───────────────────────────────────────────────── */
   .icon {
     flex-shrink: 0;
     font-size: 1.4rem;
@@ -371,7 +371,7 @@ import NavBar from '../components/NavBar.astro';
   .faq-details[open] .icon .plus  { display: none; }
   .faq-details[open] .icon .minus { display: inline; }
 
-  /* â”€â”€â”€ Answer content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Answer content ──────────────────────────────────────────── */
   .faq-answer {
     padding: 0 0 1.5rem;
     animation: fadeSlideIn 0.18s ease both;
@@ -398,7 +398,7 @@ import NavBar from '../components/NavBar.astro';
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* â”€â”€â”€ CTA Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── CTA Button ──────────────────────────────────────────────── */
   .faq-cta {
     margin-top: 3.5rem;
   }
@@ -417,7 +417,7 @@ import NavBar from '../components/NavBar.astro';
 
   .btn-return:hover { opacity: 0.85; }
 
-  /* â”€â”€â”€ Theme Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Theme Toggle ────────────────────────────────────────────── */
   .theme-toggle {
     background: none;
     border: none;

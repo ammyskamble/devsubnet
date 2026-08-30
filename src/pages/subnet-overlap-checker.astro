@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar.astro';
 ---
 <Layout
   title="Subnet Overlap Checker – CIDR Conflict Detector | DevSubnet"
-  description="Free online subnet overlap checker. Detect identical, overlapping, contained, and separate CIDR ranges before VPC peering, VPN routing, and firewall changes."
+  description="Subnet overlap checker detecting identical, overlapping, and contained CIDR ranges. Essential before VPC peering, VPN routing, firewall changes, and infrastructure deployments to prevent ambiguous routing and traffic loss."
 >
   <div class="app-shell">
     <NavBar path="overlap" />
@@ -28,6 +28,19 @@ import NavBar from '../components/NavBar.astro';
           <div class="guide-block">
             <h3>Common conflict types</h3>
             <p><strong>Identical</strong> ranges are exactly the same prefix. <strong>Contained</strong> networks sit fully inside a larger block (e.g. 192.168.1.128/25 inside 192.168.1.0/24). <strong>Overlapping</strong> networks share only part of their address space. Use the checker to confirm a change is safe before you commit.</p>
+          </div>
+          <div class="guide-block">
+            <h3>Related Tools</h3>
+            <ul style="margin: 0; padding-left: 1rem;">
+              <li><a href="/" style="color: var(--text-primary); text-decoration: none;">IPv4 Subnet Calculator</a></li>
+              <li><a href="/visual-subnet-splitter" style="color: var(--text-primary); text-decoration: none;">Visual Subnet Splitter</a></li>
+              <li><a href="/vlsm-calculator" style="color: var(--text-primary); text-decoration: none;">VLSM Calculator</a></li>
+              <li><a href="/cidr-cheat-sheet" style="color: var(--text-primary); text-decoration: none;">CIDR Cheat Sheet</a></li>
+              <li><a href="/cidr-supernet-calculator" style="color: var(--text-primary); text-decoration: none;">Supernetter</a></li>
+              <li><a href="/kubernetes-subnet-planner" style="color: var(--text-primary); text-decoration: none;">K8s Planner</a></li>
+              <li><a href="/terraform-subnet-planner" style="color: var(--text-primary); text-decoration: none;">Terraform Planner</a></li>
+              <li><a href="/aws-vpc-subnet-calculator" style="color: var(--text-primary); text-decoration: none;">AWS VPC Calc</a></li>
+            </ul>
           </div>
         </div>
       </section>

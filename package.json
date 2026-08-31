@@ -21,6 +21,10 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "typescript": "^6.0.3",
     "wrangler": "^4.127.1"
   }
 }

@@ -21,9 +21,10 @@
   --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   /* HSL Color Tokens - Gemini Palette */
-  --hsl-network: 217, 91%, 60%;
-  --hsl-host: 270, 85%, 65%;
-  --hsl-highlight: 185, 90%, 50%;
+  /* a11y Fix C: Updated HSL tokens for WCAG AA contrast (min 4.5:1 on dark bg) */
+  --hsl-network: 217, 91%, 60%;   /* #3b82f6 */
+  --hsl-host: 263, 87%, 65%;      /* #8b5cf6 */
+  --hsl-highlight: 38, 92%, 50%;  /* #f59e0b – amber, replaces low-contrast cyan */
   --hsl-danger: 355, 85%, 60%;
   --hsl-warning: 35, 95%, 55%;
 
@@ -47,8 +48,8 @@
   --border-glow: rgba(66, 133, 244, 0.12);
 
   --text-primary: hsl(224, 40%, 12%);
-  --text-secondary: hsl(224, 20%, 35%);
-  --text-muted: hsl(224, 12%, 52%);
+  --text-secondary: hsl(224, 25%, 28%);
+  --text-muted: hsl(224, 16%, 40%);
   --text-inv: #ffffff;
 
   --glass-blur: 20px;
@@ -66,12 +67,25 @@
   --border-glow: rgba(66, 133, 244, 0.15);
 
   --text-primary: hsl(210, 30%, 96%);
-  --text-secondary: hsl(210, 18%, 76%);
-  --text-muted: hsl(210, 12%, 56%);
+  --text-secondary: hsl(210, 20%, 82%);
+  --text-muted: hsl(210, 15%, 68%);
   --text-inv: #000000;
 
   --glass-blur: 28px;
   --panel-bg: rgba(11, 16, 28, 0.75);
+}
+
+/* a11y Utility: Screen-reader only (visually hidden but accessible) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Global Reset & Base */
@@ -127,9 +141,6 @@ body {
   position: absolute;
   border-radius: var(--radius-full);
   pointer-events: none;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-  animation: gemini-morph 18s ease-in-out infinite alternate;
 }
 
 .bg-blob-1 {
@@ -284,6 +295,12 @@ pre {
   font-weight: 800;
 }
 
+/* Perf Fix D: GPU-composited rotation animation (replaces non-composited --angle custom property) */
+@keyframes rotate-border {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* macOS Segmented Control Glass Pill Container */
 .nav-links {
   position: relative;
@@ -291,17 +308,59 @@ pre {
   align-items: center;
   gap: 0.35rem;
   background: rgba(15, 23, 42, 0.55);
-  border: 1px solid var(--border-color);
+  border: 1px solid transparent;
   padding: 5px;
   border-radius: var(--radius-full);
   backdrop-filter: blur(24px) saturate(180%);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
+/* Perf Fix D: will-change + transform-origin for GPU compositing */
+.nav-links::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.25px; /* border thickness */
+  background: conic-gradient(from 0deg, #00f0ff 0deg, transparent 120deg, #ff4b00 180deg, transparent 300deg, #00f0ff 360deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
+  transform-origin: center center;
+  will-change: transform;
+  animation: rotate-border 6s linear infinite;
+}
+
+/* Outward Glow Effect */
+.nav-links::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, #00f0ff 0deg, transparent 120deg, #ff4b00 180deg, transparent 300deg, #00f0ff 360deg);
+  filter: blur(10px);
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: -1;
+  transform-origin: center center;
+  will-change: transform;
+  animation: rotate-border 6s linear infinite;
+  transition: opacity var(--transition-normal);
+}
+
 :root[data-theme="light"] .nav-links {
   background: rgba(240, 244, 248, 0.85);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 6px 20px rgba(0, 0, 0, 0.08);
 }
+
+:root[data-theme="light"] .nav-links::before {
+  opacity: 0.3;
+  filter: blur(8px);
+}
+
 
 /* macOS Spring Indicator Pill */
 .mac-pill-indicator {
@@ -1950,3 +2009,91 @@ footer,
   content-visibility: auto;
   contain-intrinsic-size: 1px 400px;
 }
+
+/* --- Added Calculator UX & Tooltip Enhancements --- */
+
+/* Grouped core inputs container */
+.core-inputs-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="light"] .core-inputs-card {
+  background-color: rgba(0, 0, 0, 0.015);
+}
+
+@media (max-width: 768px) {
+  .core-inputs-card {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+}
+
+/* Highlighted summary output card for Usable Range */
+.summary-item.highlight-usable {
+  background: linear-gradient(135deg, rgba(var(--hsl-host), 0.06), rgba(var(--hsl-highlight), 0.06));
+  border-color: rgba(var(--hsl-host), 0.25);
+  box-shadow: 0 0 12px rgba(var(--hsl-host), 0.05);
+}
+
+.summary-item.highlight-usable strong {
+  color: var(--accent-host);
+  text-shadow: 0 0 10px rgba(var(--hsl-host), 0.1);
+}
+
+.capacity.highlighted {
+  background: linear-gradient(135deg, rgba(var(--hsl-network), 0.06), rgba(var(--hsl-host), 0.06));
+  border-color: rgba(var(--hsl-network), 0.2);
+  box-shadow: var(--shadow-sm), 0 0 15px rgba(var(--hsl-network), 0.05);
+}
+
+/* Contextual Help Tooltips */
+.tooltip-trigger {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted var(--text-muted);
+  text-decoration: none;
+}
+
+.tooltip-trigger::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translate(-50%, -6px) scale(0.95);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  width: 220px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: var(--shadow-md);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.tooltip-trigger:hover::after {
+  opacity: 1;
+  transform: translate(-50%, -6px) scale(1);
+}
+
+@media (max-width: 768px) {
+  .tooltip-trigger::after {
+    left: 50%;
+    transform: translate(-50%, -6px);
+    width: 180px;
+  }
+}

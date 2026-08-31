@@ -1,0 +1,163 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout 
+  title="What is a Subnet? Prefix Length & Subnet Mask Cheat Sheet"
+  description="Learn what a subnet is, how subnet prefix lengths work, and access our quick subnet mask cheat sheet for network planning."
+>
+  <div class="app-shell">
+    <NavBar path="guide" />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>What is a Subnet</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">NETWORKING BASICS</div>
+          <h1>What is a Subnet?</h1>
+          <p class="lede">
+            A subnet (subnetwork) is a logical subdivision of an IP network that divides a larger network into smaller, more efficient subnetworks. Subnet prefix lengths determine network size and host capacities.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="text-block">
+            <h2>Understanding Subnetworks</h2>
+            <p>
+              Subnetting reduces network traffic, optimizes performance, and enhances security by isolating host groups. Instead of all packets traversing the entire network, local traffic stays within its designated subnet boundary.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Understanding Subnet Prefix Length</h2>
+            <p>
+              A subnet prefix length (written in CIDR notation, such as <code>/24</code> or <code>/16</code>) specifies the number of bits allocated to the network portion of an IP address. The remaining bits belong to the host portion.
+            </p>
+            <ul>
+              <li><strong>/8 Prefix:</strong> <code>255.0.0.0</code> (16,777,214 usable IPs)</li>
+              <li><strong>/16 Prefix:</strong> <code>255.255.0.0</code> (65,534 usable IPs)</li>
+              <li><strong>/24 Prefix:</strong> <code>255.255.255.0</code> (254 usable IPs)</li>
+              <li><strong>/30 Prefix:</strong> <code>255.255.255.252</code> (2 usable IPs — ideal for point-to-point links)</li>
+            </ul>
+            <p style="margin-top: 1.25rem;">
+              Need a fast reference chart? View our complete <a href="/subnet-cheat-sheet" style="font-weight: 600; color: var(--accent-network); text-decoration: underline;">Subnet Mask Cheat Sheet</a>.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Subnet Mask Cheat Sheet</h2>
+            <p>Use this quick-reference table to look up IPv4 subnet masks, CIDR prefix lengths, total IP addresses, and usable host counts.</p>
+            
+            <div class="guide-table-wrapper">
+              <table class="guide-table">
+                <thead>
+                  <tr>
+                    <th>CIDR Prefix</th>
+                    <th>Subnet Mask</th>
+                    <th>Usable Host IPs</th>
+                    <th>Block Size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>/32</strong></td><td><code>255.255.255.255</code></td><td>1</td><td>1</td></tr>
+                  <tr><td><strong>/31</strong></td><td><code>255.255.255.254</code></td><td>2 (RFC 3021)</td><td>2</td></tr>
+                  <tr><td><strong>/30</strong></td><td><code>255.255.255.252</code></td><td>2</td><td>4</td></tr>
+                  <tr><td><strong>/29</strong></td><td><code>255.255.255.248</code></td><td>6</td><td>8</td></tr>
+                  <tr><td><strong>/28</strong></td><td><code>255.255.255.240</code></td><td>14</td><td>16</td></tr>
+                  <tr><td><strong>/27</strong></td><td><code>255.255.255.224</code></td><td>30</td><td>32</td></tr>
+                  <tr><td><strong>/26</strong></td><td><code>255.255.255.192</code></td><td>62</td><td>64</td></tr>
+                  <tr><td><strong>/25</strong></td><td><code>255.255.255.128</code></td><td>126</td><td>128</td></tr>
+                  <tr><td><strong>/24</strong></td><td><code>255.255.255.0</code></td><td>254</td><td>256</td></tr>
+                  <tr><td><strong>/23</strong></td><td><code>255.255.254.0</code></td><td>510</td><td>512</td></tr>
+                  <tr><td><strong>/22</strong></td><td><code>255.255.252.0</code></td><td>1,022</td><td>1,024</td></tr>
+                  <tr><td><strong>/16</strong></td><td><code>255.255.0.0</code></td><td>65,534</td><td>65,536</td></tr>
+                  <tr><td><strong>/8</strong></td><td><code>255.0.0.0</code></td><td>16,777,214</td><td>16,777,216</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="text-block">
+            <h3>Printable Subnet Cheat Sheet</h3>
+            <p>
+              For a quick reference during deployment or offline study, review the binary breakdown of a standard class C subnet (/24):
+            </p>
+            <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.9rem; margin-top: 1rem; line-height: 1.5;">
+              <strong style="color: var(--accent-network); display: block; margin-bottom: 0.5rem;">Binary Bit Layout (/24 Subnet Mask):</strong>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span>11111111</span><span style="color: var(--text-muted);">.</span>
+                <span>11111111</span><span style="color: var(--text-muted);">.</span>
+                <span>11111111</span><span style="color: var(--text-muted);">.</span>
+                <span style="color: var(--accent-danger, #f43f5e);">00000000</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-secondary);">
+                <span>[Network Bits (24)]</span>
+                <span style="color: var(--accent-danger, #f43f5e);">[Host Bits (8)]</span>
+              </div>
+            </div>
+            <p style="margin-top: 1rem;">
+              Understanding how host bits shift into network prefixes enables clear design of custom local network topologies.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>How to Calculate Subnet Mask from Prefix Length</h2>
+            <p>
+              Subtract the prefix length from 32 to find the host bits (<em>H</em>). The number of usable hosts is given by the formula:
+            </p>
+            <p style="font-size: 1.25rem; font-family: var(--font-display); font-weight: 600; text-align: center; margin: 1.5rem 0; color: var(--accent-network);">
+              2<sup>H</sup> - 2
+            </p>
+            <p>For example, for a <strong>/24</strong> network:</p>
+            <ol class="ordered-list">
+              <li>32 - 24 = 8 host bits</li>
+              <li>2<sup>8</sup> - 2 = 254 usable hosts</li>
+            </ol>
+          </div>
+        </section>
+
+        <div class="try-tool" style="margin-top: 2rem;">
+          <a href="/" class="btn-return">Try the IPv4 Subnet Calculator &rarr;</a>
+        </div>
+      </div>
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is a subnet?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A subnet (subnetwork) is a logical subdivision of an IP network that divides a larger network into smaller, more efficient subnetworks to optimize traffic flow and security."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I calculate subnet prefix length?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Calculate the subnet prefix length by counting the number of network bits (the 1s in a subnet mask's binary representation). Subtracting the prefix length from 32 gives you the host bits H, where 2^H - 2 represents the usable host IPs."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the formula for usable host IPs?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The formula is 2^H - 2, where H is the number of host bits remaining in the 32-bit address space. Two addresses are always reserved: the network identifier and the broadcast address."
+              }
+            }
+          ]
+        }
+      </script>
+    </main>
+  </div>
+</Layout>

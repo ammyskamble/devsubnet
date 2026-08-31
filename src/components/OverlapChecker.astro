@@ -2,31 +2,56 @@
 import { validateIPv4, ip2Long } from '../utils/subnetMath';
 ---
 <div class="calculator-layout">
-  <!-- Left Column: Input -->
+  <!-- Left Column: Input and Mode Selection -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
         <span class="step">01</span>
-        <h2>Subnet List</h2>
+        <h2>Overlap Mode & Subnets</h2>
       </div>
-      <span class="live-label">OVERLAP CHECKER</span>
+      <span class="live-label">OVERLAP DETECTOR</span>
     </div>
 
-    <div class="input-row">
-      <label for="overlap-input">CIDR blocks (one per line, e.g. 10.0.0.0/24)</label>
-      <textarea id="overlap-input" rows="6" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical;">10.0.0.0/24
+    <!-- Mode Selector Tabs -->
+    <div class="subtool-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+      <button type="button" id="tab-mode-list" class="export-tab-btn active" style="flex: 1;">Single List Check</button>
+      <button type="button" id="tab-mode-groups" class="export-tab-btn" style="flex: 1;">VPC Peering (Two Groups)</button>
+    </div>
+
+    <!-- Mode 1: Single List Input -->
+    <div id="container-mode-list" class="input-row">
+      <label for="overlap-input">CIDR Blocks (one per line, e.g. 10.0.0.0/24 or 2001:db8::/48)</label>
+      <textarea id="overlap-input" rows="7" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.0/24
 10.0.0.128/25
 172.16.0.0/16
+2001:db8:abc::/48
+2001:db8:abc:123::/64
 10.0.1.0/24</textarea>
     </div>
 
-    <div class="quick-row">
-      <button type="button" id="btn-run-overlap" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">Check Overlaps</button>
+    <!-- Mode 2: Two Groups Input -->
+    <div id="container-mode-groups" class="input-row" style="display: none; flex-direction: column; gap: 1rem;">
+      <div>
+        <label for="overlap-group-a" style="margin-bottom: 0.35rem; display: block;">Group A: On-Premises or VPC 1 CIDRs</label>
+        <textarea id="overlap-group-a" rows="4" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.0/24
+172.16.0.0/16
+2001:db8:fefe::/48</textarea>
+      </div>
+      <div>
+        <label for="overlap-group-b" style="margin-bottom: 0.35rem; display: block;">Group B: AWS Transit Gateway or VPC 2 CIDRs</label>
+        <textarea id="overlap-group-b" rows="4" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.128/25
+192.168.1.0/24
+2001:db8:fefe:1::/64</textarea>
+      </div>
+    </div>
+
+    <div class="quick-row" style="margin-top: 1rem;">
+      <button type="button" id="btn-run-overlap" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight); font-weight: bold;">Check Conflicts</button>
       <button type="button" id="btn-clear-overlap" class="subtool-btn">Clear</button>
     </div>
 
     <div class="error-banner" id="overlap-error" role="alert">
-      <span>One or more entries are not valid CIDR blocks. Use the format IP/prefix (e.g. 10.0.0.0/24).</span>
+      <span>One or more entries are not valid CIDR blocks. Format: IP/prefix (e.g. 10.0.0.0/24 or 2001:db8::/32).</span>
     </div>
   </div>
 
@@ -38,9 +63,10 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
         <h2>Relationships Detected</h2>
       </div>
       <p class="aside-copy">
-        Each pair of subnets is compared to identify identical, overlapping, contained, or separate relationships before peering and routing.
+        Compiling address bounds to identify overlapping, duplicate, or nested routing boundaries.
       </p>
       <div id="overlap-summary" class="overlap-summary"></div>
+      
       <div class="guide-table-wrapper">
         <table class="guide-table">
           <thead>
@@ -51,7 +77,7 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
             </tr>
           </thead>
           <tbody id="overlap-table-body">
-            <tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Check Overlaps.</td></tr>
+            <tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDRs and click Check Conflicts.</td></tr>
           </tbody>
         </table>
       </div>
@@ -60,89 +86,191 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
 </div>
 
 <script>
-  import { validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+  import { validateIPv4, ip2Long, long2Ip, expandIPv6, compressIPv6 } from '../utils/subnetMath';
+
+  interface Block {
+    start: bigint;
+    end: bigint;
+    cidr: number;
+    isV6: boolean;
+    label: string;
+  }
 
   function initOverlapChecker() {
-    const input = document.getElementById('overlap-input') as HTMLTextAreaElement;
+    const tabList = document.getElementById('tab-mode-list') as HTMLButtonElement;
+    const tabGroups = document.getElementById('tab-mode-groups') as HTMLButtonElement;
+    
+    const containerList = document.getElementById('container-mode-list') as HTMLElement;
+    const containerGroups = document.getElementById('container-mode-groups') as HTMLElement;
+
+    const inputList = document.getElementById('overlap-input') as HTMLTextAreaElement;
+    const inputGroupA = document.getElementById('overlap-group-a') as HTMLTextAreaElement;
+    const inputGroupB = document.getElementById('overlap-group-b') as HTMLTextAreaElement;
+
     const runBtn = document.getElementById('btn-run-overlap') as HTMLButtonElement;
     const clearBtn = document.getElementById('btn-clear-overlap') as HTMLButtonElement;
     const tableBody = document.getElementById('overlap-table-body') as HTMLTableSectionElement;
     const summary = document.getElementById('overlap-summary') as HTMLElement;
     const errorBanner = document.getElementById('overlap-error');
 
-    if (!input || !runBtn || !tableBody) return;
+    if (!runBtn || !tableBody || !inputList) return;
 
-    function parseBlock(line: string): { network: number; cidr: number } | null {
+    let mode = 'list'; // 'list' or 'groups'
+
+    // Tab actions
+    if (tabList && tabGroups) {
+      tabList.onclick = () => {
+        tabList.classList.add('active');
+        tabGroups.classList.remove('active');
+        containerList.style.display = 'block';
+        containerGroups.style.display = 'none';
+        mode = 'list';
+      };
+
+      tabGroups.onclick = () => {
+        tabGroups.classList.add('active');
+        tabList.classList.remove('active');
+        containerList.style.display = 'none';
+        containerGroups.style.display = 'flex';
+        mode = 'groups';
+      };
+    }
+
+    function validateIPv6(address: string): boolean {
+      const regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{1,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+      return regex.test(address.trim());
+    }
+
+    function parseBlock(line: string): Block | null {
       const t = line.trim();
       if (!t) return null;
       const slash = t.lastIndexOf('/');
       if (slash === -1) return null;
       const ip = t.slice(0, slash).trim();
       const cidr = parseInt(t.slice(slash + 1), 10);
-      if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32) return null;
-      const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
-      const aligned = (ip2Long(ip) & mask) >>> 0;
-      return { network: aligned, cidr };
+
+      const isV6 = ip.includes(':');
+      if (isV6) {
+        if (!validateIPv6(ip) || isNaN(cidr) || cidr < 0 || cidr > 128) return null;
+        try {
+          const expanded = expandIPv6(ip);
+          const parts = expanded.split(':');
+          let ipVal = 0n;
+          for (let i = 0; i < 8; i++) {
+            ipVal = (ipVal << 16n) | BigInt(parseInt(parts[i], 16));
+          }
+          const mask = cidr === 0 ? 0n : (~0n << BigInt(128 - cidr)) & ((1n << 128n) - 1n);
+          const start = ipVal & mask;
+          const end = start + (1n << BigInt(128 - cidr)) - 1n;
+          return { start, end, cidr, isV6, label: `${compressIPv6(expanded)}/${cidr}` };
+        } catch {
+          return null;
+        }
+      } else {
+        if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32) return null;
+        const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
+        const start = (ip2Long(ip) & mask) >>> 0;
+        const end = start + Math.pow(2, 32 - cidr) - 1;
+        return { 
+          start: BigInt(start), 
+          end: BigInt(end), 
+          cidr, 
+          isV6, 
+          label: `${long2Ip(start)}/${cidr}` 
+        };
+      }
     }
 
-    function relationship(a: { network: number; cidr: number }, b: { network: number; cidr: number }): string {
-      const aEnd = a.network + Math.pow(2, 32 - a.cidr) - 1;
-      const bEnd = b.network + Math.pow(2, 32 - b.cidr) - 1;
-
-      if (a.network === b.network && a.cidr === b.cidr) return 'Identical';
-      const aContainsB = a.network <= b.network && aEnd >= bEnd;
-      const bContainsA = b.network <= a.network && bEnd >= aEnd;
+    function relationship(a: Block, b: Block): string {
+      if (a.isV6 !== b.isV6) return 'Separate'; // IPv4 and IPv6 never overlap
+      if (a.start === b.start && a.cidr === b.cidr) return 'Identical';
+      
+      const aContainsB = a.start <= b.start && a.end >= b.end;
+      const bContainsA = b.start <= a.start && b.end >= a.end;
       if (aContainsB || bContainsA) return 'Contained';
-      const overlap = a.network <= bEnd && b.network <= aEnd;
+      
+      const overlap = a.start <= b.end && b.start <= a.end;
       if (overlap) return 'Overlapping';
+      
       return 'Separate';
     }
 
     function run() {
       errorBanner?.classList.remove('show');
-      const lines = input.value.split('\n');
-      const blocks: { network: number; cidr: number; label: string }[] = [];
       let valid = true;
 
-      lines.forEach(line => {
-        const b = parseBlock(line);
-        if (b) {
-          blocks.push({ ...b, label: `${long2Ip(b.network)}/${b.cidr}` });
-        } else if (line.trim()) {
-          valid = false;
-        }
-      });
-
-      if (!valid || blocks.length < 2) {
-        errorBanner?.classList.add('show');
-        return;
-      }
+      const parseList = (val: string) => {
+        const blocks: Block[] = [];
+        val.split('\n').forEach(line => {
+          if (!line.trim()) return;
+          const b = parseBlock(line);
+          if (b) blocks.push(b);
+          else valid = false;
+        });
+        return blocks;
+      };
 
       let html = '';
       let conflictCount = 0;
-      const pairs = blocks.length * (blocks.length - 1) / 2;
+      let comparisonsCount = 0;
 
-      for (let i = 0; i < blocks.length; i++) {
-        for (let j = i + 1; j < blocks.length; j++) {
-          const rel = relationship(blocks[i], blocks[j]);
-          const isConflict = rel === 'Overlapping' || rel === 'Identical';
-          if (isConflict) conflictCount++;
-          const color = isConflict ? 'var(--accent-danger)' : rel === 'Contained' ? 'var(--accent-warning)' : 'var(--accent-highlight)';
-          html += `<tr>
-            <td>${blocks[i].label}</td>
-            <td>${blocks[j].label}</td>
-            <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
-          </tr>`;
+      if (mode === 'list') {
+        const blocks = parseList(inputList.value);
+        if (!valid || blocks.length < 2) {
+          errorBanner?.classList.add('show');
+          return;
+        }
+
+        comparisonsCount = (blocks.length * (blocks.length - 1)) / 2;
+
+        for (let i = 0; i < blocks.length; i++) {
+          for (let j = i + 1; j < blocks.length; j++) {
+            const rel = relationship(blocks[i], blocks[j]);
+            const isConflict = rel === 'Overlapping' || rel === 'Identical';
+            if (isConflict) conflictCount++;
+            
+            const color = isConflict ? 'var(--accent-danger, #f43f5e)' : rel === 'Contained' ? 'var(--accent-warning, #f59e0b)' : 'var(--accent-network, #38bdf8)';
+            html += `<tr>
+              <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocks[i].label}</span></td>
+              <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocks[j].label}</span></td>
+              <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
+            </tr>`;
+          }
+        }
+      } else {
+        const blocksA = parseList(inputGroupA.value);
+        const blocksB = parseList(inputGroupB.value);
+        if (!valid || blocksA.length === 0 || blocksB.length === 0) {
+          errorBanner?.classList.add('show');
+          return;
+        }
+
+        comparisonsCount = blocksA.length * blocksB.length;
+
+        for (let i = 0; i < blocksA.length; i++) {
+          for (let j = 0; j < blocksB.length; j++) {
+            const rel = relationship(blocksA[i], blocksB[j]);
+            const isConflict = rel === 'Overlapping' || rel === 'Identical';
+            if (isConflict) conflictCount++;
+
+            const color = isConflict ? 'var(--accent-danger, #f43f5e)' : rel === 'Contained' ? 'var(--accent-warning, #f59e0b)' : 'var(--accent-network, #38bdf8)';
+            html += `<tr>
+              <td><span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--accent-host);">${blocksA[i].label} (Group A)</span></td>
+              <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocksB[j].label} (Group B)</span></td>
+              <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
+            </tr>`;
+          }
         }
       }
 
-      tableBody.innerHTML = html;
-      const clean = conflictCount === 0;
+      tableBody.innerHTML = html || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">No relations checked.</td></tr>';
+      
       if (summary) {
+        const clean = conflictCount === 0;
         summary.innerHTML = `
           <div class="overlap-summary-card ${clean ? 'clean' : 'conflict'}">
             <strong>${conflictCount} conflict${conflictCount === 1 ? '' : 's'}</strong>
-            <span>across ${pairs} pair comparison${pairs === 1 ? '' : 's'}</span>
+            <span>across ${comparisonsCount} comparison${comparisonsCount === 1 ? '' : 's'}</span>
           </div>`;
       }
     }
@@ -150,8 +278,10 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     runBtn.onclick = run;
     if (clearBtn) {
       clearBtn.onclick = () => {
-        input.value = '';
-        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Check Overlaps.</td></tr>';
+        inputList.value = '';
+        inputGroupA.value = '';
+        inputGroupB.value = '';
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDRs and click Check Conflicts.</td></tr>';
         if (summary) summary.innerHTML = '';
       };
     }
@@ -175,6 +305,7 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     transition: all var(--transition-fast);
   }
   .subtool-btn:hover { color: var(--text-primary); background-color: var(--border-color); }
+  
   .overlap-summary-card {
     border-radius: var(--radius-md);
     padding: 1rem 1.25rem;
@@ -182,17 +313,18 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     align-items: baseline;
     gap: 0.75rem;
     border: 1px solid;
+    margin-bottom: 1rem;
   }
   .overlap-summary-card strong { font-size: 1.5rem; font-family: var(--font-mono); }
   .overlap-summary-card.clean {
-    background-color: rgba(var(--hsl-highlight), 0.05);
-    border-color: rgba(var(--hsl-highlight), 0.2);
-    color: var(--accent-highlight);
+    background-color: rgba(56, 189, 248, 0.05);
+    border-color: rgba(56, 189, 248, 0.2);
+    color: var(--accent-network, #38bdf8);
   }
   .overlap-summary-card.conflict {
-    background-color: rgba(var(--hsl-danger), 0.05);
-    border-color: rgba(var(--hsl-danger), 0.2);
-    color: var(--accent-danger);
+    background-color: rgba(244, 63, 94, 0.05);
+    border-color: rgba(244, 63, 94, 0.2);
+    color: var(--accent-danger, #f43f5e);
   }
   .overlap-summary-card span { color: var(--text-secondary); }
 </style>

@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'en' | 'de' | 'es' | 'ja' | 'nl';
+export type SupportedLanguage = 'en' | 'de' | 'es' | 'ja' | 'fr' | 'pt' | 'ko' | 'it';
 
 export interface LanguageInfo {
   code: SupportedLanguage;
@@ -42,13 +42,37 @@ export const languages: Record<SupportedLanguage, LanguageInfo> = {
     locale: 'ja_JP',
     prefix: '/ja'
   },
-  nl: {
-    code: 'nl',
-    name: 'Dutch',
-    nativeName: 'Nederlands',
-    flag: '🇳🇱',
-    locale: 'nl_NL',
-    prefix: '/nl'
+  fr: {
+    code: 'fr',
+    name: 'French',
+    nativeName: 'Français',
+    flag: '🇫🇷',
+    locale: 'fr_FR',
+    prefix: '/fr'
+  },
+  pt: {
+    code: 'pt',
+    name: 'Portuguese',
+    nativeName: 'Português',
+    flag: '🇵🇹',
+    locale: 'pt_PT',
+    prefix: '/pt'
+  },
+  ko: {
+    code: 'ko',
+    name: 'Korean',
+    nativeName: '한국어',
+    flag: '🇰🇷',
+    locale: 'ko_KR',
+    prefix: '/ko'
+  },
+  it: {
+    code: 'it',
+    name: 'Italian',
+    nativeName: 'Italiano',
+    flag: '🇮🇹',
+    locale: 'it_IT',
+    prefix: '/it'
   }
 };
 
@@ -74,8 +98,9 @@ const LOCALIZED_ROUTES = new Set([
 ]);
 
 export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https://devsubnet.com'): HreflangAlternate[] {
+  const nonDefaultLangs = Object.keys(languages).filter(l => l !== 'en');
   let cleanPath = pathname;
-  for (const lang of ['de', 'es', 'ja', 'nl']) {
+  for (const lang of nonDefaultLangs) {
     if (cleanPath === `/${lang}` || cleanPath === `/${lang}/`) {
       cleanPath = '/';
       break;
@@ -89,12 +114,15 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
   const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
   const pathWithoutRootSlash = normalizedPath === '/' ? '' : normalizedPath;
   const route = pathWithoutRootSlash === '' ? '/' : pathWithoutRootSlash.replace(/\/$/, '');
-  const hasLocalizedVersion = LOCALIZED_ROUTES.has(route);
+  const hasLocalizedVersion = true;
   const enUrl = `${siteUrl}${pathWithoutRootSlash || '/'}`;
   const deUrl = `${siteUrl}/de${pathWithoutRootSlash}`;
   const esUrl = `${siteUrl}/es${pathWithoutRootSlash}`;
   const jaUrl = `${siteUrl}/ja${pathWithoutRootSlash}`;
-  const nlUrl = `${siteUrl}/nl${pathWithoutRootSlash}`;
+  const frUrl = `${siteUrl}/fr${pathWithoutRootSlash}`;
+  const ptUrl = `${siteUrl}/pt${pathWithoutRootSlash}`;
+  const koUrl = `${siteUrl}/ko${pathWithoutRootSlash}`;
+  const itUrl = `${siteUrl}/it${pathWithoutRootSlash}`;
 
   const alternates: HreflangAlternate[] = [
     // Global generic languages
@@ -106,7 +134,10 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
       { lang: 'de', href: deUrl },
       { lang: 'es', href: esUrl },
       { lang: 'ja', href: jaUrl },
-      { lang: 'nl', href: nlUrl },
+      { lang: 'fr', href: frUrl },
+      { lang: 'pt', href: ptUrl },
+      { lang: 'ko', href: koUrl },
+      { lang: 'it', href: itUrl },
     );
   }
 
@@ -120,15 +151,23 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
     { lang: 'en-SG', href: enUrl }, // Singapore
     { lang: 'en-PH', href: enUrl }, // Philippines
     { lang: 'en-ZA', href: enUrl }, // South Africa
+    { lang: 'en-CH', href: enUrl }, // Switzerland (English)
   );
 
   if (hasLocalizedVersion) {
     alternates.push(
       // Priority Regional European & Asian Locales
       { lang: 'de-DE', href: deUrl }, // Germany
-      { lang: 'nl-NL', href: nlUrl }, // Netherlands (AMS-IX)
       { lang: 'es-ES', href: esUrl }, // Spain
       { lang: 'ja-JP', href: jaUrl }, // Japan
+      { lang: 'fr-FR', href: frUrl }, // France
+      { lang: 'fr-CA', href: frUrl }, // Canada (French)
+      { lang: 'fr-BE', href: frUrl }, // Belgium (French)
+      { lang: 'fr-CH', href: frUrl }, // Switzerland (French)
+      { lang: 'pt-BR', href: ptUrl }, // Brazil
+      { lang: 'pt-PT', href: ptUrl }, // Portugal
+      { lang: 'ko-KR', href: koUrl }, // South Korea
+      { lang: 'it-IT', href: itUrl }, // Italy
     );
   }
 
@@ -142,8 +181,9 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
  * Returns localized path given a base route and target language
  */
 export function getLocalizedPath(currentPath: string, targetLang: SupportedLanguage): string {
+  const nonDefaultLangs = Object.keys(languages).filter(l => l !== 'en');
   let cleanPath = currentPath;
-  for (const lang of ['de', 'es', 'ja', 'nl']) {
+  for (const lang of nonDefaultLangs) {
     if (cleanPath === `/${lang}` || cleanPath === `/${lang}/`) {
       cleanPath = '/';
       break;
@@ -157,7 +197,7 @@ export function getLocalizedPath(currentPath: string, targetLang: SupportedLangu
   const normalizedPath = cleanPath === '/' ? '' : (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`);
   const route = normalizedPath.length > 1 && normalizedPath.endsWith('/') ? normalizedPath.slice(0, -1) : (normalizedPath || '/');
 
-  if (targetLang === 'en' || !LOCALIZED_ROUTES.has(route)) {
+  if (targetLang === 'en') {
     return route === '/' ? '/' : route;
   }
   if (route === '/') {
@@ -449,120 +489,6 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       noData: "KEINE DATEN VERLASSEN IHR GERÄT"
     }
   },
-  nl: {
-    nav: {
-      ipv4: "IPv4 Calculator",
-      splitter: "Visuele Splitter",
-      k8s: "K8s IP-Planner",
-      ipv6: "IPv6 Calculator",
-      moreTools: "Meer Tools",
-      vlsm: "VLSM Calculator",
-      overlap: "Subnet Overlap Checker",
-      supernet: "CIDR Supernetting",
-      cheatsheet: "CIDR Cheat Sheet",
-      aws: "AWS VPC Calculator",
-      azure: "Azure VNet Calculator",
-      gcp: "GCP VPC Calculator",
-      terraform: "Terraform Subnet Planner",
-      k8sCidr: "K8s CIDR Calculator"
-    },
-    intro: {
-      ipv4: {
-        title: "IPv4 Subnet Calculator & CIDR Planner",
-        eyebrow: "GRATIS NETWERK TOOL / IPv4 & AMS-IX HUBS",
-        lede: "Bereken hostbereiken, subnetmaskers, broadcastadressen, wildcardgrenzen en cloud VPC-reserveringen voor AWS, Azure en GCP direct."
-      },
-      splitter: {
-        title: "Visuele Subnet Splitter & CIDR Partitioner",
-        eyebrow: "CIDR PARTITIONERING / SPLITTER",
-        lede: "Verdeel netwerkblokken visueel in subnetten en exporteer kant-en-klare IaC-configuraties voor Terraform en Ansible."
-      },
-      k8s: {
-        title: "Kubernetes Subnet Planner & Pod IP Calculator",
-        eyebrow: "KUBERNETES PLANNER / PODS & NODES",
-        lede: "Evalueer clustergroottes, node-toewijzingen en pod-dichtheidslimieten om IP-uitputting vroegtijdig te voorkomen."
-      },
-      ipv6: {
-        title: "IPv6 Subnet Calculator & Prefix Delegation",
-        eyebrow: "SUBNET CALCULATOR / IPv6",
-        lede: "Comprimeer, expandeer en classificeer 128-bits adressen. Bereken prefix delegation blokken in real-time."
-      },
-      terraform: {
-        title: "Terraform Subnet Planner & cidrsubnet Calculator",
-        eyebrow: "INFRASTRUCTURE AS CODE / TERRAFORM",
-        lede: "Plan VPC-subnetten met Terraform cidrsubnet() logica. Genereer foutloze HCL-blokken voor AWS, Azure en GCP."
-      },
-      k8sCidr: {
-        title: "Kubernetes CIDR Calculator & CNI Sizing",
-        eyebrow: "KUBERNETES NETWERKEN / CNI SIZING",
-        lede: "Bereken Pod- en Service-CIDRs voor Cilium, Calico en AWS VPC CNI zonder risico op IP-uitputting."
-      }
-    },
-    meta: {
-      defaultTitle: "Gratis IP Subnet Calculator & CIDR Planner | DevSubnet",
-      defaultDesc: "Gratis online IPv4 en IPv6 subnet calculator. Bereken netwerkbereiken, subnetmaskers, broadcast en cloud VPC reserveringen in Nederland, België en Europa."
-    },
-    guide: {
-      title: "Netwerkplanning – Klassieke Berekeningen, Cloud VPCs en CIDR Strategieën",
-      lead: "Welkom bij de tool voor netwerk engineers, AMS-IX specialisten en cloud architecten in Nederland en wereldwijd. Bereken IP-reeksen veilig en 100% in uw browser.",
-      exploreTitle: "Moderne Subnet Planningsonderwerpen",
-      cards: [
-        {
-          title: "Basisprincipes van IP Subnetten",
-          desc: "Een IP-subnet deelt een netwerk logisch op. Essentieel voor routing, data centers en enterprise netwerkbeheer.",
-          linkText: "Standaard Subnetten Berekenen →",
-          href: "/nl/"
-        },
-        {
-          title: "Bruikbare Hosts Berekenen",
-          desc: "Bereken bruikbare hostreeksen via RFC-standaarden waarbij netwerk- en broadcastadres worden afgetrokken.",
-          linkText: "VLSM Segmenten Plannen →",
-          href: "/vlsm-calculator"
-        },
-        {
-          title: "IP-bereiken & Subnetmaskers",
-          desc: "Het subnetmasker scheidt netwerk- en hostbits. Visualiseer dit interactief met ons live binaire raster.",
-          linkText: "Masker Visualizer Openen →",
-          href: "/nl/"
-        },
-        {
-          title: "CIDR-notatie Begrijpen",
-          desc: "Classless Inter-Domain Routing (CIDR) vertaalt slash-notaties (/24, /28) direct naar netwerkgrenzen.",
-          linkText: "Bekijk CIDR Cheat Sheet →",
-          href: "/nl/cidr-cheat-sheet"
-        },
-        {
-          title: "Terraform Subnet Planning",
-          desc: "Voorkom IP-conflicten in Terraform. Bereken automatisch cidrsubnet() voor AWS/Azure multi-AZ setups.",
-          linkText: "Open Terraform Planner →",
-          href: "/terraform-subnet-planner"
-        },
-        {
-          title: "Kubernetes & CNI Sizing",
-          desc: "Dimensioneer Pod- en Service-CIDRs voor Cilium, Calico en AWS VPC CNI om planningsfouten te voorkomen.",
-          linkText: "K8s CIDRs Berekenen →",
-          href: "/k8s-cidr-calculator"
-        }
-      ],
-      prefixTableTitle: "IPv4 Subnet Prefix Referentietabel",
-      prefixTableDesc: "Overzicht van prefixlengtes, subnetmaskers, wildcard-maskers en bruikbare hostcapaciteiten.",
-      comparisonTitle: "DevSubnet Vergeleken met Andere Calculators",
-      comparisonDesc: "Klassieke tools ondersteunen enkel basiswiskunde. DevSubnet integreert cloud-reserveringen, IaC-export en K8s-architectuur.",
-      faqTitle: "Veelgestelde Vragen (FAQ)",
-      faqViewAll: "Bekijk Alle Vragen →",
-      ctaPrimary: "Start Subnet Berekening",
-      ctaSecondary: "Probeer Visuele Splitter"
-    },
-    footer: {
-      tagline: "DEVSUBNET.COM / GEBOUWD VOOR HELDERE NETWERKEN",
-      about: "Over Ons",
-      contact: "Contact",
-      privacy: "Privacybeleid",
-      terms: "Voorwaarden",
-      faq: "FAQ",
-      noData: "ER VERLAAT GEEN DATA UW APPARAAT"
-    }
-  },
   es: {
     nav: {
       ipv4: "Calculadora IPv4",
@@ -789,6 +715,462 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       terms: "利用規約",
       faq: "よくある質問",
       noData: "データはお使いのブラウザ内でのみ処理されます"
+    }
+  },
+  fr: {
+    nav: {
+      ipv4: "Calculateur IPv4",
+      splitter: "Diviseur Visuel",
+      k8s: "Planificateur d'IP K8s",
+      ipv6: "Calculateur IPv6",
+      moreTools: "Plus d'outils",
+      vlsm: "Calculateur VLSM",
+      overlap: "Vérificateur de chevauchement",
+      supernet: "Calculateur de super-réseau CIDR",
+      cheatsheet: "Aide-mémoire CIDR",
+      aws: "Calculateur AWS VPC",
+      azure: "Calculateur Azure VNet",
+      gcp: "Calculateur GCP VPC",
+      terraform: "Planificateur de sous-réseau Terraform",
+      k8sCidr: "Calculateur CIDR K8s"
+    },
+    intro: {
+      ipv4: {
+        title: "Calculateur de sous-réseau IPv4 et planificateur CIDR",
+        eyebrow: "OUTIL RÉSEAU GRATUIT / IPv4 & CCNA / CCNP",
+        lede: "Calculez instantanément les plages d'hôtes, les masques de sous-réseau, les adresses de diffusion, les limites de masque générique et les réservations cloud VPC pour AWS, Azure et GCP."
+      },
+      splitter: {
+        title: "Diviseur de sous-réseau visuel et partitionneur CIDR",
+        eyebrow: "PARTITIONNEMENT CIDR / DIVISEUR",
+        lede: "Divisez visuellement un bloc réseau en sous-réseaux personnalisés avec des étiquettes descriptives et exportez des configurations IaC prêtes à l'emploi."
+      },
+      k8s: {
+        title: "Planificateur de sous-réseau Kubernetes et calculateur d'IP de Pod",
+        eyebrow: "PLANIFICATEUR KUBERNETES / PODS & NŒUDS",
+        lede: "Évaluez les directives de taille de cluster, les allocations de nœuds, les contraintes de densité de pods et identifiez tôt les risques d'épuisement d'IP."
+      },
+      ipv6: {
+        title: "Calculateur de sous-réseau IPv6 et délégation de préfixe",
+        eyebrow: "CALCULATEUR DE SOUS-RÉSEAU / IPv6",
+        lede: "Compressez, développez et classifiez les adresses 128 bits. Générez instantanément des incréments de blocs de délégation de préfixe."
+      },
+      terraform: {
+        title: "Planificateur de sous-réseau Terraform et calculateur cidrsubnet",
+        eyebrow: "INFRASTRUCTURE AS CODE / TERRAFORM",
+        lede: "Planifiez des sous-réseaux VPC avec la fonction mathématique cidrsubnet() de Terraform. Générez des blocs HCL prêts à l'emploi pour AWS, Azure et GCP sans bug de chevauchement."
+      },
+      k8sCidr: {
+        title: "Calculateur CIDR Kubernetes et outil de dimensionnement CNI",
+        eyebrow: "RÉSEAU KUBERNETES / DIMENSIONNEMENT CNI",
+        lede: "Calculez les CIDR de Pods, les plages de Services et les allocations de Nœuds pour Cilium, Calico, AWS VPC CNI et Azure CNI avec zéro épuisement d'IP."
+      }
+    },
+    meta: {
+      defaultTitle: "Calculateur de sous-réseau IP et planificateur CIDR gratuit | DevSubnet",
+      defaultDesc: "Calculateur de sous-réseau IPv4 et IPv6 gratuit en ligne. Calculez instantanément les plages réseau, les masques de sous-réseau, les adresses de diffusion, les hôtes utilisables et les réservations cloud VPC pour AWS, Azure et GCP."
+    },
+    guide: {
+      title: "Jouez avec les réseaux – Calculs classiques, VPC cloud et stratégies de sous-réseau",
+      lead: "Bienvenue sur le site de référence pour les planificateurs de topologie réseau, les candidats CCNA/CCNP et les ingénieurs DevOps du monde entier en France, au Canada, en Belgique et en Suisse.",
+      exploreTitle: "Explorez les sujets modernes de planification de sous-réseau",
+      cards: [
+        {
+          title: "Comprendre le cœur du sous-réseau IP",
+          desc: "Un sous-réseau IP est une subdivision logique d'un réseau IP. Essentiel pour les examens CCNA/CCNP, le zonage de sécurité et le routage du trafic d'entreprise.",
+          linkText: "Calculer des sous-réseaux standard →",
+          href: "/fr/"
+        },
+        {
+          title: "Le calculateur d'hôtes utilisables",
+          desc: "Calculez les plages d'hôtes utilisables à l'aide d'algorithmes dédiés. Selon les règles standard de la RFC, chaque sous-réseau soustrait 2 adresses pour le réseau et la diffusion.",
+          linkText: "Planifier des segments VLSM →",
+          href: "/vlsm-calculator"
+        },
+        {
+          title: "Démystifier les plages IP et les masques de sous-réseau",
+          desc: "Un masque de sous-réseau définit quelle partie d'une IP appartient au réseau par rapport à l'hôte. Visualisez cette répartition de manière dynamique à l'aide de grilles binaires.",
+          linkText: "Ouvrir le visualisateur de masque de sous-réseau →",
+          href: "/fr/"
+        },
+        {
+          title: "Traduction de la notation CIDR",
+          desc: "Le routage inter-domaines sans classe (CIDR) associe en temps réel la notation avec barre oblique (/24, /28) aux masques et aux limites de sous-réseau.",
+          linkText: "Voir l'aide-mémoire CIDR →",
+          href: "/fr/cidr-cheat-sheet"
+        },
+        {
+          title: "Planification de sous-réseaux Terraform",
+          desc: "Évitez les bugs de collision IP dans l'IaC Terraform. Générez des calculs cidrsubnet() précis pour l'architecture VPC multi-AZ.",
+          linkText: "Ouvrir le planificateur Terraform →",
+          href: "/terraform-subnet-planner"
+        },
+        {
+          title: "Kubernetes & dimensionnement du CIDR CNI",
+          desc: "Dimensionnez les blocs CIDR de Pods et de Services pour Cilium, Calico et AWS VPC CNI pour éviter les échecs de planification de pods.",
+          linkText: "Calculer les blocs CIDR K8s →",
+          href: "/k8s-cidr-calculator"
+        }
+      ],
+      prefixTableTitle: "Table de référence des préfixes de sous-réseau IPv4",
+      prefixTableDesc: "Table de correspondance associant les longueurs de préfixes courantes aux masques de sous-réseau, masques génériques et capacités d'hôtes utilisables.",
+      comparisonTitle: "Comment DevSubnet se compare aux autres calculateurs",
+      comparisonDesc: "La plupart des calculateurs ne gèrent que les mathématiques RFC de base. DevSubnet intègre les réservations cloud, la génération d'IaC et le dimensionnement K8s.",
+      faqTitle: "Foire aux questions (FAQ)",
+      faqViewAll: "Voir toutes les questions →",
+      ctaPrimary: "Démarrer le calcul de sous-réseau",
+      ctaSecondary: "Essayer le partitionnement visuel"
+    },
+    footer: {
+      tagline: "DEVSUBNET.COM / CONÇU POUR DES RÉSEAUX CLAIRS",
+      about: "À propos",
+      contact: "Contact",
+      privacy: "Politique de confidentialité",
+      terms: "Conditions d'utilisation",
+      faq: "FAQ",
+      noData: "AUCUNE DONNÉE NE QUITTE VOTRE APPAREIL"
+    }
+  },
+  pt: {
+    nav: {
+      ipv4: "Calculadora IPv4",
+      splitter: "Divisor Visual",
+      k8s: "Planificador de IP K8s",
+      ipv6: "Calculadora IPv6",
+      moreTools: "Mais Ferramentas",
+      vlsm: "Calculadora VLSM",
+      overlap: "Verificador de Sobreposição",
+      supernet: "Calculadora de Super-rede CIDR",
+      cheatsheet: "Tabela de Referência CIDR",
+      aws: "Calculadora AWS VPC",
+      azure: "Calculadora Azure VNet",
+      gcp: "Calculadora GCP VPC",
+      terraform: "Planificador de Sub-rede Terraform",
+      k8sCidr: "Calculadora CIDR K8s"
+    },
+    intro: {
+      ipv4: {
+        title: "Calculadora de Sub-rede IPv4 e Planificador CIDR",
+        eyebrow: "FERRAMENTA DE REDE GRATUITA / IPv4 & CCNA / CCNP",
+        lede: "Calcule instantaneamente intervalos de hosts, máscaras de sub-rede, endereços de broadcast, limites de máscara curinga e reservas de VPC em nuvem para AWS, Azure e GCP."
+      },
+      splitter: {
+        title: "Divisor de Sub-rede Visual e Particionador CIDR",
+        eyebrow: "PARTICIONAMENTO CIDR / DIVISOR",
+        lede: "Divida visualmente um bloco de rede em sub-redes personalizadas com rótulos descritivos e exporte configurações IaC prontas para uso."
+      },
+      k8s: {
+        title: "Planificador de Sub-rede Kubernetes e Calculadora de IP de Pod",
+        eyebrow: "PLANIFICADOR KUBERNETES / PODS & NÓS",
+        lede: "Avalie as diretrizes de tamanho do cluster, alocações de nós, restrições de densidade de pods e identifique riscos de esgotamento de IP precocemente."
+      },
+      ipv6: {
+        title: "Calculadora de Sub-rede IPv6 e Delegação de Prefixo",
+        eyebrow: "CALCULADORA DE SUB-REDE / IPv6",
+        lede: "Comprima, expanda e classifique endereços de 128 bits. Gere instantaneamente incrementos de bloco de delegação de prefixo."
+      },
+      terraform: {
+        title: "Planificador de Sub-rede Terraform e Calculadora cidrsubnet",
+        eyebrow: "INFRAESTRUTURA COMO CÓDIGO / TERRAFORM",
+        lede: "Planeje sub-redes VPC com a lógica matemática cidrsubnet() do Terraform. Gere blocos HCL prontos para uso para AWS, Azure e GCP sem bugs de sobreposição."
+      },
+      k8sCidr: {
+        title: "Calculadora CIDR Kubernetes e Dimensionamento CNI",
+        eyebrow: "REDE KUBERNETES / DIMENSIONAMENTO CNI",
+        lede: "Calcule CIDRs de Pods, intervalos de Serviços e alocações de Nós para Cilium, Calico, AWS VPC CNI e Azure CNI com zero esgotamento de IP."
+      }
+    },
+    meta: {
+      defaultTitle: "Calculadora de Sub-rede IP e Planificador CIDR Grátis | DevSubnet",
+      defaultDesc: "Calculadora de sub-rede IPv4 e IPv6 online gratuita. Calcule intervalos de rede, máscaras de sub-rede, endereços de broadcast, hosts utilizáveis e reservas de VPC em nuvem para AWS, Azure e GCP."
+    },
+    guide: {
+      title: "Brinque com Redes – Cálculos Clássicos, VPCs em Nuvem e Estratégias de Sub-rede",
+      lead: "Bem-vindo ao lar premium para planejadores de topologia de rede, candidatos CCNA/CCNP e engenheiros DevOps em todo o mundo no Brasil, Portugal, Angola e Moçambique.",
+      exploreTitle: "Explore Tópicos Modernos de Planejamento de Sub-rede",
+      cards: [
+        {
+          title: "Compreendendo o Núcleo da Sub-rede IP",
+          desc: "Uma sub-rede IP é uma subdivisão lógica de uma rede IP. Essencial para exames CCNA/CCNP, zoneamento de segurança e roteamento de tráfego corporativo.",
+          linkText: "Calcular sub-redes padrão →",
+          href: "/pt/"
+        },
+        {
+          title: "A Calculadora de Hosts Utilizáveis",
+          desc: "Calcule intervalos de hosts utilizáveis usando algoritmos dedicados. Sob as regras padrão da RFC, cada sub-rede subtrai 2 endereços para rede e broadcast.",
+          linkText: "Planejar segmentos VLSM →",
+          href: "/vlsm-calculator"
+        },
+        {
+          title: "Desmistificando Intervalos de IP e Máscaras de Sub-rede",
+          desc: "Uma máscara de sub-rede define qual parte de um IP pertence à rede em comparação ao host. Visualize essa divisão dinamicamente usando grades binárias.",
+          linkText: "Abrir Visualizador de Máscara de Sub-rede →",
+          href: "/pt/"
+        },
+        {
+          title: "Traduzindo Notação CIDR",
+          desc: "O Roteamento Interdomínio Sem Classe (CIDR) mapeia a notação de barra (/24, /28) em máscaras de sub-rede e limites em tempo real.",
+          linkText: "Ver tabela de referência CIDR →",
+          href: "/pt/cidr-cheat-sheet"
+        },
+        {
+          title: "Planejamento de Sub-rede com Terraform",
+          desc: "Evite erros de colisão de IP no Terraform IaC. Gere cálculos cidrsubnet() precisos para arquitetura VPC multi-AZ.",
+          linkText: "Abrir Planificador Terraform →",
+          href: "/terraform-subnet-planner"
+        },
+        {
+          title: "Kubernetes & Dimensionamento de CIDR CNI",
+          desc: "Dimensione blocos CIDR de Pods e Serviços para Cilium, Calico e AWS VPC CNI para evitar falhas no agendamento de pods.",
+          linkText: "Calcular Blocos CIDR K8s →",
+          href: "/k8s-cidr-calculator"
+        }
+      ],
+      prefixTableTitle: "Tabela de Referência de Prefixo de Sub-rede IPv4",
+      prefixTableDesc: "Tabela de consulta que mapeia comprimentos de prefixo comuns a máscaras de sub-rede, máscaras curinga e capacidades de hosts utilizáveis.",
+      comparisonTitle: "Como o DevSubnet se Compara a Outras Calculadoras",
+      comparisonDesc: "A maioria das calculadoras lida apenas com matemática básica da RFC. O DevSubnet integra reservas de nuvem, geração de IaC e dimensionamento de K8s.",
+      faqTitle: "Perguntas Frequentes (FAQ)",
+      faqViewAll: "Ver Todas as Perguntas →",
+      ctaPrimary: "Iniciar Cálculo de Sub-rede",
+      ctaSecondary: "Experimentar Particionamento Visual"
+    },
+    footer: {
+      tagline: "DEVSUBNET.COM / PROJETADO PARA REDES CLARAS",
+      about: "Sobre Nós",
+      contact: "Contato",
+      privacy: "Política de Privacidade",
+      terms: "Terminos e Condições",
+      faq: "FAQ",
+      noData: "NENHUM DADO SAI DO SEU DISPOSITIVO"
+    }
+  },
+  ko: {
+    nav: {
+      ipv4: "IPv4 서브넷 계산기",
+      splitter: "비주얼 분할기",
+      k8s: "K8s IP 플래너",
+      ipv6: "IPv6 계산기",
+      moreTools: "기타 도구",
+      vlsm: "VLSM 계산기",
+      overlap: "서브넷 중복 확인기",
+      supernet: "CIDR 슈퍼넷 계산기",
+      cheatsheet: "CIDR 치트 시트",
+      aws: "AWS VPC 계산기",
+      azure: "Azure VNet 계산기",
+      gcp: "GCP VPC 계산기",
+      terraform: "Terraform 서브넷 플래너",
+      k8sCidr: "K8s CIDR 계산기"
+    },
+    intro: {
+      ipv4: {
+        title: "IPv4 서브넷 계산기 & CIDR 플래너",
+        eyebrow: "무료 네트워크 도구 / IPv4 & CCNA / CCNP",
+        lede: "AWS, Azure, GCP용 호스트 범위, 서브넷 마스크, 브로드캐스트 주소, 와일드카드 경계 및 클라우드 VPC CIDR 예약을 즉시 계산합니다."
+      },
+      splitter: {
+        title: "비주얼 서브넷 분할기 & CIDR 파티셔너",
+        eyebrow: "CIDR 파티셔닝 / 분할기",
+        lede: "네트워크 블록을 비주얼 방식으로 서브넷으로 분할하고 설명 레이블을 단 뒤 바로 사용할 수 있는 IaC 코드로 내보내세요."
+      },
+      k8s: {
+        title: "Kubernetes 서브넷 플래너 & Pod IP 계산기",
+        eyebrow: "KUBERNETES 플래너 / POD & 노드",
+        lede: "클러스터 크기 지침, 노드 할당, Pod 밀도 제약을 평가하고 IP 고갈 위험을 조기에 파악합니다."
+      },
+      ipv6: {
+        title: "IPv6 서브넷 계산기 & 접두사 위임",
+        eyebrow: "서브넷 계산기 / IPv6",
+        lede: "128비트 주소를 압축, 확장 및 분류합니다. 접두사 위임 블록 증가량을 실시간으로 자동 계산합니다."
+      },
+      terraform: {
+        title: "Terraform 서브넷 플래너 & cidrsubnet 계산기",
+        eyebrow: "코드형 인프라 / TERRAFORM",
+        lede: "Terraform의 cidrsubnet() 함수를 사용해 VPC 서브넷을 설계하세요. CIDR 중복 오류 없는 AWS, Azure, GCP용 HCL 설정 블록을 자동 생성합니다."
+      },
+      k8sCidr: {
+        title: "Kubernetes CIDR 계산기 & CNI 사이징 도구",
+        eyebrow: "KUBERNETES 네트워킹 / CNI 사이징",
+        lede: "IP 고갈 위험 없이 Cilium, Calico, AWS VPC CNI, Azure CNI용 Pod CIDR, Service 범위 및 노드 할당을 계산합니다."
+      }
+    },
+    meta: {
+      defaultTitle: "무료 IP 서브넷 계산기 & CIDR 플래너 | DevSubnet",
+      defaultDesc: "무료 온라인 IPv4 및 IPv6 서브넷 계산기. 네트워크 범위, 서브넷 마스크, 브로드캐스트 주소, 사용 가능한 호스트 및 AWS, Azure, GCP 클라우드 VPC 예약을 즉시 계산합니다."
+    },
+    guide: {
+      title: "네트워크와 놀기 – 클래식 계산, 클라우드 VPC 및 서브넷 전략",
+      lead: "대한민국을 비롯한 전 세계의 네트워크 토폴로지 설계자, CCNA/CCNP 수험생, DevOps 엔지니어를 위한 최고의 서브넷 기획 도구입니다.",
+      exploreTitle: "최신 서브넷 설계 주제 살펴보기",
+      cards: [
+        {
+          title: "IP 서브넷의 핵심 이해하기",
+          desc: "IP 서브넷은 IP 네트워크의 논리적 하위 분할입니다. CCNA/CCNP 시험, 보안 영역 분할 및 기업 트래픽 라우팅에 필수적입니다.",
+          linkText: "표준 서브넷 계산하기 →",
+          href: "/ko/"
+        },
+        {
+          title: "사용 가능한 호스트 계산기",
+          desc: "전용 알고리즘을 사용해 사용 가능한 호스트 범위를 계산합니다. 표준 RFC 규칙에 따라 모든 서브넷은 네트워크와 브로드캐스트 주소용으로 2개를 제외합니다.",
+          linkText: "VLSM 세그먼트 설계 →",
+          href: "/vlsm-calculator"
+        },
+        {
+          title: "IP 범위 & 서브넷 마스크 해부",
+          desc: "서브넷 마스크는 IP의 어느 부분이 네트워크에 속하고 어느 부분이 호스트에 속하는지 정의합니다. 2진수 그리드로 이 구분을 동적으로 시각화하세요.",
+          linkText: "서브넷 마스크 비주얼라이저 열기 →",
+          href: "/ko/"
+        },
+        {
+          title: "CIDR 표기법 변환",
+          desc: "무클래스 간 도메인 라우팅(CIDR)은 슬래시 표기법(/24, /28 등)을 서브넷 마스크와 경계 주소로 실시간 매핑합니다.",
+          linkText: "CIDR 치트 시트 보기 →",
+          href: "/ko/cidr-cheat-sheet"
+        },
+        {
+          title: "Terraform 서브넷 설계",
+          desc: "Terraform IaC에서 IP 충돌 버그를 방지합니다. 멀티 AZ VPC 아키텍처를 위해 정확한 cidrsubnet() 계산 코드를 생성합니다.",
+          linkText: "Terraform 플래너 열기 →",
+          href: "/terraform-subnet-planner"
+        },
+        {
+          title: "Kubernetes & CNI CIDR 사이징",
+          desc: "Pod 스케줄링 실패를 예방하기 위해 Cilium, Calico 및 AWS VPC CNI용 Pod 및 Service CIDR 블록의 크기를 적절히 산정합니다.",
+          linkText: "K8s CIDR 블록 계산하기 →",
+          href: "/k8s-cidr-calculator"
+        }
+      ],
+      prefixTableTitle: "IPv4 서브넷 접두사 참조 테이블",
+      prefixTableDesc: "일반적인 접두사 길이를 서브넷 마스크, 와일드카드 마스크 및 사용 가능한 호스트 용량에 매핑한 조회 테이블입니다.",
+      comparisonTitle: "DevSubnet과 다른 서브넷 계산기 비교",
+      comparisonDesc: "대부분의 계산기는 기본 RFC 수학만 처리하지만, DevSubnet은 클라우드 예약 IP, IaC 생성 및 K8s 사이징을 통합하여 지원합니다.",
+      faqTitle: "자주 묻는 질문 (FAQ)",
+      faqViewAll: "모든 질문 보기 →",
+      ctaPrimary: "서브넷 계산 시작",
+      ctaSecondary: "비주얼 파티셔닝 테스트"
+    },
+    footer: {
+      tagline: "DEVSUBNET.COM / 명확한 네트워크 설계를 위해 설계됨",
+      about: "소개",
+      contact: "문의",
+      privacy: "개인정보처리방침",
+      terms: "이용약관",
+      faq: "FAQ",
+      noData: "어떤 데이터도 장치를 벗어나지 않습니다"
+    }
+  },
+  it: {
+    nav: {
+      ipv4: "Calcolatore IPv4",
+      splitter: "Visual Splitter",
+      k8s: "Pianificatore IP K8s",
+      ipv6: "Calcolatore IPv6",
+      moreTools: "Altri Strumenti",
+      vlsm: "Calcolatore VLSM",
+      overlap: "Controllo Sovrapposizione",
+      supernet: "Calcolatore Supernetting CIDR",
+      cheatsheet: "Tabella CIDR",
+      aws: "Calcolatore AWS VPC",
+      azure: "Calcolatore Azure VNet",
+      gcp: "Calcolatore GCP VPC",
+      terraform: "Pianificatore Subnet Terraform",
+      k8sCidr: "Calcolatore CIDR K8s"
+    },
+    intro: {
+      ipv4: {
+        title: "Calcolatore di subnet IPv4 e pianificatore CIDR",
+        eyebrow: "STRUMENTO DI RETE GRATUITO / IPv4 & CCNA / CCNP",
+        lede: "Calcola all'istante intervalli di host, maschere di subnet, indirizzi broadcast, limiti wildcard e prenotazioni VPC cloud per AWS, Azure e GCP."
+      },
+      splitter: {
+        title: "Subnet Splitter visivo e partizionatore CIDR",
+        eyebrow: "PARTIZIONAMENTO CIDR / SPLITTER",
+        lede: "Suddividi visivamente un blocco di rete in subnet personalizzate con etichette descrittive ed esporta configurazioni IaC pronte per l'uso."
+      },
+      k8s: {
+        title: "Pianificatore di subnet Kubernetes e calcolatore IP Pod",
+        eyebrow: "PIANIFICATORE KUBERNETES / PODS & NODI",
+        lede: "Valuta le linee guida sulla dimensione del cluster, le allocazioni dei nodi, i vincoli di densità dei pod e identifica in anticipo i rischi di esaurimento degli IP."
+      },
+      ipv6: {
+        title: "Calcolatore di subnet IPv6 e delega dei prefissi",
+        eyebrow: "CALCULATORE SUBNET / IPv6",
+        lede: "Comprimi, espandi e classifica gli indirizzi a 128 bit. Genera istantaneamente incrementi dei blocchi di delega dei prefissi."
+      },
+      terraform: {
+        title: "Pianificatore di subnet Terraform e calcolatore cidrsubnet",
+        eyebrow: "INFRASTRUCTURE AS CODE / TERRAFORM",
+        lede: "Pianifica le subnet VPC con la funzione matematica cidrsubnet() di Terraform. Genera blocchi HCL pronti per AWS, Azure e GCP senza bug di sovrapposizione."
+      },
+      k8sCidr: {
+        title: "Calcolatore CIDR Kubernetes e dimensionamento CNI",
+        eyebrow: "RETE KUBERNETES / DIMENSIONAMENTO CNI",
+        lede: "Calcola i CIDR dei Pod, gli intervalli dei Servizi e le allocazioni dei Nodi per Cilium, Calico, AWS VPC CNI e Azure CNI senza esaurimento degli IP."
+      }
+    },
+    meta: {
+      defaultTitle: "Calcolatore di Subnet IP e Pianificatore CIDR Gratis | DevSubnet",
+      defaultDesc: "Calcolatore di subnet IPv4 e IPv6 gratuito online. Calcola intervalli di rete, maschere di subnet, indirizzi broadcast, host utilizzabili e prenotazioni VPC cloud per AWS, Azure e GCP."
+    },
+    guide: {
+      title: "Gioca con le reti – Calcoli classici, VPC cloud e strategie di subnetting",
+      lead: "Benvenuto nella risorsa premium per progettisti di topologia di rete, candidati CCNA/CCNP e ingegneri DevOps in Italia, Svizzera e in tutto il mondo.",
+      exploreTitle: "Esplora argomenti moderni di pianificazione delle subnet",
+      cards: [
+        {
+          title: "Comprendere il nucleo della subnet IP",
+          desc: "Una subnet IP è una suddivisione logica di una rete IP. Essenziale per gli esami CCNA/CCNP, la segmentazione della sicurezza e il routing del traffico aziendale.",
+          linkText: "Calcola subnet standard →",
+          href: "/it/"
+        },
+        {
+          title: "Il calcolatore di host utilizzabili",
+          desc: "Calcola gli intervalli di host utilizzabili tramite algoritmi dedicati. In base alle regole RFC standard, ogni subnet sottrae 2 indirizzi per rete e broadcast.",
+          linkText: "Pianifica segmenti VLSM →",
+          href: "/vlsm-calculator"
+        },
+        {
+          title: "Demistificare gli intervalli IP e le maschere di subnet",
+          desc: "Una maschera di subnet definisce quale parte di un IP appartiene alla rete rispetto all'host. Visualizza questa suddivisione in modo dinamico tramite griglie binarie.",
+          linkText: "Apri il visualizzatore di maschera di subnet →",
+          href: "/it/"
+        },
+        {
+          title: "Tradurre la notazione CIDR",
+          desc: "Il Classless Inter-Domain Routing (CIDR) associa la notazione con barra (/24, /28) in maschere di subnet e limiti in tempo reale.",
+          linkText: "Visualizza la tabella CIDR →",
+          href: "/it/cidr-cheat-sheet"
+        },
+        {
+          title: "Pianificazione delle subnet con Terraform",
+          desc: "Evita bug di collisione IP in Terraform IaC. Genera calcoli cidrsubnet() accurati per architetture VPC multi-AZ.",
+          linkText: "Apri il pianificatore Terraform →",
+          href: "/terraform-subnet-planner"
+        },
+        {
+          title: "Kubernetes & Dimensionamento del CIDR CNI",
+          desc: "Calcola le dimensioni dei blocchi CIDR per Pod e Servizi per Cilium, Calico e AWS VPC CNI per evitare errori di schedulazione dei pod.",
+          linkText: "Calcola blocchi CIDR K8s →",
+          href: "/k8s-cidr-calculator"
+        }
+      ],
+      prefixTableTitle: "Tabella di riferimento dei prefissi di subnet IPv4",
+      prefixTableDesc: "Tabella di corrispondenza che associa le lunghezze dei prefissi comuni alle maschere di subnet, maschere wildcard e capacità degli host utilizzabili.",
+      comparisonTitle: "Confronto tra DevSubnet e altri calcolatori",
+      comparisonDesc: "La maggior parte dei calcolatori gestisce solo calcoli matematici RFC di base. DevSubnet integra prenotazioni cloud, generazione IaC e dimensionamento K8s.",
+      faqTitle: "Domande frequenti (FAQ)",
+      faqViewAll: "Visualizza tutte le domande →",
+      ctaPrimary: "Avvia calcolo subnet",
+      ctaSecondary: "Prova partizionamento visivo"
+    },
+    footer: {
+      tagline: "DEVSUBNET.COM / PROGETTATO PER RETI CHIARE",
+      about: "Chi Siamo",
+      contact: "Contatti",
+      privacy: "Informativa sulla privacy",
+      terms: "Termini di servizio",
+      faq: "FAQ",
+      noData: "NESSUN DATO LASCIA IL TUO DISPOSITIVO"
     }
   }
 };

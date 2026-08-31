@@ -3,30 +3,30 @@ import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
-const t = translations.nl;
+const t = translations.ko;
 ---
 
 <Layout 
-  lang="nl"
-  title="IP Subnetting & CIDR FAQ – Veelgestelde Vragen | DevSubnet"
-  description="Antwoorden op veelgestelde vragen over IP-subnetten, CIDR, AMS-IX routing en Kubernetes netwerken. Helder uitgelegd voor netwerk engineers."
+  lang="ko"
+  title="IP 서브네팅 & CIDR FAQ – 자주 묻는 질문 | DevSubnet"
+  description="IP 서브넷, CIDR, 클라우드 VPC 및 Kubernetes 네트워킹에 대한 질문과 답변. 계산법, AWS 예약 및 모범 사례를 알기 쉽게 설명합니다."
 >
   <div class="app-shell">
-    <NavBar path="faq" lang="nl" />
+    <NavBar path="faq" lang="ko" />
 
     <main class="faq-main">
       <div class="faq-container">
         <!-- Breadcrumb -->
         <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="/nl/">Home</a> <span class="sep">/</span> <strong>FAQ</strong>
+          <a href="/ko/">홈</a> <span class="sep">/</span> <strong>FAQ</strong>
         </nav>
 
         <!-- Page Header -->
         <section class="faq-intro">
-          <div class="eyebrow">SNELLE ANTWOORDEN</div>
-          <h1>IP Subnet FAQ</h1>
+          <div class="eyebrow">빠른 답변</div>
+          <h1>IP 서브넷 FAQ</h1>
           <p class="lede">
-            De belangrijkste vragen over IP-subnetten, CIDR en cloud netwerken helder en beknopt beantwoord.
+            IP 서브넷, CIDR 및 클라우드 네트워크에 대해 가장 많이 묻는 질문을 쉽고 명확하게 답변해 드립니다.
           </p>
         </section>
 
@@ -34,67 +34,67 @@ const t = translations.nl;
         <div class="faq-accordion" role="list">
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Wat is een subnetmasker en hoe werkt het?</span>
+              <span>서브넷 마스크란 무엇이며 어떻게 작동하나요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>Een subnetmasker is een 32-bits getal dat een IP-adres splitst in een netwerkdeel en een hostdeel via een bitwise AND-bewerking.</p>
+              <p>서브넷 마스크는 IP 주소를 네트워크 부분과 호스트 부분으로 나누는 32비트 숫자입니다. 비트 단위 AND 연산을 수행하여 1로 표시된 비트는 네트워크를, 0으로 표시된 비트는 호스트를 정의합니다.</p>
             </div>
           </details>
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Hoe bereken ik subnetten uit een IP-adres?</span>
+              <span>IP 주소에서 서브넷을 어떻게 계산하나요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>Zet de CIDR-notatie of het subnetmasker om naar binair. Het aantal mogelijke subnetten is 2<sup>n</sup> (geleende bits) en bruikbare hosts is 2<sup>h</sup> &minus; 2.</p>
+              <p>CIDR 또는 서브넷 마스크를 2진수로 변환합니다. 생성 가능한 서브넷 수는 2<sup>n</sup>(빌려온 비트 수)이고, 사용 가능한 호스트 수는 2<sup>h</sup> &minus; 2입니다.</p>
             </div>
           </details>
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Wat betekent CIDR-notatie?</span>
+              <span>CIDR 표기법이란 무엇인가요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>CIDR (Classless Inter-Domain Routing) noteert de prefixlengte met een schuine streep (bijv. /24 voor 24 netwerkbits) en vervangt het oude classful model.</p>
+              <p>CIDR(Classless Inter-Domain Routing)은 IP 접두사를 슬래시와 숫자 형태로 간결하게 나타내는 표기법(예: 24비트 네트워크의 경우 /24)으로, 기존의 경직된 클래스 기반 주소 지정 모델을 대체했습니다.</p>
             </div>
           </details>
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Hoeveel bruikbare hosts heeft een /24 subnet?</span>
+              <span>/24 서브넷은 사용 가능한 호스트가 몇 개인가요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>Een /24 subnet bevat 256 IP-adressen. Na aftrek van het netwerk- en broadcastadres blijven er exact 254 bruikbare hostadressen over.</p>
+              <p>/24 서브넷은 256개의 IP 주소를 가집니다. 네트워크 주소와 브로드캐스트 주소를 제외하면 정확히 254개의 호스트 주소를 사용할 수 있습니다.</p>
             </div>
           </details>
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Welke IP-adressen reserveert AWS in een VPC-subnet?</span>
+              <span>AWS는 VPC 서브넷에서 어떤 IP 주소를 예약하나요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>AWS reserveert 5 IP-adressen per subnet: de eerste 4 (netwerk, VPC-router, DNS, toekomstig) en de laatste (broadcast).</p>
+              <p>AWS는 서브넷당 5개의 IP 주소를 예약합니다. 처음 4개 주소(네트워크 주소, VPC 라우터, DNS, 향후 사용)와 마지막 주소(브로드캐스트)가 이에 해당합니다.</p>
             </div>
           </details>
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
-              <span>Hoe dimensioneer ik Kubernetes Pod- en Service-CIDRs?</span>
+              <span>Kubernetes Pod 및 Service CIDR은 어떻게 사이징해야 하나요?</span>
               <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
             </summary>
             <div class="faq-answer">
-              <p>Kies niet-overlappende CIDR-blokken voor Nodes, Pods en Services. Wijs per node doorgaans een /24 (254 pods) of /26 (62 pods) toe.</p>
+              <p>노드, Pod, 서비스 간에 겹치지 않는 CIDR 범위를 설정하세요. 일반적으로 노드당 /24(254개 Pod) 또는 /26(62개 Pod)를 할당합니다.</p>
             </div>
           </details>
         </div>
 
         <div style="margin-top: 3rem; text-align: center;">
-          <a href="/nl/" class="btn-seo-primary">Naar de Subnet Calculator →</a>
+          <a href="/ko/" class="btn-seo-primary">계산기로 이동 →</a>
         </div>
       </div>
     </main>
@@ -106,7 +106,7 @@ const t = translations.nl;
         <a href="/contact">{t.footer.contact}</a>
         <a href="/privacy">{t.footer.privacy}</a>
         <a href="/terms">{t.footer.terms}</a>
-        <a href="/nl/faq">{t.footer.faq}</a>
+        <a href="/ko/faq">{t.footer.faq}</a>
       </div>
       <span>{t.footer.noData}</span>
     </footer>

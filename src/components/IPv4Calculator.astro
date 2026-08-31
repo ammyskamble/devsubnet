@@ -29,60 +29,63 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
       <span class="live-label">LIVE CALCULATION</span>
     </div>
 
-    <!-- Inputs Row -->
-    <div class="input-grid-2-1">
-      <div class="input-row">
-        <label for="ip-address">IP address</label>
-        <div class="ip-input">
-          <input 
-            type="text" 
-            id="ip-address" 
-            value={defaultIp} 
-            placeholder="e.g., 10.0.0.0" 
-            inputmode="decimal" 
-            autocomplete="off" 
-            maxlength="15"
-          />
+    <!-- Grouped Inputs Card -->
+    <div class="core-inputs-card">
+      <!-- Inputs Row -->
+      <div class="input-grid-2-1">
+        <div class="input-row">
+          <label for="ip-address" class="tooltip-trigger" data-tooltip="IPv4 address: Enter four octets (0-255) separated by dots.">IP address</label>
+          <div class="ip-input">
+            <input 
+              type="text" 
+              id="ip-address" 
+              value={defaultIp} 
+              placeholder="e.g., 10.0.0.0" 
+              inputmode="decimal" 
+              autocomplete="off" 
+              maxlength="15"
+            />
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label for="cidr" class="tooltip-trigger" data-tooltip="CIDR Prefix: The number of bits allocated to the network prefix (0 to 32).">CIDR</label>
+          <div class="ip-input">
+            <span class="slash">/</span>
+            <input 
+              type="number" 
+              id="cidr" 
+              value={defaultCidr} 
+              min="0" 
+              max="32"
+            />
+          </div>
         </div>
       </div>
 
-      <div class="input-row">
-        <label for="cidr">CIDR</label>
-        <div class="ip-input">
-          <span class="slash">/</span>
-          <input 
-            type="number" 
-            id="cidr" 
-            value={defaultCidr} 
-            min="0" 
-            max="32"
-          />
-        </div>
+      <!-- Slider -->
+      <div class="slider-container">
+        <input 
+          type="range" 
+          id="cidr-slider" 
+          value={defaultCidr} 
+          min="0" 
+          max="32"
+          aria-label="CIDR prefix slider"
+        />
       </div>
-    </div>
 
-    <!-- Slider -->
-    <div class="slider-container">
-      <input 
-        type="range" 
-        id="cidr-slider" 
-        value={defaultCidr} 
-        min="0" 
-        max="32"
-        aria-label="CIDR prefix slider"
-      />
-    </div>
-
-    <!-- Cloud Selector -->
-    <div class="input-row">
-      <label for="cloud-provider">Cloud Architecture Rules</label>
-      <div class="select-wrapper">
-        <select id="cloud-provider">
-          <option value="standard" selected={defaultCloud === 'standard'}>Standard (Default Gateway + Broadcast Reserved)</option>
-          <option value="aws" selected={defaultCloud === 'aws'}>AWS VPC (5 Reserved IPs)</option>
-          <option value="azure" selected={defaultCloud === 'azure'}>Microsoft Azure VNet (5 Reserved IPs)</option>
-          <option value="gcp" selected={defaultCloud === 'gcp'}>Google Cloud VPC (4 Reserved IPs)</option>
-        </select>
+      <!-- Cloud Selector -->
+      <div class="input-row">
+        <label for="cloud-provider" class="tooltip-trigger" data-tooltip="Cloud provider rules: Select the architecture to apply vendor-specific reserved IP offsets (AWS/Azure reserve 5 IPs, GCP reserves 4).">Cloud Architecture Rules</label>
+        <div class="select-wrapper">
+          <select id="cloud-provider">
+            <option value="standard" selected={defaultCloud === 'standard'}>Standard (Default Gateway + Broadcast Reserved)</option>
+            <option value="aws" selected={defaultCloud === 'aws'}>AWS VPC (5 Reserved IPs)</option>
+            <option value="azure" selected={defaultCloud === 'azure'}>Microsoft Azure VNet (5 Reserved IPs)</option>
+            <option value="gcp" selected={defaultCloud === 'gcp'}>Google Cloud VPC (4 Reserved IPs)</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -103,7 +106,7 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
     <!-- Binary visualization -->
     <div class="binary-section">
       <div class="binary-heading">
-        <span>Binary Address Layout</span>
+        <span class="tooltip-trigger" data-tooltip="Bitwise visual representation of the network (blue) and host (purple) portions of the IP.">Binary Address Layout</span>
         <div class="binary-legend">
           <div class="legend-item"><span class="legend-color net"></span> Network</div>
           <div class="legend-item"><span class="legend-color host"></span> Host</div>
@@ -131,32 +134,40 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         <span class="step">02</span>
         <h2>Subnet Metrics</h2>
       </div>
-      <button class="copy-button" type="button" id="copy-ipv4-json">Copy JSON</button>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="copy-button" type="button" id="copy-ipv4-json">Copy JSON</button>
+        <button class="copy-button" type="button" id="copy-ipv4-csv">Copy CSV</button>
+        <button class="copy-button" type="button" id="copy-ipv4-markdown">Copy MD Table</button>
+        <button class="copy-button" type="button" id="share-link-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight); display: inline-flex; align-items: center; gap: 0.25rem;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+          <span>Share Link</span>
+        </button>
+      </div>
     </div>
 
     <div class="summary-grid">
       <div class="summary-item primary">
-        <span>Network Range / Address</span>
+        <span class="tooltip-trigger" data-tooltip="Network range: The base IP representing the subnet prefix boundaries.">Network Range / Address</span>
         <strong id="res-network">{initialResult.network}/{defaultCidr}</strong>
       </div>
-      <div class="summary-item">
-        <span>Usable Host IPs</span>
+      <div class="summary-item highlight-usable">
+        <span class="tooltip-trigger" data-tooltip="Usable range: The IP addresses available for allocation to servers or host interfaces.">Usable Host IPs</span>
         <strong id="res-host-range">{initialResult.firstUsable} - {initialResult.lastUsable}</strong>
       </div>
       <div class="summary-item">
-        <span>Subnet Mask</span>
+        <span class="tooltip-trigger" data-tooltip="Subnet mask: A 32-bit mask where 1s define the network prefix and 0s define hosts (e.g., 255.255.255.0).">Subnet Mask</span>
         <strong id="res-mask">{initialResult.netmask}</strong>
       </div>
       <div class="summary-item">
-        <span>Wildcard Mask</span>
+        <span class="tooltip-trigger" data-tooltip="Wildcard mask: The bitwise inverse of the subnet mask, commonly used in Cisco ACLs (e.g., 0.0.0.255).">Wildcard Mask</span>
         <strong id="res-wildcard">{initialResult.wildcard}</strong>
       </div>
       <div class="summary-item">
-        <span>Broadcast Address</span>
+        <span class="tooltip-trigger" data-tooltip="Broadcast address: The last address in the subnet, used to send packets to all hosts on the segment.">Broadcast Address</span>
         <strong id="res-broadcast">{initialResult.broadcast}</strong>
       </div>
       <div class="summary-item">
-        <span>Total IP Capacity</span>
+        <span class="tooltip-trigger" data-tooltip="Total capacity: The total number of IP addresses in the subnet including reserved/utility IPs (2^(32 - CIDR)).">Total IP Capacity</span>
         <strong id="res-total-hosts">{initialResult.totalHosts.toLocaleString()}</strong>
       </div>
     </div>
@@ -172,6 +183,69 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         ))}
       </ul>
     </div>
+
+    <!-- Explanatory Reserved IPs breakdown -->
+    <details class="reserved-info-details" style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: rgba(255,255,255,0.01);">
+      <summary style="font-size: 0.8rem; font-weight: 600; padding: 0.75rem; cursor: pointer; color: var(--accent-highlight); outline: none; user-select: none; display: flex; align-items: center; gap: 0.25rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        Compare Cloud Provider Reservation Rules
+      </summary>
+      <div style="padding: 0.75rem; font-size: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+        <p>Different cloud and RFC architectures reserve IP addresses for routing, DNS, and system services:</p>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
+          <div style="border-left: 3px solid var(--text-muted); padding-left: 0.5rem;">
+            <strong>Standard RFC 1918:</strong> Reserves <strong>2 IPs</strong>. The network address (first IP) and broadcast address (last IP).
+          </div>
+          <div style="border-left: 3px solid var(--accent-network); padding-left: 0.5rem;">
+            <strong>AWS VPC:</strong> Reserves <strong>5 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Router), <code>.2</code> (DNS), <code>.3</code> (Future use), and <code>.255</code> (Broadcast).
+          </div>
+          <div style="border-left: 3px solid var(--accent-host); padding-left: 0.5rem;">
+            <strong>Microsoft Azure:</strong> Reserves <strong>5 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Gateway), <code>.2</code> (DNS), <code>.3</code> (DHCP mapping), and <code>.255</code> (Broadcast).
+          </div>
+          <div style="border-left: 3px solid var(--accent-highlight); padding-left: 0.5rem;">
+            <strong>Google Cloud (GCP):</strong> Reserves <strong>4 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Gateway), <code>.254</code> (Future use), and <code>.255</code> (Broadcast).
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Inline Subnet Splitter -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="panel-heading" style="padding-bottom: 0.5rem; border-bottom: none;">
+        <div>
+          <span class="step" style="background: rgba(var(--hsl-host), 0.15); color: var(--accent-host);">03</span>
+          <h2 class="tooltip-trigger" data-tooltip="Interactive Subnet Splitter: Split your current CIDR block in half recursively to plan smaller segments.">Interactive Subnet Splitter</h2>
+        </div>
+        <span class="live-label" style="background: rgba(var(--hsl-network), 0.12); color: var(--accent-network);">ALLOCATIONS</span>
+      </div>
+
+      <p class="aside-copy" style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+        Divide the calculated network block <strong><span id="inline-splitter-base-display" style="color: var(--accent-network); font-family: var(--font-mono);">192.168.1.0/24</span></strong> into custom segments. Click <strong>Split</strong> to partition a block, or <strong>Merge</strong> to combine adjacent siblings.
+      </p>
+
+      <div class="splitter-visual-root" style="margin-top: 0.25rem;">
+        <div class="subnet-block-row" id="inline-splitter-grid" style="min-height: 80px;">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <div class="guide-table-wrapper" style="margin-top: 0.5rem; max-height: 250px; overflow-y: auto;">
+        <table class="guide-table" style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>CIDR Range</th>
+              <th>Usable IP Range</th>
+              <th>Hosts</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inline-splitter-table-body">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Right Column: Interactive Side Panel -->
@@ -185,13 +259,14 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         A subnet with a mask of {initialResult.netmask} provides {initialResult.usableHosts.toLocaleString()} usable IP addresses for devices.
       </p>
 
-      <div class="capacity">
+      <div class="capacity highlighted">
         <div>
           <span>USABLE HOST CAPACITY</span>
           <strong id="res-usable-hosts">{initialResult.usableHosts.toLocaleString()}</strong>
         </div>
         <span class="capacity-unit">IPs available</span>
       </div>
+
 
       <div class="scale-visualizer">
         <div class="scale-fill" id="res-scale-fill" style={`width: ${Math.max(0, Math.min(100, (defaultCidr / 32) * 100))}%`}></div>
@@ -200,9 +275,18 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
       
       <!-- IaC Exporter Section -->
       <div class="export-panel">
-        <div class="export-tabs">
-          <button type="button" class="export-tab-btn active" data-lang="tf">Terraform IaC</button>
-          <button type="button" class="export-tab-btn" data-lang="yaml">Ansible/YAML</button>
+        <div class="export-tabs" style="display: flex; gap: 0.5rem; width: 100%;">
+          <!-- a11y Fix B: sr-only label for the unlabelled select -->
+          <label for="export-iac-select" class="sr-only">Export IaC Format</label>
+          <select id="export-iac-select" class="cloud-select" aria-label="Export IaC Format" style="width: 100%; height: 36px; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); outline: none;">
+            <option value="tf" selected>Terraform HCL</option>
+            <option value="yaml">Ansible / YAML</option>
+            <option value="pulumi-ts">Pulumi (TypeScript)</option>
+            <option value="pulumi-py">Pulumi (Python)</option>
+            <option value="cfn">AWS CloudFormation</option>
+            <option value="cdk-ts">AWS CDK (TypeScript)</option>
+            <option value="bicep">Azure Bicep</option>
+          </select>
         </div>
         <div class="code-wrapper">
           <div class="code-copy-overlay">
@@ -297,7 +381,7 @@ resource "aws_subnet" "subnet_1" &#123;
 </div>
 
 <script>
-  import { calculateSubnet, getBinaryBits, validateIPv4 } from '../utils/subnetMath';
+  import { calculateSubnet, getBinaryBits, validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
 
   function initIPv4Calculator() {
     // DOM Elements
@@ -330,8 +414,227 @@ resource "aws_subnet" "subnet_1" &#123;
     const iacOutput = document.getElementById('iac-code-output');
     const copyIacBtn = document.getElementById('copy-iac-code');
     const copyJsonBtn = document.getElementById('copy-ipv4-json');
+    const copyCsvBtn = document.getElementById('copy-ipv4-csv');
+    const copyMarkdownBtn = document.getElementById('copy-ipv4-markdown');
+    const shareLinkBtn = document.getElementById('share-link-btn');
     
     let currentLang = 'tf';
+
+    // Inline Splitter State
+    interface InlineSubnetNode {
+      networkLong: number;
+      cidr: number;
+      label: string;
+    }
+
+    let inlineSubnets: InlineSubnetNode[] = [];
+    let baseNetworkLong = 0;
+    let baseCidrVal = 24;
+
+    function resetInlineSplitter(networkIp: string, cidr: number) {
+      baseCidrVal = cidr;
+      const ipLong = ip2Long(networkIp);
+      baseNetworkLong = (ipLong & (cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0)) >>> 0;
+      
+      inlineSubnets = [{
+        networkLong: baseNetworkLong,
+        cidr: cidr,
+        label: "Subnet 1"
+      }];
+      
+      renderInlineSplitter();
+    }
+
+    function splitInlineSubnet(index: number) {
+      const node = inlineSubnets[index];
+      if (node.cidr >= 32) return;
+
+      const newCidr = node.cidr + 1;
+      const offset = Math.pow(2, 32 - newCidr);
+
+      const child1: InlineSubnetNode = {
+        networkLong: node.networkLong,
+        cidr: newCidr,
+        label: `${node.label} (A)`
+      };
+
+      const child2: InlineSubnetNode = {
+        networkLong: node.networkLong + offset,
+        cidr: newCidr,
+        label: `${node.label} (B)`
+      };
+
+      inlineSubnets.splice(index, 1, child1, child2);
+      renderInlineSplitter();
+    }
+
+    function canMergeInline(index: number): boolean {
+      const node = inlineSubnets[index];
+      if (node.cidr <= baseCidrVal) return false;
+
+      const offset = Math.pow(2, 32 - node.cidr);
+      const isRightSibling = (node.networkLong / offset) % 2 === 1;
+      const siblingNetwork = isRightSibling ? node.networkLong - offset : node.networkLong + offset;
+
+      const siblingIndex = inlineSubnets.findIndex(s => s.networkLong === siblingNetwork && s.cidr === node.cidr);
+      return siblingIndex !== -1;
+    }
+
+    function mergeInlineSubnet(index: number) {
+      const node = inlineSubnets[index];
+      if (node.cidr <= baseCidrVal) return;
+
+      const offset = Math.pow(2, 32 - node.cidr);
+      const isRightSibling = (node.networkLong / offset) % 2 === 1;
+      const siblingNetwork = isRightSibling ? node.networkLong - offset : node.networkLong + offset;
+      const siblingIndex = inlineSubnets.findIndex(s => s.networkLong === siblingNetwork && s.cidr === node.cidr);
+
+      if (siblingIndex === -1) return;
+
+      const parentCidr = node.cidr - 1;
+      const parentNetwork = isRightSibling ? siblingNetwork : node.networkLong;
+
+      const parentNode: InlineSubnetNode = {
+        networkLong: parentNetwork,
+        cidr: parentCidr,
+        label: node.label.replace(/\s*\(A\)|\s*\(B\)/g, '') || "Merged Subnet"
+      };
+
+      const firstIdx = Math.min(index, siblingIndex);
+      inlineSubnets.splice(firstIdx, 2, parentNode);
+      renderInlineSplitter();
+    }
+
+    function renderInlineSplitter() {
+      const grid = document.getElementById('inline-splitter-grid');
+      const tableBody = document.getElementById('inline-splitter-table-body');
+      const baseDisplay = document.getElementById('inline-splitter-base-display');
+      
+      if (!grid || !tableBody) return;
+
+      const baseIpStr = long2Ip(baseNetworkLong);
+      if (baseDisplay) baseDisplay.innerText = `${baseIpStr}/${baseCidrVal}`;
+
+      inlineSubnets.sort((a, b) => a.networkLong - b.networkLong);
+
+      let gridHtml = '';
+      const totalBlocksCapacity = Math.pow(2, 32 - baseCidrVal);
+
+      inlineSubnets.forEach((node, idx) => {
+        const nodeCapacity = Math.pow(2, 32 - node.cidr);
+        const widthPct = (nodeCapacity / totalBlocksCapacity) * 100;
+        
+        let sizeClass = 'size-medium';
+        if (node.cidr - baseCidrVal <= 1) sizeClass = 'size-large';
+        else if (node.cidr - baseCidrVal >= 4) sizeClass = 'size-small';
+
+        const canMergeNode = canMergeInline(idx);
+
+        gridHtml += `
+          <div class="subnet-block ${sizeClass}" style="flex: 1 1 ${widthPct}%; min-width: max(120px, ${widthPct}%); max-width: 100%; padding: 0.6rem 0.75rem;">
+            <div class="subnet-block-highlight"></div>
+            <div class="subnet-info" style="margin-bottom: 0.5rem;">
+              <div class="subnet-meta" style="flex-direction: column; gap: 0.25rem;">
+                <span class="subnet-cidr" style="font-size: 0.75rem; font-weight: bold;">${long2Ip(node.networkLong)}/${node.cidr}</span>
+                <input 
+                  type="text" 
+                  class="inline-subnet-label-input" 
+                  value="${node.label}" 
+                  data-idx="${idx}" 
+                  placeholder="Label..."
+                  style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.75rem; outline:none; max-width:90px;"
+                />
+              </div>
+            </div>
+            <div class="subnet-actions" style="display: flex; gap: 0.25rem;">
+              ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">Split</button>` : ''}
+              ${canMergeNode ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">Merge</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = gridHtml;
+
+      let tableHtml = '';
+      inlineSubnets.forEach((node, idx) => {
+        const calculated = calculateSubnet(long2Ip(node.networkLong), node.cidr, 'standard');
+
+        tableHtml += `
+          <tr>
+            <td>
+              <input 
+                type="text" 
+                class="inline-subnet-table-label-input" 
+                value="${node.label}" 
+                data-idx="${idx}"
+                aria-label="Subnet Label ${idx + 1}"
+                style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.8rem; outline:none; max-width: 100px;"
+              />
+            </td>
+            <td><strong>${calculated.network}/${node.cidr}</strong></td>
+            <td>${node.cidr >= 31 ? `${calculated.network} - ${calculated.broadcast}` : `${calculated.firstUsable} - ${calculated.lastUsable}`}</td>
+            <td>${calculated.usableHosts.toLocaleString()}</td>
+            <td>
+              <div style="display:flex; gap:0.25rem;">
+                ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">Split</button>` : ''}
+                ${canMergeInline(idx) ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">Merge</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tableBody.innerHTML = tableHtml;
+
+      // Event listeners for inline split/merge
+      grid.querySelectorAll('.inline-split-btn').forEach(btn => {
+        (btn as HTMLButtonElement).onclick = (e) => {
+          const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-split')!, 10);
+          splitInlineSubnet(idx);
+        };
+      });
+
+      grid.querySelectorAll('.inline-merge-btn').forEach(btn => {
+        (btn as HTMLButtonElement).onclick = (e) => {
+          const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-merge')!, 10);
+          mergeInlineSubnet(idx);
+        };
+      });
+
+      tableBody.querySelectorAll('.inline-split-btn').forEach(btn => {
+        (btn as HTMLButtonElement).onclick = (e) => {
+          const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-split')!, 10);
+          splitInlineSubnet(idx);
+        };
+      });
+
+      tableBody.querySelectorAll('.inline-merge-btn').forEach(btn => {
+        (btn as HTMLButtonElement).onclick = (e) => {
+          const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-merge')!, 10);
+          mergeInlineSubnet(idx);
+        };
+      });
+
+      // Label syncing listeners
+      grid.querySelectorAll('.inline-subnet-label-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement;
+          const idx = parseInt(target.getAttribute('data-idx')!, 10);
+          inlineSubnets[idx].label = target.value;
+          const tableInput = tableBody.querySelector(`.inline-subnet-table-label-input[data-idx="${idx}"]`) as HTMLInputElement;
+          if (tableInput) tableInput.value = target.value;
+        });
+      });
+
+      tableBody.querySelectorAll('.inline-subnet-table-label-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement;
+          const idx = parseInt(target.getAttribute('data-idx')!, 10);
+          inlineSubnets[idx].label = target.value;
+          const blockInput = grid.querySelector(`.inline-subnet-label-input[data-idx="${idx}"]`) as HTMLInputElement;
+          if (blockInput) blockInput.value = target.value;
+        });
+      });
+    }
 
     function updateAll() {
       const ip = ipInput.value.trim();
@@ -401,6 +704,12 @@ resource "aws_subnet" "subnet_1" &#123;
 
       // Update IaC Snippet Code block
       updateIaCCode(result.network, cidr, cloud);
+
+      // Reset inline splitter if base CIDR or base Network changed
+      const currentNetworkLong = ip2Long(result.network);
+      if (currentNetworkLong !== baseNetworkLong || cidr !== baseCidrVal) {
+        resetInlineSplitter(result.network, cidr);
+      }
     }
 
     // Non-blocking rAF scheduler
@@ -413,7 +722,10 @@ resource "aws_subnet" "subnet_1" &#123;
     function updateIaCCode(network: string, cidr: number, cloud: string) {
       if (!iacOutput) return;
       
-      if (currentLang === 'tf') {
+      const iacSelect = document.getElementById('export-iac-select') as HTMLSelectElement;
+      const format = iacSelect ? iacSelect.value : 'tf';
+
+      if (format === 'tf') {
         if (cloud === 'aws') {
           iacOutput.innerText = `# AWS VPC Subnet IaC snippet
 resource "aws_subnet" "subnet_aws" {
@@ -441,7 +753,7 @@ resource "terraform_subnet" "subnet_generic" {
   description = "Assigned IP Block"
 }`;
         }
-      } else {
+      } else if (format === 'yaml') {
         iacOutput.innerText = `# Ansible Network Subnet Settings
 network_config:
   subnet_ip: "${network}"
@@ -450,6 +762,51 @@ network_config:
     metadata:
       description: "Calculated via devsubnet.com"
       host_capacity: ${cidr}`;
+      } else if (format === 'pulumi-ts') {
+        iacOutput.innerText = `import * as aws from "@pulumi/aws";
+
+const subnet = new aws.ec2.Subnet("subnet", {
+    vpcId: "vpc-12345678",
+    cidrBlock: "${network}/${cidr}",
+    availabilityZone: "us-east-1a",
+    tags: { Name: "subnet-${cidr}" },
+});`;
+      } else if (format === 'pulumi-py') {
+        iacOutput.innerText = `import pulumi_aws as aws
+
+subnet = aws.ec2.Subnet("subnet",
+    vpc_id="vpc-12345678",
+    cidr_block="${network}/${cidr}",
+    availability_zone="us-east-1a",
+    tags={"Name": "subnet-${cidr}"}
+)`;
+      } else if (format === 'cfn') {
+        iacOutput.innerText = `Resources:
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: vpc-12345678
+      CidrBlock: ${network}/${cidr}
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: subnet-${cidr}`;
+      } else if (format === 'cdk-ts') {
+        iacOutput.innerText = `import * as ec2 from 'aws-cdk-lib/aws-ec2';
+
+// Inside Stack constructor:
+const subnet = new ec2.Subnet(this, 'Subnet', {
+  vpcId: 'vpc-12345678',
+  cidrBlock: '${network}/${cidr}',
+  availabilityZone: 'us-east-1a',
+});`;
+      } else if (format === 'bicep') {
+        iacOutput.innerText = `resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
+  name: 'vnet-prod/subnet-${cidr}'
+  properties: {
+    addressPrefix: '${network}/${cidr}'
+  }
+}`;
       }
     }
 
@@ -483,22 +840,18 @@ network_config:
       };
     });
 
-    // IaC Lang tab selection
-    document.querySelectorAll('.export-tab-btn').forEach(btn => {
-      (btn as HTMLButtonElement).onclick = (e) => {
-        document.querySelectorAll('.export-tab-btn').forEach(b => b.classList.remove('active'));
-        const target = e.currentTarget as HTMLButtonElement;
-        target.classList.add('active');
-        currentLang = target.getAttribute('data-lang') || 'tf';
-        
+    // IaC Lang selection dropdown
+    const iacSelect = document.getElementById('export-iac-select') as HTMLSelectElement;
+    if (iacSelect) {
+      iacSelect.onchange = () => {
         const ip = ipInput.value.trim();
         const cidr = parseInt(cidrInput.value, 10);
         const result = calculateSubnet(ip, cidr, cloudSelector.value as any);
         updateIaCCode(result.network, cidr, cloudSelector.value);
       };
-    });
+    }
 
-    // Copy Buttons
+    // Copy & Share Buttons
     if (copyJsonBtn) {
       copyJsonBtn.onclick = async () => {
         const ip = ipInput.value.trim();
@@ -517,6 +870,87 @@ network_config:
       };
     }
 
+    if (copyCsvBtn) {
+      copyCsvBtn.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        const cloud = cloudSelector.value as any;
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, cloud);
+
+        const csvContent = [
+          ['Metric', 'Value'],
+          ['Network Range / Address', `${res.network}/${cidr}`],
+          ['Usable Host IPs', `${res.firstUsable} - ${res.lastUsable}`],
+          ['Subnet Mask', res.netmask],
+          ['Wildcard Mask', res.wildcard],
+          ['Broadcast Address', res.broadcast],
+          ['Total IP Capacity', res.totalHosts],
+          ['Usable Host Capacity', res.usableHosts]
+        ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+        await navigator.clipboard.writeText(csvContent);
+        copyCsvBtn.innerText = 'Copied!';
+        copyCsvBtn.classList.add('copied');
+        setTimeout(() => {
+          copyCsvBtn.innerText = 'Copy CSV';
+          copyCsvBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
+    if (copyMarkdownBtn) {
+      copyMarkdownBtn.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        const cloud = cloudSelector.value as any;
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, cloud);
+
+        const mdContent = [
+          '| Metric | Value |',
+          '| --- | --- |',
+          `| **Network Range / Address** | ${res.network}/${cidr} |`,
+          `| **Usable Host IPs** | ${res.firstUsable} - ${res.lastUsable} |`,
+          `| **Subnet Mask** | ${res.netmask} |`,
+          `| **Wildcard Mask** | ${res.wildcard} |`,
+          `| **Broadcast Address** | ${res.broadcast} |`,
+          `| **Total IP Capacity** | ${res.totalHosts.toLocaleString()} |`,
+          `| **Usable Host Capacity** | ${res.usableHosts.toLocaleString()} |`
+        ].join('\n');
+
+        await navigator.clipboard.writeText(mdContent);
+        copyMarkdownBtn.innerText = 'Copied!';
+        copyMarkdownBtn.classList.add('copied');
+        setTimeout(() => {
+          copyMarkdownBtn.innerText = 'Copy MD Table';
+          copyMarkdownBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
+    if (shareLinkBtn) {
+      shareLinkBtn.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = cidrInput.value;
+        const cloud = cloudSelector.value;
+        
+        const url = new URL(window.location.origin + window.location.pathname);
+        url.searchParams.set('ip', ip);
+        url.searchParams.set('cidr', cidr);
+        url.searchParams.set('cloud', cloud);
+
+        await navigator.clipboard.writeText(url.toString());
+        const btnTextSpan = shareLinkBtn.querySelector('span');
+        if (btnTextSpan) btnTextSpan.innerText = 'Link Copied!';
+        shareLinkBtn.classList.add('copied');
+        setTimeout(() => {
+          if (btnTextSpan) btnTextSpan.innerText = 'Share Link';
+          shareLinkBtn.classList.remove('copied');
+        }, 2000);
+      };
+    }
+
     if (copyIacBtn) {
       copyIacBtn.onclick = async () => {
         if (!iacOutput) return;
@@ -530,10 +964,10 @@ network_config:
       };
     }
 
-    // Check URL params on mount
+    // Check URL params on mount (supports cidr & prefix)
     const params = new URLSearchParams(window.location.search);
     const ipParam = params.get('ip');
-    const cidrParam = params.get('cidr');
+    const cidrParam = params.get('cidr') || params.get('prefix');
     const cloudParam = params.get('cloud');
 
     if (ipParam && validateIPv4(ipParam)) ipInput.value = ipParam;
@@ -549,6 +983,69 @@ network_config:
         cloudSelector.value = cloudParam;
       }
     }
+    // Keyboard Navigation & Shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + C (Copy primary Usable Host Range)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyC') {
+        const rangeEl = document.getElementById('res-host-range');
+        if (rangeEl) {
+          e.preventDefault();
+          const text = rangeEl.innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            const flash = document.createElement('div');
+            flash.textContent = 'Copied Usable Host Range: ' + text;
+            flash.style.position = 'fixed';
+            flash.style.bottom = '20px';
+            flash.style.right = '20px';
+            flash.style.background = 'var(--accent-highlight)';
+            flash.style.color = '#0d111c';
+            flash.style.padding = '0.5rem 1rem';
+            flash.style.borderRadius = 'var(--radius-sm)';
+            flash.style.zIndex = '99999';
+            flash.style.fontFamily = 'var(--font-sans)';
+            flash.style.fontSize = '0.85rem';
+            flash.style.fontWeight = 'bold';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 2000);
+          });
+        }
+      }
+
+      // Arrow Up/Down to adjust CIDR slider (when not typing in a text field)
+      const focused = document.activeElement;
+      const isInputText = focused && (
+        focused.tagName === 'TEXTAREA' || 
+        (focused.tagName === 'INPUT' && (focused as HTMLInputElement).type === 'text')
+      );
+      if (!isInputText) {
+        let val = parseInt(cidrSlider.value, 10);
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (val < 32) {
+            val++;
+            cidrSlider.value = val.toString();
+            cidrInput.value = val.toString();
+            scheduledUpdate();
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (val > 0) {
+            val--;
+            cidrSlider.value = val.toString();
+            cidrInput.value = val.toString();
+            scheduledUpdate();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Clean up event listener when page navigates (using Astro transitions)
+    document.addEventListener('astro:before-swap', () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }, { once: true });
+
     updateAll();
   }
 

@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.pt;
+---
+
+<Layout 
+  lang="pt"
+  title="FAQ sobre Sub-rede IP & CIDR – Perguntas Frequentes | DevSubnet"
+  description="Respostas a perguntas comuns sobre sub-redes IP, CIDR, VPCs em nuvem e redes Kubernetes. Cálculos, reservas da AWS e melhores práticas explicadas de forma simples."
+>
+  <div class="app-shell">
+    <NavBar path="faq" lang="pt" />
+
+    <main class="faq-main">
+      <div class="faq-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/pt/">Início</a> <span class="sep">/</span> <strong>FAQ</strong>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="faq-intro">
+          <div class="eyebrow">RESPOSTAS RÁPIDAS</div>
+          <h1>FAQ sobre Sub-rede IP</h1>
+          <p class="lede">
+            As perguntas mais importantes sobre sub-redes IP, CIDR e redes em nuvem respondidas de forma simples e precisa.
+          </p>
+        </section>
+
+        <!-- FAQ Accordion List -->
+        <div class="faq-accordion" role="list">
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>O que é uma máscara de sub-rede e como ela funciona?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Uma máscara de sub-rede é um número de 32 bits que divide um endereço IP em parte de rede e parte de host. Ela executa uma operação AND bit a bit, onde os bits 1 definem a rede e os bits 0 definem o host.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Como calculo sub-redes a partir de um endereço IP?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Converta o CIDR ou a máscara de sub-rede em binário. O número de sub-redes possíveis é 2<sup>n</sup> (bits emprestados) e os hosts utilizáveis são 2<sup>h</sup> &minus; 2.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>O que significa a notação CIDR?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>O CIDR (Classless Inter-Domain Routing) representa prefixos IP de forma compacta com uma barra (ex. /24 para 24 bits de rede) e substituiu o modelo rígido de endereçamento baseado em classes.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Quantos hosts utilizáveis tem uma sub-rede /24?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Uma sub-rede /24 possui 256 endereços IP. Após deduzir os endereços de rede e broadcast, restam exatamente 254 endereços de host utilizáveis.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Quais endereços IP a AWS reserva em uma sub-rede VPC?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>A AWS reserva 5 endereços IP por sub-rede: os primeiros 4 (rede, roteador VPC, DNS, uso futuro) e o último (broadcast).</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>Como dimensionar os CIDRs de Pod e Service no Kubernetes?</span>
+              <span class="icon" aria-hidden="true"><span class="plus">+</span><span class="minus">&#8722;</span></span>
+            </summary>
+            <div class="faq-answer">
+              <p>Escolha CIDRs que não se sobreponham para nós, pods e serviços. Normalmente, atribua um /24 (254 pods) ou um /26 (62 pods) por nó.</p>
+            </div>
+          </details>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+          <a href="/pt/" class="btn-seo-primary">Ir para a Calculadora →</a>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/about">{t.footer.about}</a>
+        <a href="/contact">{t.footer.contact}</a>
+        <a href="/privacy">{t.footer.privacy}</a>
+        <a href="/terms">{t.footer.terms}</a>
+        <a href="/pt/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .faq-main {
+    padding: 3rem 1.5rem;
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a {
+    color: var(--accent-network);
+    text-decoration: none;
+  }
+  .faq-intro h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq-intro .lede {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .faq-details {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+  }
+  .faq-summary {
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+  }
+  .faq-answer {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+</style>

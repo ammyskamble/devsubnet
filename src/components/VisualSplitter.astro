@@ -57,6 +57,58 @@ const {
       </button>
     </div>
 
+    <!-- Architecture Presets & Dual-Stack Toggle Group -->
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-color); margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="input-row" style="margin: 0;">
+        <label for="split-preset-templates" style="margin-bottom: 0.35rem; display: block;">Load Standard Architecture Preset</label>
+        <div class="select-wrapper">
+          <select id="split-preset-templates" style="width: 100%; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; color: var(--text-primary); outline: none;">
+            <option value="none" selected>-- Select a Preset Topology --</option>
+            <option value="aws-3tier">3-Tier AWS VPC across 3 Availability Zones</option>
+            <option value="hub-spoke">Hub-and-Spoke VPN Pool</option>
+            <option value="k8s-cluster">Small Kubernetes Cluster</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <label class="switch-toggle" for="dual-stack-toggle" style="position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0;">
+          <input type="checkbox" id="dual-stack-toggle" aria-label="Enable Dual-Stack IPv4 and IPv6 subnet planning switch" style="opacity: 0; width: 0; height: 0;" />
+          <span class="switch-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .3s; border-radius: 22px;"></span>
+        </label>
+        <div>
+          <label style="margin: 0; font-weight: 600; display: block; font-size: 0.85rem; color: var(--text-primary);">Enable Dual-Stack (IPv4 / IPv6) Planning</label>
+          <span class="field-hint" style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Auto-allocate sequential /64 IPv6 ranges side-by-side with IPv4 subnets.</span>
+        </div>
+      </div>
+
+      <div id="dual-stack-v6-wrapper" class="input-row" style="display: none; margin: 0;">
+        <label for="dual-stack-v6-base" style="margin-bottom: 0.35rem; display: block;">IPv6 Base CIDR Block</label>
+        <input type="text" id="dual-stack-v6-base" value="2001:db8:1234::/48" class="ip-input" style="width: 100%; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; color: var(--text-primary); font-family: var(--font-mono);" />
+      </div>
+    </div>
+
+    <!-- Toggle Style Overrides -->
+    <style is:inline>
+      .switch-toggle input:checked + .switch-slider {
+        background-color: var(--accent-network, #38bdf8) !important;
+      }
+      .switch-toggle .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #fff;
+        transition: .3s;
+        border-radius: 50%;
+      }
+      .switch-toggle input:checked + .switch-slider:before {
+        transform: translateX(18px) !important;
+      }
+    </style>
+
     <!-- Error Banner -->
     <div class="error-banner" id="splitter-error" role="alert">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -111,9 +163,16 @@ const {
       </p>
 
       <div class="export-panel">
-        <div class="export-tabs">
-          <button type="button" class="export-tab-btn active" id="btn-tab-tf">Terraform</button>
-          <button type="button" class="export-tab-btn" id="btn-tab-yaml">YAML</button>
+        <div class="export-tabs" style="display: flex; gap: 0.5rem; width: 100%;">
+          <select id="export-iac-select" class="cloud-select" style="width: 100%; height: 36px; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); outline: none;">
+            <option value="tf" selected>Terraform HCL</option>
+            <option value="yaml">Ansible / YAML</option>
+            <option value="pulumi-ts">Pulumi (TypeScript)</option>
+            <option value="pulumi-py">Pulumi (Python)</option>
+            <option value="cfn">AWS CloudFormation</option>
+            <option value="cdk-ts">AWS CDK (TypeScript)</option>
+            <option value="bicep">Azure Bicep</option>
+          </select>
         </div>
         <div class="code-wrapper">
           <div class="code-copy-overlay">
@@ -127,7 +186,7 @@ const {
 </div>
 
 <script>
-  import { long2Ip, ip2Long, validateIPv4 } from '../utils/subnetMath';
+  import { long2Ip, ip2Long, validateIPv4, expandIPv6, compressIPv6 } from '../utils/subnetMath';
 
   interface SubnetNode {
     networkLong: number;
@@ -146,8 +205,12 @@ const {
     const copyJsonBtn = document.getElementById('copy-splitter-json');
     const errorBanner = document.getElementById('splitter-error');
     
-    const tfTab = document.getElementById('btn-tab-tf');
-    const yamlTab = document.getElementById('btn-tab-yaml');
+    // Preset Topologies, Dual-Stack & Advanced IaC Selectors
+    const presetSelect = document.getElementById('split-preset-templates') as HTMLSelectElement;
+    const dualStackToggle = document.getElementById('dual-stack-toggle') as HTMLInputElement;
+    const v6Wrapper = document.getElementById('dual-stack-v6-wrapper') as HTMLElement;
+    const v6BaseInput = document.getElementById('dual-stack-v6-base') as HTMLInputElement;
+    const iacSelect = document.getElementById('export-iac-select') as HTMLSelectElement;
 
     if (!baseIpInput || !baseCidrInput || !gridRoot || !tableBody) return;
 
@@ -155,7 +218,103 @@ const {
     let subnets: SubnetNode[] = [];
     let baseIp = "10.0.0.0";
     let baseCidr = 24;
-    let activeTab = 'tf';
+
+    // Preset mappings
+    const presets: Record<string, { baseIp: string; baseCidr: number; v6Base: string; subnets: { offset: number; cidr: number; label: string }[] }> = {
+      'aws-3tier': {
+        baseIp: '10.0.0.0',
+        baseCidr: 16,
+        v6Base: '2001:db8:1234::/48',
+        subnets: [
+          { offset: 0, cidr: 24, label: 'Public-Subnet-AZ1' },
+          { offset: 256, cidr: 24, label: 'Public-Subnet-AZ2' },
+          { offset: 512, cidr: 24, label: 'Public-Subnet-AZ3' },
+          { offset: 768, cidr: 24, label: 'Spare-Public' },
+          { offset: 1024, cidr: 22, label: 'Database-Subnet-AZ1' },
+          { offset: 2048, cidr: 22, label: 'Database-Subnet-AZ2' },
+          { offset: 3072, cidr: 22, label: 'Database-Subnet-AZ3' },
+          { offset: 4096, cidr: 20, label: 'Application-Subnet-AZ1' },
+          { offset: 8192, cidr: 20, label: 'Application-Subnet-AZ2' },
+          { offset: 12288, cidr: 20, label: 'Application-Subnet-AZ3' },
+          { offset: 16384, cidr: 18, label: 'Future-Expansion-App' },
+          { offset: 32768, cidr: 17, label: 'Future-VPC-Reserve' }
+        ]
+      },
+      'hub-spoke': {
+        baseIp: '192.168.0.0',
+        baseCidr: 16,
+        v6Base: '2001:db8:cafe::/48',
+        subnets: [
+          { offset: 0, cidr: 20, label: 'Hub-Transit-VPC' },
+          { offset: 4096, cidr: 20, label: 'Spoke-VPC-Production' },
+          { offset: 8192, cidr: 20, label: 'Spoke-VPC-Staging' },
+          { offset: 12288, cidr: 20, label: 'Spoke-VPC-Dev' },
+          { offset: 16384, cidr: 21, label: 'VPN-Client-Pool' },
+          { offset: 18432, cidr: 21, label: 'Shared-Services-Subnet' },
+          { offset: 20480, cidr: 20, label: 'Spare-Spoke-VPC' },
+          { offset: 24576, cidr: 19, label: 'Transit-Gateway-Attachment' },
+          { offset: 32768, cidr: 17, label: 'Future-Spoke-Expansion' }
+        ]
+      },
+      'k8s-cluster': {
+        baseIp: '172.16.0.0',
+        baseCidr: 16,
+        v6Base: '2001:db8:beef::/48',
+        subnets: [
+          { offset: 0, cidr: 18, label: 'Kubernetes-Pod-Network' },
+          { offset: 16384, cidr: 20, label: 'Kubernetes-Service-Network' },
+          { offset: 20480, cidr: 24, label: 'Control-Plane-Nodes' },
+          { offset: 20736, cidr: 24, label: 'Worker-Nodes' },
+          { offset: 20992, cidr: 23, label: 'Internal-LoadBalancers' },
+          { offset: 21504, cidr: 22, label: 'Ingress-Controller-ELB' },
+          { offset: 22528, cidr: 21, label: 'Cluster-Admin-VPN' },
+          { offset: 24576, cidr: 19, label: 'Cluster-Backup-Storage' },
+          { offset: 32768, cidr: 17, label: 'Spare-Kubernetes-Pool' }
+        ]
+      }
+    };
+
+    function validateIPv6(address: string): boolean {
+      const regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{1,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+      return regex.test(address.trim());
+    }
+
+    // Helper to calculate sequential IPv6 subnets
+    function getIPv6Subnet(baseIpCidr: string, index: number): string {
+      try {
+        const slash = baseIpCidr.lastIndexOf('/');
+        if (slash === -1) return "2001:db8::/64";
+        const ip = baseIpCidr.slice(0, slash).trim();
+        const basePrefix = parseInt(baseIpCidr.slice(slash + 1), 10);
+        if (!validateIPv6(ip) || isNaN(basePrefix) || basePrefix < 0 || basePrefix > 64) {
+          return "2001:db8::/64";
+        }
+
+        const expanded = expandIPv6(ip);
+        const parts = expanded.split(':');
+        let ipVal = 0n;
+        for (let i = 0; i < 8; i++) {
+          ipVal = (ipVal << 16n) | BigInt(parseInt(parts[i], 16));
+        }
+
+        const varBits = 64 - basePrefix;
+        if (varBits <= 0) return `${compressIPv6(expanded)}/64`;
+
+        const first64 = ipVal >> 64n;
+        const mask = (1n << BigInt(varBits)) - 1n;
+        const allocatedLow64 = (first64 & ~mask) | (BigInt(index) & mask);
+        const finalIpVal = allocatedLow64 << 64n;
+
+        const hexParts: string[] = [];
+        for (let i = 7; i >= 0; i--) {
+          const partVal = (finalIpVal >> BigInt(i * 16)) & 0xffffn;
+          hexParts.push(partVal.toString(16).padStart(4, '0'));
+        }
+        return `${compressIPv6(hexParts.join(':'))}/64`;
+      } catch {
+        return "2001:db8::/64";
+      }
+    }
 
     function initializeState() {
       baseIp = baseIpInput.value.trim();
@@ -178,6 +337,33 @@ const {
         label: "Subnet 1"
       }];
       
+      renderAll();
+    }
+
+    function loadPreset() {
+      const presetName = presetSelect.value;
+      if (presetName === 'none' || !presets[presetName]) return;
+
+      const preset = presets[presetName];
+      baseIpInput.value = preset.baseIp;
+      baseCidrInput.value = preset.baseCidr.toString();
+      baseIp = preset.baseIp;
+      baseCidr = preset.baseCidr;
+
+      v6BaseInput.value = preset.v6Base;
+
+      const baseLong = ip2Long(preset.baseIp);
+      subnets = preset.subnets.map(s => ({
+        networkLong: baseLong + s.offset,
+        cidr: s.cidr,
+        label: s.label
+      }));
+
+      // Trigger dual-stack
+      dualStackToggle.checked = true;
+      v6Wrapper.style.display = 'block';
+
+      errorBanner?.classList.remove('show');
       renderAll();
     }
 
@@ -251,6 +437,9 @@ const {
 
       subnets.sort((a, b) => a.networkLong - b.networkLong);
 
+      const isDualStack = dualStackToggle.checked;
+      const v6Base = v6BaseInput.value.trim();
+
       let gridHtml = '';
       const totalBlocksCapacity = Math.pow(2, 32 - baseCidr);
 
@@ -262,18 +451,22 @@ const {
         if (node.cidr - baseCidr <= 1) sizeClass = 'size-large';
         else if (node.cidr - baseCidr >= 4) sizeClass = 'size-small';
 
+        const v6Subnet = isDualStack ? getIPv6Subnet(v6Base, idx) : '';
+
         gridHtml += `
           <div class="subnet-block ${sizeClass}" style="flex: 1 1 ${widthPct}%; min-width: max(140px, ${widthPct}%); max-width: 100%;">
             <div class="subnet-block-highlight"></div>
             <div class="subnet-info">
               <div class="subnet-meta">
                 <span class="subnet-cidr">${long2Ip(node.networkLong)}/${node.cidr}</span>
+                ${isDualStack ? `<span style="font-size:0.7rem; color:var(--accent-network); font-family:var(--font-mono); font-weight:bold; margin-top:0.15rem; display:block;">IPv6: ${v6Subnet}</span>` : ''}
                 <input 
                   type="text" 
                   class="subnet-label-input" 
                   value="${node.label}" 
                   data-idx="${idx}" 
                   placeholder="Label segment..."
+                  style="margin-top:0.4rem;"
                 />
               </div>
             </div>
@@ -293,6 +486,8 @@ const {
         const firstUsable = node.cidr === 32 ? long2Ip(node.networkLong) : long2Ip(node.networkLong + 1);
         const lastUsable = node.cidr === 32 ? long2Ip(node.networkLong) : long2Ip(node.networkLong + size - 2);
 
+        const v6Subnet = isDualStack ? getIPv6Subnet(v6Base, idx) : '';
+
         tableHtml += `
           <tr>
             <td>
@@ -304,7 +499,10 @@ const {
                 style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.9rem; outline:none;"
               />
             </td>
-            <td><strong>${long2Ip(node.networkLong)}/${node.cidr}</strong></td>
+            <td>
+              <strong>${long2Ip(node.networkLong)}/${node.cidr}</strong>
+              ${isDualStack ? `<div style="font-size:0.75rem; color:var(--accent-network); font-family:var(--font-mono); margin-top:0.25rem;">[v6] ${v6Subnet}</div>` : ''}
+            </td>
             <td>${node.cidr >= 31 ? `${long2Ip(node.networkLong)} - ${long2Ip(node.networkLong + size - 1)}` : `${firstUsable} - ${lastUsable}`}</td>
             <td>${usableHosts.toLocaleString()}</td>
             <td>
@@ -372,8 +570,19 @@ const {
     function updateCodeSnippet() {
       if (!codeOutput) return;
 
-      if (activeTab === 'tf') {
-        let code = `# Terraform Variable & CIDR Allocation Map\nvariable "vpc_cidr" {\n  default = "${baseIp}/${baseCidr}"\n}\n\n`;
+      const format = iacSelect.value;
+      const isDualStack = dualStackToggle.checked;
+      const v6Base = v6BaseInput.value.trim();
+
+      let code = '';
+
+      if (format === 'tf') {
+        code = `# Terraform VPC Subnet Allocations\nvariable "vpc_cidr" {\n  default = "${baseIp}/${baseCidr}"\n}\n`;
+        if (isDualStack) {
+          code += `variable "vpc_ipv6_cidr" {\n  default = "${v6Base}"\n}\n`;
+        }
+        code += `\n`;
+
         subnets.forEach((node, i) => {
           const key = node.label.toLowerCase().replace(/[^a-z0-9]/g, '_') || `subnet_${i}`;
           const newBits = node.cidr - baseCidr;
@@ -382,39 +591,136 @@ const {
           const offset = node.networkLong - parentStart;
           const netNum = offset / capacityAtTarget;
 
-          code += `# Segment: ${node.label}\nresource "aws_subnet" "${key}" {\n  vpc_id     = "vpc-prod"\n  cidr_block = cidrsubnet(var.vpc_cidr, ${newBits}, ${netNum})\n}\n\n`;
+          code += `# Segment: ${node.label}\n`;
+          code += `resource "aws_subnet" "${key}" {\n`;
+          code += `  vpc_id            = "vpc-prod"\n`;
+          code += `  cidr_block        = cidrsubnet(var.vpc_cidr, ${newBits}, ${netNum})\n`;
+          if (isDualStack) {
+            code += `  ipv6_cidr_block   = cidrsubnet(var.vpc_ipv6_cidr, 16, ${i})\n`;
+            code += `  assign_ipv6_address_on_creation = true\n`;
+          }
+          code += `  tags = {\n`;
+          code += `    Name = "${node.label}"\n`;
+          code += `  }\n`;
+          code += `}\n\n`;
         });
-        codeOutput.innerText = code.trim();
-      } else {
-        let code = `vpc_base_cidr: "${baseIp}/${baseCidr}"\nallocated_subnets:\n`;
-        subnets.forEach(node => {
-          code += `  - name: "${node.label}"\n    cidr: "${long2Ip(node.networkLong)}/${node.cidr}"\n`;
+      } else if (format === 'yaml') {
+        code = `vpc_base_cidr: "${baseIp}/${baseCidr}"\n`;
+        if (isDualStack) {
+          code += `vpc_ipv6_base_cidr: "${v6Base}"\n`;
+        }
+        code += `allocated_subnets:\n`;
+        subnets.forEach((node, idx) => {
+          code += `  - name: "${node.label}"\n`;
+          code += `    cidr: "${long2Ip(node.networkLong)}/${node.cidr}"\n`;
+          if (isDualStack) {
+            code += `    ipv6_cidr: "${getIPv6Subnet(v6Base, idx)}"\n`;
+          }
         });
-        codeOutput.innerText = code.trim();
+      } else if (format === 'pulumi-ts') {
+        code = `import * as aws from "@pulumi/aws";\n\n`;
+        code += `const vpc = new aws.ec2.Vpc("vpc", {\n`;
+        code += `    cidrBlock: "${baseIp}/${baseCidr}",\n`;
+        if (isDualStack) {
+          code += `    assignGeneratedIpv6CidrBlock: true,\n`;
+        }
+        code += `});\n\n`;
+        subnets.forEach((node, i) => {
+          const key = node.label.toLowerCase().replace(/[^a-z0-9]/g, '_') || `subnet_${i}`;
+          code += `// Subnet: ${node.label}\n`;
+          code += `const ${key} = new aws.ec2.Subnet("${key}", {\n`;
+          code += `    vpcId: vpc.id,\n`;
+          code += `    cidrBlock: "${long2Ip(node.networkLong)}/${node.cidr}",\n`;
+          if (isDualStack) {
+            code += `    ipv6CidrBlock: "${getIPv6Subnet(v6Base, i)}",\n`;
+            code += `    assignIpv6AddressOnCreation: true,\n`;
+          }
+          code += `    tags: { Name: "${node.label}" },\n`;
+          code += `});\n\n`;
+        });
+      } else if (format === 'pulumi-py') {
+        code = `import pulumi_aws as aws\n\n`;
+        code += `vpc = aws.ec2.Vpc("vpc",\n`;
+        code += `    cidr_block="${baseIp}/${baseCidr}",\n`;
+        if (isDualStack) {
+          code += `    assign_generated_ipv6_cidr_block=True\n`;
+        }
+        code += `)\n\n`;
+        subnets.forEach((node, i) => {
+          const key = node.label.toLowerCase().replace(/[^a-z0-9]/g, '_') || `subnet_${i}`;
+          code += `# Subnet: ${node.label}\n`;
+          code += `${key} = aws.ec2.Subnet("${key}",\n`;
+          code += `    vpc_id=vpc.id,\n`;
+          code += `    cidr_block="${long2Ip(node.networkLong)}/${node.cidr}",\n`;
+          if (isDualStack) {
+            code += `    ipv6_cidr_block="${getIPv6Subnet(v6Base, i)}",\n`;
+            code += `    assign_ipv6_address_on_creation=True,\n`;
+          }
+          code += `    tags={"Name": "${node.label}"}\n`;
+          code += `)\n\n`;
+        });
+      } else if (format === 'cfn') {
+        code = `Resources:\n  VPC:\n    Type: AWS::EC2::VPC\n    Properties:\n      CidrBlock: ${baseIp}/${baseCidr}\n      EnableDnsSupport: true\n      EnableDnsHostnames: true\n\n`;
+        subnets.forEach((node, i) => {
+          const key = node.label.replace(/[^a-zA-Z0-9]/g, '');
+          code += `  ${key}Subnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: ${long2Ip(node.networkLong)}/${node.cidr}\n`;
+          if (isDualStack) {
+            code += `      Ipv6CidrBlock: ${getIPv6Subnet(v6Base, i)}\n`;
+            code += `      AssignIpv6AddressOnCreation: true\n`;
+          }
+          code += `      Tags:\n        - Key: Name\n          Value: ${node.label}\n\n`;
+        });
+      } else if (format === 'cdk-ts') {
+        code = `import * as ec2 from 'aws-cdk-lib/aws-ec2';\n\n// Inside Stack constructor:\n`;
+        code += `const vpc = new ec2.Vpc(this, 'Vpc', {\n  ipAddresses: ec2.IpAddresses.cidr('${baseIp}/${baseCidr}'),\n});\n\n`;
+        subnets.forEach((node, i) => {
+          const key = node.label.replace(/[^a-zA-Z0-9]/g, '');
+          code += `// Subnet: ${node.label}\n`;
+          code += `const ${key}Subnet = new ec2.Subnet(this, '${key}Subnet', {\n`;
+          code += `  vpcId: vpc.vpcId,\n`;
+          code += `  cidrBlock: '${long2Ip(node.networkLong)}/${node.cidr}',\n`;
+          code += `  availabilityZone: 'us-east-1a',\n`;
+          code += `});\n\n`;
+        });
+      } else if (format === 'bicep') {
+        code = `resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {\n  name: 'vnet-prod'\n  location: resourceGroup().location\n  properties: {\n    addressSpace: {\n      addressPrefixes: [\n        '${baseIp}/${baseCidr}'\n`;
+        if (isDualStack) {
+          code += `        '${v6Base}'\n`;
+        }
+        code += `      ]\n    }\n    subnets: [\n`;
+        subnets.forEach((node, idx) => {
+          const key = node.label.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          code += `      {\n        name: '${key}'\n        properties: {\n`;
+          if (isDualStack) {
+            code += `          addressPrefixes: [\n            '${long2Ip(node.networkLong)}/${node.cidr}'\n            '${getIPv6Subnet(v6Base, idx)}'\n          ]\n`;
+          } else {
+            code += `          addressPrefix: '${long2Ip(node.networkLong)}/${node.cidr}'\n`;
+          }
+          code += `        }\n      }\n`;
+        });
+        code += `    ]\n  }\n}`;
       }
+
+      codeOutput.innerText = code.trim();
     }
 
     baseIpInput.oninput = initializeState;
     baseCidrInput.oninput = initializeState;
     if (resetBtn) resetBtn.onclick = initializeState;
 
-    if (tfTab) {
-      tfTab.onclick = () => {
-        tfTab.classList.add('active');
-        yamlTab?.classList.remove('active');
-        activeTab = 'tf';
-        updateCodeSnippet();
-      };
-    }
+    presetSelect.onchange = loadPreset;
+    
+    dualStackToggle.onchange = () => {
+      if (dualStackToggle.checked) {
+        v6Wrapper.style.display = 'block';
+      } else {
+        v6Wrapper.style.display = 'none';
+      }
+      renderAll();
+    };
 
-    if (yamlTab) {
-      yamlTab.onclick = () => {
-        yamlTab.classList.add('active');
-        tfTab?.classList.remove('active');
-        activeTab = 'yaml';
-        updateCodeSnippet();
-      };
-    }
+    v6BaseInput.oninput = renderAll;
+    iacSelect.onchange = renderAll;
 
     if (copyCodeBtn) {
       copyCodeBtn.onclick = async () => {
@@ -431,11 +737,14 @@ const {
 
     if (copyJsonBtn) {
       copyJsonBtn.onclick = async () => {
-        const formatted = subnets.map(node => ({
+        const isDualStack = dualStackToggle.checked;
+        const v6Base = v6BaseInput.value.trim();
+        const formatted = subnets.map((node, idx) => ({
           label: node.label,
           cidr: `${long2Ip(node.networkLong)}/${node.cidr}`,
           network: long2Ip(node.networkLong),
-          prefix: node.cidr
+          prefix: node.cidr,
+          ...(isDualStack ? { ipv6_cidr: getIPv6Subnet(v6Base, idx) } : {})
         }));
         await navigator.clipboard.writeText(JSON.stringify(formatted, null, 2));
         copyJsonBtn.innerText = 'Copied!';
@@ -446,6 +755,45 @@ const {
         }, 2000);
       };
     }
+
+    // Keyboard Shortcuts for VisualSplitter
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + C (Copy all JSON)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyC') {
+        e.preventDefault();
+        copyJsonBtn?.click();
+      }
+      
+      // Arrow Up/Down to adjust base CIDR (when not typing in a text field)
+      const focused = document.activeElement;
+      const isInputText = focused && (
+        focused.tagName === 'TEXTAREA' || 
+        (focused.tagName === 'INPUT' && (focused as HTMLInputElement).type === 'text')
+      );
+      if (!isInputText && baseCidrInput) {
+        let val = parseInt(baseCidrInput.value, 10);
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (val < 30) {
+            val++;
+            baseCidrInput.value = val.toString();
+            initializeState();
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (val > 8) {
+            val--;
+            baseCidrInput.value = val.toString();
+            initializeState();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('astro:before-swap', () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }, { once: true });
 
     initializeState();
   }

@@ -5,6 +5,7 @@ import {
   languages,
   type SupportedLanguage,
 } from "../utils/i18n";
+import PrivacySettings from "../components/PrivacySettings.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const {
-  lang = "en",
+  lang = (Astro.currentLocale as SupportedLanguage) || "en",
   title = "Free IP Subnet Calculator & CIDR Planner | DevSubnet",
   description = "Free online IPv4 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly.",
   canonicalUrl = Astro.url.href,
@@ -58,43 +59,62 @@ const currentLangInfo = languages[lang] || languages.en;
     <!-- Resilient Non-blocking Google Analytics & Telemetry (Safe from Ad-blocker Rejections) -->
     <script is:inline>
       try {
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          try {
-            window.dataLayer.push(arguments);
-          } catch (e) {
-            // Silently suppress telemetry exceptions
-          }
-        }
-        window.gtag = gtag;
-
-        function initAnalytics() {
-          try {
-            const gaScript = document.createElement("script");
-            gaScript.async = true;
-            gaScript.defer = true;
-            gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
-            gaScript.onerror = function () {
-              // Gracefully swallow ad-blocker (uBlock, Brave, Pi-hole) net::ERR_BLOCKED_BY_CLIENT
-            };
-            document.head.appendChild(gaScript);
-
-            gtag("js", new Date());
-            gtag("config", "G-F2T4WC5Y9V", {
-              transport_url: window.location.origin + "/api/collect"
-            });
-          } catch (e) {
-            // Silently swallow analytics init errors
-          }
-        }
-
-        if ("requestIdleCallback" in window) {
-          requestIdleCallback(initAnalytics, { timeout: 4000 });
+        const consent = localStorage.getItem("devsubnet-analytics-consent");
+        if (consent === "false") {
+          window['ga-disable-G-F2T4WC5Y9V'] = true;
         } else {
-          setTimeout(initAnalytics, 2000);
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            try {
+              window.dataLayer.push(arguments);
+            } catch (e) {
+              // Silently suppress telemetry exceptions
+            }
+          }
+          window.gtag = gtag;
+
+          function initAnalytics() {
+            try {
+              const gaScript = document.createElement("script");
+              gaScript.async = true;
+              gaScript.defer = true;
+              gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
+              gaScript.onerror = function () {
+                // Gracefully swallow ad-blocker (uBlock, Brave, Pi-hole) net::ERR_BLOCKED_BY_CLIENT
+              };
+              document.head.appendChild(gaScript);
+
+              gtag("js", new Date());
+              gtag("config", "G-F2T4WC5Y9V", {
+                transport_url: window.location.origin + "/api/collect"
+              });
+            } catch (e) {
+              // Silently swallow analytics init errors
+            }
+          }
+
+          // Perf Fix C: Defer until after load event, then yield to idle time
+          window.addEventListener('load', function() {
+            if ("requestIdleCallback" in window) {
+              requestIdleCallback(initAnalytics, { timeout: 4000 });
+            } else {
+              setTimeout(initAnalytics, 2000);
+            }
+          }, { once: true });
         }
       } catch (e) {
         // Telemetry fail-safe
+      }
+    </script>
+
+    <!-- PWA Offline Service Worker Registration -->
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+            .catch(err => console.error('PWA Service Worker registration failed:', err));
+        });
       }
     </script>
 
@@ -218,5 +238,6 @@ const currentLangInfo = languages[lang] || languages.en;
     </div>
 
     <slot />
+    <PrivacySettings />
   </body>
 </html>

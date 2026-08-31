@@ -116,6 +116,101 @@ import NavBar from '../components/NavBar.astro';
         </div>
       </section>
 
+      <!-- CNI Pod Sizing & Density Calculator Section -->
+      <section class="calculator-panel" style="margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">02</span><h2>CNI Pod Sizing & Density Calculator</h2></div>
+          <span class="live-label" style="background-color:rgba(145, 80, 245, 0.12); color:var(--accent-host);">POD DENSITY SIZER</span>
+        </div>
+
+        <div class="k8s-calc-grid">
+          <!-- Inputs Column -->
+          <div class="k8s-inputs-col">
+            <div class="field-group">
+              <label for="density-cni-type">CNI Plugin & Mode</label>
+              <select id="density-cni-type" class="cloud-select">
+                <option value="calico" selected>Project Calico Overlay (IPv4)</option>
+                <option value="cilium-v4">Cilium Overlay (IPv4)</option>
+                <option value="cilium-v6">Cilium Overlay (IPv6 Prefix Mode)</option>
+                <option value="awsvpc-std">AWS VPC CNI (Standard Mode)</option>
+                <option value="awsvpc-prefix">AWS VPC CNI (Prefix Delegation Mode)</option>
+                <option value="azurecni">Azure CNI VNet Integration</option>
+              </select>
+              <span class="field-hint">Defines the address allocation boundaries per worker node.</span>
+            </div>
+
+            <div class="field-group" id="density-cidr-wrapper">
+              <label for="density-node-cidr">Chosen Node CIDR size</label>
+              <select id="density-node-cidr" class="cloud-select">
+                <option value="24" selected>/24 (254 usable IPs)</option>
+              </select>
+              <span class="field-hint">The prefix size allocated to each individual node for Pod IPs.</span>
+            </div>
+
+            <div class="field-group" id="density-aws-wrapper" style="display: none;">
+              <label for="density-aws-instance">AWS Instance Type</label>
+              <select id="density-aws-instance" class="cloud-select">
+                <option value="t3.micro">t3.micro (2 ENIs, 2 IPs/ENI)</option>
+                <option value="t3.medium" selected>t3.medium (3 ENIs, 6 IPs/ENI)</option>
+                <option value="m5.large">m5.large (3 ENIs, 10 IPs/ENI)</option>
+                <option value="m5.xlarge">m5.xlarge (4 ENIs, 15 IPs/ENI)</option>
+                <option value="m5.4xlarge">m5.4xlarge (8 ENIs, 30 IPs/ENI)</option>
+                <option value="custom">Custom Configuration...</option>
+              </select>
+              <span class="field-hint">Determines hardware-bound ENI and IP limits.</span>
+            </div>
+
+            <div class="field-group" id="density-custom-aws-wrapper" style="display: none; gap: 1rem;">
+              <div style="flex: 1;">
+                <label for="density-eni-count" style="margin-bottom: 0.35rem; display: block;">ENI Count</label>
+                <input type="number" id="density-eni-count" value="3" min="1" max="20" class="ip-input" style="width: 100%;" />
+              </div>
+              <div style="flex: 1;">
+                <label for="density-ip-per-eni" style="margin-bottom: 0.35rem; display: block;">IPs/ENI</label>
+                <input type="number" id="density-ip-per-eni" value="6" min="1" max="50" class="ip-input" style="width: 100%;" />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="density-kubelet-limit">Kubelet Max Pods Limit</label>
+              <input type="number" id="density-kubelet-limit" value="110" min="1" max="500" class="ip-input" />
+              <span class="field-hint">Kubernetes kubelet hard limit (Standard is 110, High density is 250).</span>
+            </div>
+          </div>
+
+          <!-- Diagnostics Column -->
+          <div class="k8s-diagnostics-col">
+            <div class="diagnostic-card" style="height: 100%;">
+              <div class="diag-header">
+                <span class="diag-title">Per-Node Sizing Metrics</span>
+                <span class="diag-badge" style="background: rgba(145, 80, 245, 0.15); color: var(--accent-host);">CNI METRICS</span>
+              </div>
+
+              <div class="diag-metric-row">
+                <span>IP Allocation from Subnet:</span>
+                <strong id="density-out-ip-cap">256 IPs</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>CNI Plugin Limit:</span>
+                <strong id="density-out-cni-limit">110 Pods</strong>
+              </div>
+              <div class="diag-metric-row">
+                <span>Kubelet Ceiling:</span>
+                <strong id="density-out-kubelet-limit">110 Pods</strong>
+              </div>
+              <div class="diag-metric-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+                <span>Usable Pods per Node:</span>
+                <strong id="density-out-usable-pods" style="color:var(--accent-network); font-size: 1.05rem;">110 Pods</strong>
+              </div>
+
+              <div id="density-out-status" class="diag-warning" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--text-primary); margin-top: 0.5rem; line-height: 1.5;">
+                Optimizing layout metrics...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Technical Architecture Section -->
       <section class="guide-section">
         <div class="guide-sticky">
@@ -490,6 +585,159 @@ maxPods: ${maxPodsPerNode}`;
     calculateK8sArchitecture();
   }
 
-  document.addEventListener('astro:page-load', setupK8sArchitecture);
-  setupK8sArchitecture();
+  function setupCniSizing() {
+    const cniSelect = document.getElementById('density-cni-type') as HTMLSelectElement;
+    const cidrWrapper = document.getElementById('density-cidr-wrapper') as HTMLElement;
+    const cidrSelect = document.getElementById('density-node-cidr') as HTMLSelectElement;
+    const awsWrapper = document.getElementById('density-aws-wrapper') as HTMLElement;
+    const awsInstanceSelect = document.getElementById('density-aws-instance') as HTMLSelectElement;
+    const customAwsWrapper = document.getElementById('density-custom-aws-wrapper') as HTMLElement;
+    const eniInput = document.getElementById('density-eni-count') as HTMLInputElement;
+    const ipPerEniInput = document.getElementById('density-ip-per-eni') as HTMLInputElement;
+    const kubeletLimitInput = document.getElementById('density-kubelet-limit') as HTMLInputElement;
+
+    const outIpCap = document.getElementById('density-out-ip-cap');
+    const outCniLimit = document.getElementById('density-out-cni-limit');
+    const outKubeletLimit = document.getElementById('density-out-kubelet-limit');
+    const outUsablePods = document.getElementById('density-out-usable-pods');
+    const outStatus = document.getElementById('density-out-status');
+
+    if (!cniSelect) return;
+
+    const awsInstances: Record<string, { enis: number; ips: number }> = {
+      't3.micro': { enis: 2, ips: 2 },
+      't3.medium': { enis: 3, ips: 6 },
+      'm5.large': { enis: 3, ips: 10 },
+      'm5.xlarge': { enis: 4, ips: 15 },
+      'm5.4xlarge': { enis: 8, ips: 30 },
+      'custom': { enis: 3, ips: 6 }
+    };
+
+    function updateFieldsVisibility() {
+      const cni = cniSelect.value;
+      if (cni === 'awsvpc-std' || cni === 'awsvpc-prefix') {
+        awsWrapper.style.display = 'block';
+        cidrWrapper.style.display = 'none';
+        const awsVal = awsInstanceSelect.value;
+        if (awsVal === 'custom') {
+          customAwsWrapper.style.display = 'flex';
+        } else {
+          customAwsWrapper.style.display = 'none';
+          if (awsInstances[awsVal]) {
+            eniInput.value = awsInstances[awsVal].enis.toString();
+            ipPerEniInput.value = awsInstances[awsVal].ips.toString();
+          }
+        }
+      } else {
+        awsWrapper.style.display = 'none';
+        customAwsWrapper.style.display = 'none';
+        cidrWrapper.style.display = 'block';
+
+        // Load correct prefix choices (IPv4 vs IPv6)
+        let html = '';
+        if (cni === 'cilium-v6') {
+          html = `
+            <option value="112" selected>/112 (65,536 IPs per Node)</option>
+            <option value="116">/116 (4,096 IPs per Node)</option>
+            <option value="120">/120 (256 IPs per Node)</option>
+            <option value="124">/124 (16 IPs per Node)</option>
+            <option value="128">/128 (1 IP per Node)</option>
+          `;
+        } else {
+          html = `
+            <option value="22">/22 (1,022 usable IPs)</option>
+            <option value="23">/23 (510 usable IPs)</option>
+            <option value="24" selected>/24 (254 usable IPs)</option>
+            <option value="25">/25 (126 usable IPs)</option>
+            <option value="26">/26 (62 usable IPs)</option>
+            <option value="27">/27 (30 usable IPs)</option>
+            <option value="28">/28 (14 usable IPs)</option>
+          `;
+        }
+        cidrSelect.innerHTML = html;
+      }
+    }
+
+    function calculate() {
+      const cni = cniSelect.value;
+      const kubeletLimit = parseInt(kubeletLimitInput.value || '110', 10);
+      
+      let ipCapacity = 0;
+      let cniLimit = 0;
+      let cniLabel = '';
+
+      if (cni === 'awsvpc-std' || cni === 'awsvpc-prefix') {
+        const enis = parseInt(eniInput.value || '0', 10);
+        const ips = parseInt(ipPerEniInput.value || '0', 10);
+
+        if (cni === 'awsvpc-std') {
+          // Standard AWS VPC CNI: ENIs * (IPs - 1) + 2
+          cniLimit = enis * (ips - 1) + 2;
+          cniLabel = `AWS ENI standard mode limit`;
+        } else {
+          // Prefix delegation mode: ENIs * ((IPs - 1) * 16) + 2
+          cniLimit = enis * ((ips - 1) * 16) + 2;
+          cniLabel = `AWS ENI prefix mode limit`;
+        }
+        ipCapacity = cniLimit; // drawn from subnet
+      } else {
+        const prefix = parseInt(cidrSelect.value || '24', 10);
+        if (cni === 'cilium-v6') {
+          ipCapacity = Math.pow(2, 128 - prefix);
+          cniLimit = ipCapacity;
+          cniLabel = `IPv6 overlay size limit`;
+        } else {
+          // IPv4 Overlay
+          ipCapacity = Math.max(0, Math.pow(2, 32 - prefix) - 2);
+          cniLimit = ipCapacity;
+          cniLabel = `IPv4 overlay size limit`;
+        }
+      }
+
+      const usablePods = Math.min(ipCapacity, cniLimit, kubeletLimit);
+
+      if (outIpCap) outIpCap.innerText = ipCapacity.toLocaleString() + ' IPs';
+      if (outCniLimit) outCniLimit.innerText = cniLimit.toLocaleString() + ' Pods';
+      if (outKubeletLimit) outKubeletLimit.innerText = kubeletLimit.toLocaleString() + ' Pods';
+      if (outUsablePods) outUsablePods.innerText = usablePods.toLocaleString() + ' Pods per Node';
+
+      if (outStatus) {
+        if (usablePods < kubeletLimit) {
+          outStatus.innerHTML = `<span style="color:var(--accent-danger, #f43f5e); font-weight:bold;">⚠️ Exceeded limits!</span> Pod capacity is restricted to <strong>${usablePods}</strong> by CNI/IP limits. Consider expanding the Node CIDR prefix size or upgrading instance type.`;
+        } else if (ipCapacity > kubeletLimit * 4) {
+          outStatus.innerHTML = `<span style="color:var(--accent-warning, #f59e0b); font-weight:bold;">💡 Oversized Subnet!</span> Subnet allocates <strong>${ipCapacity}</strong> IPs, but Kubelet limits pods to <strong>${kubeletLimit}</strong>. You are wasting IP addresses. Consider reducing the Node CIDR size.`;
+        } else {
+          outStatus.innerHTML = `<span style="color:var(--accent-network, #38bdf8); font-weight:bold;">✅ Optimal Sizing!</span> Node CIDR size matches Kubelet and CNI limits perfectly with minimal address waste.`;
+        }
+      }
+    }
+
+    cniSelect.onchange = () => {
+      updateFieldsVisibility();
+      calculate();
+    };
+
+    awsInstanceSelect.onchange = () => {
+      updateFieldsVisibility();
+      calculate();
+    };
+
+    [cidrSelect, eniInput, ipPerEniInput, kubeletLimitInput].forEach(el => {
+      if (el) {
+        el.oninput = calculate;
+        el.onchange = calculate;
+      }
+    });
+
+    updateFieldsVisibility();
+    calculate();
+  }
+
+  function initCalculators() {
+    setupK8sArchitecture();
+    setupCniSizing();
+  }
+
+  document.addEventListener('astro:page-load', initCalculators);
+  initCalculators();
 </script>

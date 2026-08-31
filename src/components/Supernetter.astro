@@ -40,6 +40,26 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
       <p class="aside-copy">
         A single summary route that covers all listed networks reduces routing table size and accelerates convergence. Some networks may remain separate if they are not aggregatable.
       </p>
+
+      <!-- BGP Bounding Supernet Result -->
+      <div id="bgp-supernet-card" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 0.5rem; display: none;">
+        <h3 style="font-size: 0.85rem; text-transform: uppercase; font-family: var(--font-display); color: var(--accent-network, #38bdf8); margin-bottom: 0.75rem; font-weight: bold; letter-spacing: 0.05em;">Smallest Bounding Supernet (BGP Summary)</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">Supernet CIDR:</span>
+            <strong id="bgp-supernet-cidr" style="font-family: var(--font-mono); font-size: 1.15rem; color: var(--text-primary);">192.168.0.0/22</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">IP Range:</span>
+            <span id="bgp-supernet-range" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-primary);">192.168.0.0 - 192.168.3.255</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">Space Efficiency:</span>
+            <span id="bgp-supernet-efficiency" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-primary);">50.0% (512 / 1024 IPs)</span>
+          </div>
+        </div>
+      </div>
+
       <div class="guide-table-wrapper">
         <table class="guide-table">
           <thead>
@@ -109,6 +129,42 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
 
       blocks.sort((a, b) => a.network - b.network || a.cidr - b.cidr);
 
+      // 1. Calculate Smallest Bounding Supernet
+      const minStart = Math.min(...blocks.map(b => b.network));
+      const maxEnd = Math.max(...blocks.map(b => b.network + Math.pow(2, 32 - b.cidr) - 1));
+      const totalInputIps = blocks.reduce((sum, b) => sum + Math.pow(2, 32 - b.cidr), 0);
+
+      let boundingCidr = 32 - Math.ceil(Math.log2(maxEnd - minStart + 1));
+      if (boundingCidr < 0) boundingCidr = 0;
+      let boundingNetwork = 0;
+      while (boundingCidr >= 0) {
+        const mask = boundingCidr === 0 ? 0 : (~0 << (32 - boundingCidr)) >>> 0;
+        boundingNetwork = (minStart & mask) >>> 0;
+        const end = boundingNetwork + Math.pow(2, 32 - boundingCidr) - 1;
+        if (end >= maxEnd) {
+          break;
+        }
+        boundingCidr--;
+      }
+
+      const boundingEnd = boundingNetwork + Math.pow(2, 32 - boundingCidr) - 1;
+      const boundingSize = Math.pow(2, 32 - boundingCidr);
+      const efficiency = (totalInputIps / boundingSize) * 100;
+
+      // Update Bounding Supernet UI Elements
+      const bgpCard = document.getElementById('bgp-supernet-card');
+      const bgpCidr = document.getElementById('bgp-supernet-cidr');
+      const bgpRange = document.getElementById('bgp-supernet-range');
+      const bgpEfficiency = document.getElementById('bgp-supernet-efficiency');
+
+      if (bgpCard && bgpCidr && bgpRange && bgpEfficiency) {
+        bgpCidr.innerText = `${long2Ip(boundingNetwork)}/${boundingCidr}`;
+        bgpRange.innerText = `${long2Ip(boundingNetwork)} - ${long2Ip(boundingEnd)}`;
+        bgpEfficiency.innerText = `${efficiency.toFixed(1)}% (${totalInputIps.toLocaleString()} / ${boundingSize.toLocaleString()} IPs)`;
+        bgpCard.style.display = 'block';
+      }
+
+      // 2. Collapse contiguous blocks (existing algorithm)
       let aggregated = blocks.map(b => ({ ...b }));
       let changed = true;
       while (changed) {
@@ -140,7 +196,17 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
       tableBody.innerHTML = html || '<tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No results.</td></tr>';
 
       if (codeOutput) {
-        let code = '# Supernet summary routes\n';
+        const bNet = long2Ip(boundingNetwork);
+        const bMask = long2Ip(boundingCidr === 0 ? 0 : (~0 << (32 - boundingCidr)) >>> 0);
+        let code = `# BGP Route Summarization & Aggregate Configs\n`;
+        code += `# Cisco IOS BGP aggregate:\n`;
+        code += `router bgp 65001\n`;
+        code += `  aggregate-address ${bNet} ${bMask} summary-only\n\n`;
+        code += `# Juniper Static Route for advertisement:\n`;
+        code += `set routing-options static route ${bNet}/${boundingCidr} discard\n\n`;
+        code += `# Cisco static null route to prevent routing loops:\n`;
+        code += `ip route ${bNet} ${bMask} Null0\n\n`;
+        code += `# Individual collapsed summary routes:\n`;
         aggregated.forEach(a => {
           code += `ip route ${long2Ip(a.network)}/${a.cidr} Null0\n`;
         });
@@ -154,6 +220,8 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
         input.value = '';
         tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Aggregate.</td></tr>';
         if (codeOutput) codeOutput.innerText = '# Summary route export';
+        const bgpCard = document.getElementById('bgp-supernet-card');
+        if (bgpCard) bgpCard.style.display = 'none';
       };
     }
     if (copyBtn) {

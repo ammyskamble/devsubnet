@@ -3,31 +3,31 @@ import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
-const t = translations.nl;
+const t = translations.pt;
 ---
 <Layout
-  lang="nl"
-  title="CIDR Cheat Sheet – Volledige IPv4 Subnet Referentietabel | DevSubnet"
-  description="Volledige IPv4 CIDR cheat sheet van /0 tot /32 met subnetmaskers, wildcard-maskers, totale IP's en bruikbare hosts."
+  lang="pt"
+  title="Tabela de Referência CIDR – Sub-redes IPv4 Completas | DevSubnet"
+  description="Tabela de referência CIDR IPv4 completa de /0 a /32 com máscaras de sub-rede, máscaras curinga, IPs totais e hosts utilizáveis."
 >
   <div class="app-shell">
-    <NavBar path="cheatsheet" lang="nl" />
+    <NavBar path="cheatsheet" lang="pt" />
     <main>
       <section class="intro" aria-labelledby="page-title">
-        <div class="eyebrow">REFERENTIE / CIDR CHEAT SHEET</div>
-        <h1 id="page-title">IPv4 CIDR Cheat Sheet</h1>
-        <p class="lede">Alle prefixlengtes van /0 tot /32 met subnetmasker, wildcard-masker, totaal aantal adressen en bruikbare hosts in één overzicht.</p>
+        <div class="eyebrow">REFERÊNCIA / TABELA CIDR</div>
+        <h1 id="page-title">Tabela de Referência CIDR IPv4</h1>
+        <p class="lede">Todos os comprimentos de prefixo de /0 a /32 com sua máscara de sub-rede, máscara curinga (wildcard), endereços totais e hosts disponíveis.</p>
       </section>
 
       <section class="calculator-panel" style="gap: 1.5rem; margin-bottom: 2.5rem;">
         <div class="panel-heading">
-          <div><span class="step">01</span><h2>Volledige Prefix Referentie</h2></div>
+          <div><span class="step">01</span><h2>Referência Completa de Prefixos</h2></div>
           <span class="live-label">/0 – /32</span>
         </div>
         <div class="guide-table-wrapper">
           <table class="guide-table">
             <thead>
-              <tr><th>CIDR</th><th>Subnetmasker</th><th>Wildcard</th><th>Totaal IP's</th><th>Bruikbare Hosts</th></tr>
+              <tr><th>CIDR</th><th>Máscara de Sub-rede</th><th>Curinga (Wildcard)</th><th>Total de IPs</th><th>Hosts Utilizáveis</th></tr>
             </thead>
             <tbody>
               <tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1</td><td>1</td></tr>
@@ -55,15 +55,15 @@ const t = translations.nl;
       </section>
 
       <section class="guide-section">
-        <div class="guide-sticky"><h2>Hoe CIDR te <em>gebruiken</em></h2></div>
+        <div class="guide-sticky"><h2>Como <em>usar</em> o CIDR</h2></div>
         <div class="guide-content">
           <div class="guide-block">
-            <h3>Formule voor bruikbare hosts</h3>
-            <p>Bruikbare hosts = 2<sup>(32 − prefix)</sup> − 2. Elk subnet verliest standaard 2 adressen: het netwerkadres en het broadcastadres.</p>
+            <h3>Fórmula de hosts utilizáveis</h3>
+            <p>Hosts utilizáveis = 2<sup>(32 − prefixo)</sup> − 2. Cada sub-rede perde dois endereços: o identificador de rede (primeiro) e o broadcast (último).</p>
           </div>
           <div class="guide-block">
-            <h3>Interactieve Calculator</h3>
-            <p>Gebruik onze <a href="/nl/">IPv4 subnet calculator</a> voor real-time berekeningen inclusief cloud VPC reserveringen voor AWS, Azure en GCP.</p>
+            <h3>Calculadora Interativa</h3>
+            <p>Experimente nossa <a href="/pt/">Calculadora IPv4</a> para calcular intervalos em tempo real com reservas de nuvem para AWS, Azure e GCP.</p>
           </div>
         </div>
       </section>
@@ -75,7 +75,7 @@ const t = translations.nl;
         <a href="/contact">{t.footer.contact}</a>
         <a href="/privacy">{t.footer.privacy}</a>
         <a href="/terms">{t.footer.terms}</a>
-        <a href="/nl/faq">{t.footer.faq}</a>
+        <a href="/pt/faq">{t.footer.faq}</a>
       </div>
       <span>{t.footer.noData}</span>
     </footer>

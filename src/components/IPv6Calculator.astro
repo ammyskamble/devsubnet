@@ -333,6 +333,69 @@ const {
       }
     }
     
+    // Keyboard Navigation & Shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + C (Copy primary Usable Host Range / Bounds)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyC') {
+        const rangeEl = document.getElementById('v6-res-range');
+        if (rangeEl) {
+          e.preventDefault();
+          const text = rangeEl.innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            const flash = document.createElement('div');
+            flash.textContent = 'Copied Address Range: ' + text;
+            flash.style.position = 'fixed';
+            flash.style.bottom = '20px';
+            flash.style.right = '20px';
+            flash.style.background = 'var(--accent-highlight)';
+            flash.style.color = '#0d111c';
+            flash.style.padding = '0.5rem 1rem';
+            flash.style.borderRadius = 'var(--radius-sm)';
+            flash.style.zIndex = '99999';
+            flash.style.fontFamily = 'var(--font-sans)';
+            flash.style.fontSize = '0.85rem';
+            flash.style.fontWeight = 'bold';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 2000);
+          });
+        }
+      }
+
+      // Arrow Up/Down to adjust CIDR slider (when not typing in a text field)
+      const focused = document.activeElement;
+      const isInputText = focused && (
+        focused.tagName === 'TEXTAREA' || 
+        (focused.tagName === 'INPUT' && (focused as HTMLInputElement).type === 'text')
+      );
+      if (!isInputText) {
+        let val = parseInt(v6PrefixSlider.value, 10);
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (val < 128) {
+            val++;
+            v6PrefixSlider.value = val.toString();
+            v6PrefixInput.value = val.toString();
+            calculateIPv6();
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (val > 0) {
+            val--;
+            v6PrefixSlider.value = val.toString();
+            v6PrefixInput.value = val.toString();
+            calculateIPv6();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Clean up event listener when page navigates
+    document.addEventListener('astro:before-swap', () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }, { once: true });
+
     calculateIPv6();
   }
 

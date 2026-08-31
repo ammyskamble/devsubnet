@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.it;
+---
+<Layout
+  lang="it"
+  title="Tabella di Riferimento CIDR – Subnet IPv4 Complete | DevSubnet"
+  description="Tabella di riferimento CIDR IPv4 completa da /0 a /32 con maschere di subnet, maschere wildcard, IP totali e host utilizzabili."
+>
+  <div class="app-shell">
+    <NavBar path="cheatsheet" lang="it" />
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">RIFERIMENTO / TABELLA CIDR</div>
+        <h1 id="page-title">Tabella di Riferimento CIDR IPv4</h1>
+        <p class="lede">Tutte le lunghezze di prefisso da /0 a /32 con la loro maschera di subnet, maschera wildcard (wildcard), indirizzi totali e host disponibili.</p>
+      </section>
+
+      <section class="calculator-panel" style="gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Riferimento Completo dei Prefissi</h2></div>
+          <span class="live-label">/0 – /32</span>
+        </div>
+        <div class="guide-table-wrapper">
+          <table class="guide-table">
+            <thead>
+              <tr><th>CIDR</th><th>Maschera di Subnet</th><th>Wildcard</th><th>IP Totali</th><th>Host Utilizzabili</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1</td><td>1</td></tr>
+              <tr><td>/31</td><td>255.255.255.254</td><td>0.0.0.1</td><td>2</td><td>2</td></tr>
+              <tr><td>/30</td><td>255.255.255.252</td><td>0.0.0.3</td><td>4</td><td>2</td></tr>
+              <tr><td>/29</td><td>255.255.255.248</td><td>0.0.0.7</td><td>8</td><td>6</td></tr>
+              <tr><td>/28</td><td>255.255.255.240</td><td>0.0.0.15</td><td>16</td><td>14</td></tr>
+              <tr><td>/27</td><td>255.255.255.224</td><td>0.0.0.31</td><td>32</td><td>30</td></tr>
+              <tr><td>/26</td><td>255.255.255.192</td><td>0.0.0.63</td><td>64</td><td>62</td></tr>
+              <tr><td>/25</td><td>255.255.255.128</td><td>0.0.0.127</td><td>128</td><td>126</td></tr>
+              <tr><td>/24</td><td>255.255.255.0</td><td>0.0.0.255</td><td>256</td><td>254</td></tr>
+              <tr><td>/23</td><td>255.255.254.0</td><td>0.0.1.255</td><td>512</td><td>510</td></tr>
+              <tr><td>/22</td><td>255.255.252.0</td><td>0.0.3.255</td><td>1,024</td><td>1,022</td></tr>
+              <tr><td>/21</td><td>255.255.248.0</td><td>0.0.7.255</td><td>2,048</td><td>2,046</td></tr>
+              <tr><td>/20</td><td>255.255.240.0</td><td>0.0.15.255</td><td>4,096</td><td>4,094</td></tr>
+              <tr><td>/19</td><td>255.255.224.0</td><td>0.0.31.255</td><td>8,192</td><td>8,190</td></tr>
+              <tr><td>/18</td><td>255.255.192.0</td><td>0.0.63.255</td><td>16,384</td><td>16,382</td></tr>
+              <tr><td>/17</td><td>255.255.128.0</td><td>0.0.127.255</td><td>32,768</td><td>32,766</td></tr>
+              <tr><td>/16</td><td>255.255.0.0</td><td>0.0.255.255</td><td>65,536</td><td>65,534</td></tr>
+              <tr><td>/8</td><td>255.0.0.0</td><td>0.255.255.255</td><td>16,777,216</td><td>16,777,214</td></tr>
+              <tr><td>/0</td><td>0.0.0.0</td><td>255.255.255.255</td><td>4,294,967,296</td><td>4,294,967,294</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="guide-sticky"><h2>Come <em>usare</em> il CIDR</h2></div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>Formula per gli host utilizzabili</h3>
+            <p>Host utilizzabili = 2<sup>(32 − prefisso)</sup> − 2. Ciascuna subnet perde due indirizzi: l'identificatore di rete (il primo) e il broadcast (l'ultimo).</p>
+          </div>
+          <div class="guide-block">
+            <h3>Calcolatore Interattivo</h3>
+            <p>Prova il nostro <a href="/it/">Calcolatore IPv4</a> per calcolare gli intervalli in tempo real con le prenotazioni cloud per AWS, Azure e GCP.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>{t.footer.tagline}</span>
+      <div class="footer-links">
+        <a href="/about">{t.footer.about}</a>
+        <a href="/contact">{t.footer.contact}</a>
+        <a href="/privacy">{t.footer.privacy}</a>
+        <a href="/terms">{t.footer.terms}</a>
+        <a href="/it/faq">{t.footer.faq}</a>
+      </div>
+      <span>{t.footer.noData}</span>
+    </footer>
+  </div>
+</Layout>

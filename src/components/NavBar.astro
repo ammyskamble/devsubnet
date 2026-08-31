@@ -23,6 +23,8 @@ const primaryLinks = [
 ];
 
 const moreTools = [
+  { href: `/what-is-a-subnet`, label: "What is a Subnet?", key: "what-is-a-subnet" },
+  { href: `/subnet-cheat-sheet`, label: "Subnet Cheat Sheet", key: "subnet-cheat-sheet" },
   { href: `/terraform-subnet-planner`, label: t.nav.terraform, key: "terraform" },
   { href: `/k8s-cidr-calculator`, label: t.nav.k8sCidr, key: "k8s-cidr" },
   { href: `/vlsm-calculator`, label: t.nav.vlsm, key: "vlsm" },
@@ -35,14 +37,15 @@ const moreTools = [
 ];
 
 // Resolve the current path to a key for active-state highlighting
-const pathKey = path.split('/').filter(p => !['de', 'es', 'ja', 'nl'].includes(p))[0] || 'ipv4';
+const nonDefaultLangs = Object.keys(languages).filter(l => l !== 'en');
+const pathKey = path.split('/').filter(p => !nonDefaultLangs.includes(p))[0] || 'ipv4';
 function isActive(item: { href: string; key: string }): boolean {
   if (pathKey === 'ipv4' || pathKey === '') return item.key === 'ipv4';
   return item.key === pathKey;
 }
 
 const currentPathname = Astro.url.pathname;
-const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
+const availableLangs = Object.keys(languages) as SupportedLanguage[];
 ---
 
 <header class="topbar">
@@ -70,7 +73,7 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
       ))}
 
       <div class="nav-more">
-        <button class="nav-tab nav-more-btn" type="button" aria-haspopup="true" aria-expanded="false">
+        <button class="nav-tab nav-more-btn" type="button" aria-label="Toggle more subnetting tools dropdown menu" aria-haspopup="true" aria-expanded="false">
           {t.nav.moreTools}
           <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
@@ -87,7 +90,7 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
     <div class="nav-actions">
       <!-- Language Switcher Dropdown -->
       <div class="lang-picker">
-        <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Change Language / Sprache / Idioma / 言語">
+        <button class="lang-btn" type="button" aria-label="Toggle language settings dropdown" aria-haspopup="true" aria-expanded="false" title="Change Language / Sprache / Idioma / 言語">
           <span class="lang-flag">{currentLangInfo.flag}</span>
           <span class="lang-code">{currentLangInfo.code.toUpperCase()}</span>
           <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -224,21 +227,28 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
     navContainer.addEventListener('mousemove', function(e) {
       const mouseX = e.clientX;
 
-      tabs.forEach(function(tab) {
-        const rect = tab.getBoundingClientRect();
-        const tabCenterX = rect.left + rect.width / 2;
-        const distance = Math.abs(mouseX - tabCenterX);
+      // Perf Fix B: batch all reads first (avoids forced reflow per-tab)
+      const rects = tabs.map(function(tab) {
+        return tab.getBoundingClientRect();
+      });
 
-        if (distance < maxDistance) {
-          // Cosine squared wave formula for macOS Dock Magnification
-          const factor = Math.cos((distance / maxDistance) * (Math.PI / 2));
-          const scale = 1 + (maxScale - 1) * Math.pow(factor, 2);
-          tab.style.transform = 'scale(' + scale.toFixed(3) + ')';
-          tab.style.zIndex = '10';
-        } else {
-          tab.style.transform = 'scale(1)';
-          tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
-        }
+      // Then batch all writes inside a single rAF
+      requestAnimationFrame(function() {
+        tabs.forEach(function(tab, i) {
+          const rect = rects[i];
+          const tabCenterX = rect.left + rect.width / 2;
+          const distance = Math.abs(mouseX - tabCenterX);
+
+          if (distance < maxDistance) {
+            const factor = Math.cos((distance / maxDistance) * (Math.PI / 2));
+            const scale = 1 + (maxScale - 1) * Math.pow(factor, 2);
+            tab.style.transform = 'scale(' + scale.toFixed(3) + ')';
+            tab.style.zIndex = '10';
+          } else {
+            tab.style.transform = 'scale(1)';
+            tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
+          }
+        });
       });
     });
 
@@ -259,6 +269,7 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
 
     function movePillTo(target) {
       if (!target) return;
+      // Perf Fix B: batch reads first, then write in rAF to avoid forced reflow
       const containerRect = navContainer.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
       const left = targetRect.left - containerRect.left;
@@ -266,10 +277,12 @@ const availableLangs: SupportedLanguage[] = ['en', 'de', 'es', 'ja', 'nl'];
       const width = targetRect.width;
       const height = targetRect.height;
 
-      pill.style.transform = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
-      pill.style.width = width + 'px';
-      pill.style.height = height + 'px';
-      pill.style.opacity = '1';
+      requestAnimationFrame(function() {
+        pill.style.transform = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
+        pill.style.width = width + 'px';
+        pill.style.height = height + 'px';
+        pill.style.opacity = '1';
+      });
     }
 
     if (activeTab) movePillTo(activeTab);

@@ -1,0 +1,314 @@
+---
+---
+<div class="privacy-modal-overlay" id="privacy-modal" aria-hidden="true" inert role="dialog" aria-labelledby="privacy-modal-title" aria-modal="true">
+  <div class="privacy-modal-card">
+    <div class="privacy-modal-header">
+      <h2 id="privacy-modal-title">Privacy & Data Governance</h2>
+      <button class="privacy-modal-close" id="privacy-close-btn" aria-label="Close dialog" type="button">&times;</button>
+    </div>
+    
+    <div class="privacy-modal-body">
+      <div class="zero-log-badge">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <div>
+          <h3>Zero-Log Architecture Guarantee</h3>
+          <p>100% of calculations (IP subnetting, CIDR splits, K8s sizing) are executed directly in your browser. No IP addresses or infrastructure schemas are ever sent over the network.</p>
+        </div>
+      </div>
+
+      <div class="consent-setting">
+        <div class="consent-info">
+          <h4>Product Telemetry (Google Analytics)</h4>
+          <p>We use anonymous usage analytics (page views and feature clicks) to improve the tool's interface and capabilities. We never log custom IP addresses or input parameters.</p>
+        </div>
+        <label class="switch-toggle" for="analytics-consent-checkbox">
+          <input type="checkbox" id="analytics-consent-checkbox" aria-label="Google Analytics telemetry consent switch" checked />
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="privacy-modal-footer">
+      <button class="privacy-save-btn" id="privacy-save-btn" type="button">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .privacy-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 17, 28, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast, 0.2s) ease;
+  }
+  .privacy-modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .privacy-modal-card {
+    background: var(--bg-surface, #141b2e);
+    border: 1px solid var(--border-color, #232d45);
+    border-radius: var(--radius-md, 12px);
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    transition: transform var(--transition-fast, 0.2s) ease;
+    overflow: hidden;
+  }
+  .privacy-modal-overlay.open .privacy-modal-card {
+    transform: scale(1);
+  }
+  .privacy-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #232d45);
+  }
+  .privacy-modal-header h2 {
+    font-size: 1.15rem;
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--text-primary);
+  }
+  .privacy-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.75rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s ease;
+  }
+  .privacy-modal-close:hover {
+    color: var(--text-primary);
+  }
+  .privacy-modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .zero-log-badge {
+    background: rgba(56, 189, 248, 0.05);
+    border: 1px dashed rgba(56, 189, 248, 0.3);
+    border-radius: var(--radius-sm, 6px);
+    padding: 1.15rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .zero-log-badge svg {
+    color: var(--accent-network, #38bdf8);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .zero-log-badge h3 {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .zero-log-badge p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .consent-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .consent-info h4 {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .consent-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+  }
+  
+  /* Toggle Switch */
+  .switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .switch-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color, #232d45);
+    transition: .3s;
+    border-radius: 26px;
+  }
+  .switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  .switch-toggle input:checked + .switch-slider {
+    background-color: var(--accent-network, #38bdf8);
+  }
+  .switch-toggle input:checked + .switch-slider:before {
+    transform: translateX(20px);
+  }
+  
+  .privacy-modal-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border-color, #232d45);
+    display: flex;
+    justify-content: flex-end;
+  }
+  .privacy-save-btn {
+    background: var(--accent-network, #38bdf8);
+    color: #0d111c;
+    border: none;
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-sm, 6px);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.2s);
+  }
+  .privacy-save-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+</style>
+
+<script>
+  function setupPrivacyModal() {
+    const modal = document.getElementById('privacy-modal');
+    const closeBtn = document.getElementById('privacy-close-btn');
+    const saveBtn = document.getElementById('privacy-save-btn');
+    const consentCheckbox = document.getElementById('analytics-consent-checkbox') as HTMLInputElement;
+
+    if (!modal || !consentCheckbox) return;
+
+    // Load initial state
+    const consent = localStorage.getItem('devsubnet-analytics-consent');
+    if (consent === 'false') {
+      consentCheckbox.checked = false;
+    } else {
+      consentCheckbox.checked = true;
+    }
+
+    function openModal() {
+      modal?.classList.add('open');
+      modal?.setAttribute('aria-hidden', 'false');
+      modal?.removeAttribute('inert'); // a11y Fix A: allow focus into modal
+    }
+
+    function closeModal() {
+      modal?.classList.remove('open');
+      modal?.setAttribute('aria-hidden', 'true');
+      modal?.setAttribute('inert', ''); // a11y Fix A: block focus on hidden modal
+    }
+
+    // Dynamic Footer Link Injection
+    function injectFooterLink() {
+      const footerLinks = document.querySelector('footer .footer-links');
+      if (footerLinks && !footerLinks.querySelector('.open-privacy-btn')) {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'open-privacy-btn';
+        link.style.cursor = 'pointer';
+        
+        // Translate link text based on current locale route
+        const path = window.location.pathname;
+        if (path.includes('/de/')) {
+          link.textContent = 'Datenschutzeinstellungen';
+        } else if (path.includes('/es/')) {
+          link.textContent = 'Ajustes de Privacidad';
+        } else if (path.includes('/ja/')) {
+          link.textContent = 'プライバシー設定';
+        } else if (path.includes('/nl/')) {
+          link.textContent = 'Privacy-instellingen';
+        } else {
+          link.textContent = 'Privacy Settings';
+        }
+        
+        link.onclick = (e) => {
+          e.preventDefault();
+          openModal();
+        };
+        footerLinks.appendChild(link);
+      }
+    }
+
+    injectFooterLink();
+
+    // Bind triggers dynamically
+    document.querySelectorAll('.open-privacy-btn').forEach(btn => {
+      (btn as HTMLElement).onclick = (e) => {
+        e.preventDefault();
+        openModal();
+      };
+    });
+
+    if (closeBtn) closeBtn.onclick = closeModal;
+
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        const isChecked = consentCheckbox.checked;
+        localStorage.setItem('devsubnet-analytics-consent', isChecked ? 'true' : 'false');
+        
+        // Disable GA if user opts out
+        if (!isChecked) {
+          (window as any)['ga-disable-G-F2T4WC5Y9V'] = true;
+        } else {
+          (window as any)['ga-disable-G-F2T4WC5Y9V'] = false;
+          if (!window.gtag) {
+            window.location.reload();
+          }
+        }
+        closeModal();
+      };
+    }
+
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+  }
+
+  document.addEventListener('astro:page-load', setupPrivacyModal);
+  setupPrivacyModal();
+</script>

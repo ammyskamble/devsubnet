@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MainShell from '../../components/MainShell.astro';
+import { translations } from '../../utils/i18n';
+
+const t = translations.ko;
+---
+
+<Layout 
+  lang="ko"
+  title="비주얼 서브넷 분할기 & CIDR 파티셔너 | DevSubnet"
+  description="네트워크 블록을 비주얼 방식으로 서브넷으로 분할합니다. 동적 트리 표시 및 Terraform / Ansible용 IaC 코드를 제공합니다."
+>
+  <MainShell activeTab="splitter" navPath="visual-subnet-splitter" lang="ko" />
+</Layout>

@@ -1,0 +1,1657 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+---
+
+<Layout
+  title="Website Sitemap & Structure Analyzer | DevSubnet"
+  description="Free online website analyzer and sitemap segregator. Parse sitemaps, URL lists, or HTML to group links by category, check directory depth, run SEO diagnostics, and download reports."
+>
+  <div class="app-shell">
+    <NavBar path="website-analyzer" />
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">WEB UTILITIES / STRUCTURE &amp; OPTIMIZATION</div>
+        <h1 id="page-title">Website Sitemap &amp; Structure Analyzer</h1>
+        <p class="lede">Input a sitemap XML, HTML source, or list of URLs. Categorize your website's architecture, identify nesting depth, export sitemaps, and receive optimization recommendations instantly.</p>
+      </section>
+
+      <section aria-label="Website analyzer workspace">
+        <div class="calculator-layout">
+          <!-- Left Column: Inputs and Settings -->
+          <div class="calculator-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step">01</span>
+                <h2>Select Input Mode</h2>
+              </div>
+              <span class="live-label">CLIENT-SIDE AUDIT</span>
+            </div>
+
+            <!-- Mode Switcher Tabs -->
+            <div class="analyzer-modes">
+              <button class="mode-btn active" data-mode="sitemap" type="button">Sitemap XML</button>
+              <button class="mode-btn" data-mode="list" type="button">URL List</button>
+              <button class="mode-btn" data-mode="html" type="button">HTML Source</button>
+              <button class="mode-btn" data-mode="scan" type="button">Live Scan</button>
+            </div>
+
+            <!-- Input Container -->
+            <div class="input-row">
+              <label for="analyzer-input" id="input-label">Paste Sitemap XML</label>
+              
+              <!-- Textarea for paste modes -->
+              <div id="text-input-container">
+                <textarea 
+                  id="analyzer-input" 
+                  placeholder="Paste your sitemap.xml content here..." 
+                  spellcheck="false"
+                  rows="10"
+                ></textarea>
+              </div>
+
+              <!-- URL input for scan mode -->
+              <div id="url-input-container" style="display: none;">
+                <div class="ip-input" style="width: 100%;">
+                  <input 
+                    type="url" 
+                    id="analyzer-url" 
+                    placeholder="https://example.com/sitemap.xml or https://example.com" 
+                    autocomplete="off" 
+                  />
+                </div>
+                <p class="input-tip">Fetches contents client-side via CORS proxy. Fallback to pasting if blocked by security policies.</p>
+              </div>
+            </div>
+
+            <div class="quick-row">
+              <button type="button" id="btn-load-example" class="subtool-btn">Load Demo Example</button>
+              <button type="button" id="btn-run-analysis" class="subtool-btn action-highlight">Analyze Website</button>
+            </div>
+
+            <!-- Segregation Rules Info Card -->
+            <div class="settings-card" style="margin-top: 1.5rem;">
+              <h3>Categorical Segregation Rules</h3>
+              <ul class="rules-list">
+                <li><span class="badge blog-badge">Blog</span> <code>/blog</code>, <code>/post</code>, <code>/article</code>, <code>/news</code></li>
+                <li><span class="badge product-badge">Product</span> <code>/product</code>, <code>/shop</code>, <code>/store</code>, <code>/item</code>, <code>/pricing</code></li>
+                <li><span class="badge docs-badge">Docs</span> <code>/docs</code>, <code>/guide</code>, <code>/wiki</code>, <code>/help</code>, <code>/faq</code></li>
+                <li><span class="badge legal-badge">Static</span> <code>/about</code>, <code>/contact</code>, <code>/privacy</code>, <code>/terms</code>, <code>/legal</code></li>
+                <li><span class="badge asset-badge">Assets</span> Styles (CSS), Scripts (JS), Images, Fonts, PDFs</li>
+                <li><span class="badge api-badge">API / Query</span> URLs matching <code>/api/</code> or containing query strings <code>?</code></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Dashboard & Results -->
+          <div class="insight-panel">
+            <!-- Placeholder before analysis -->
+            <div class="calculator-panel placeholder-panel" id="results-placeholder">
+              <div class="placeholder-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <h3>Waiting for Analysis</h3>
+              <p>Paste your sitemap or website content in the left panel and click <strong>Analyze Website</strong> to review categorical breakdown, folder depth, SEO optimization alerts, and download options.</p>
+            </div>
+
+            <!-- Analysis Results Dashboard -->
+            <div class="calculator-panel" id="results-container" style="display: none; gap: 1.5rem;">
+              <div>
+                <span class="aside-kicker">WEBSITE STRUCTURE INSIGHTS</span>
+                <h2>Analysis Dashboard</h2>
+              </div>
+
+              <!-- Summary KPIs -->
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <span class="stat-num" id="stat-total-links">0</span>
+                  <span class="stat-label">Total URLs</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-num" id="stat-max-depth">0</span>
+                  <span class="stat-label">Max Depth</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-num text-warning" id="stat-issues-count">0</span>
+                  <span class="stat-label">Issues Flagged</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-num text-success" id="stat-health-score">100%</span>
+                  <span class="stat-label">Health Score</span>
+                </div>
+              </div>
+
+              <!-- Download Center -->
+              <div class="download-panel">
+                <h3>Export &amp; Download Results</h3>
+                <div class="download-buttons">
+                  <button type="button" class="dl-btn" data-format="json">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download JSON
+                  </button>
+                  <button type="button" class="dl-btn" data-format="csv">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download CSV
+                  </button>
+                  <button type="button" class="dl-btn" data-format="txt">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    URL List (.txt)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Output Tabs -->
+              <div class="export-panel" style="margin-top: 0.5rem;">
+                <div class="export-tabs">
+                  <button type="button" class="export-tab-btn active" data-tab="categories">Segregated Groups</button>
+                  <button type="button" class="export-tab-btn" data-tab="optimizations">SEO &amp; Performance Audit</button>
+                  <button type="button" class="export-tab-btn" data-tab="tree">Directory Tree</button>
+                </div>
+
+                <div class="tab-content" id="tab-categories">
+                  <!-- Custom visual distribution bar -->
+                  <div class="bar-chart-container">
+                    <h4>Categorical URL Distribution</h4>
+                    <div class="distribution-bar" id="dist-bar"></div>
+                    <div class="distribution-legend" id="dist-legend"></div>
+                  </div>
+
+                  <!-- Categories accordion/list -->
+                  <div class="categories-list" id="categories-container"></div>
+                </div>
+
+                <div class="tab-content" id="tab-optimizations" style="display: none;">
+                  <div class="audit-summary">
+                    <p class="aside-copy">Automated audit checking file types, URL structures, nesting directory depth, protocols, and security parameters.</p>
+                  </div>
+                  <div class="audit-issues" id="audit-issues-container"></div>
+                </div>
+
+                <div class="tab-content" id="tab-tree" style="display: none;">
+                  <div class="tree-summary">
+                    <p class="aside-copy">Collapsible visualization mapping of the website's directory structures.</p>
+                  </div>
+                  <div class="directory-tree-view" id="tree-container"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Detailed Guide -->
+      <section class="guide-section" style="margin-top: 4rem;">
+        <div class="guide-sticky"><h2>Why analyze <em>site structure</em>?</h2></div>
+        <div class="guide-content">
+          <div class="guide-block">
+            <h3>Categorical Segregation</h3>
+            <p>Dividing a website's pages and assets into distinct logical categories (such as blogs, documentation, APIs, products, and legal) helps developers map routing configurations, understand cloud load balancing requirements, and organize sitemap indexes. Segregation also highlights which sections of your site consume the most network bandwidth or require stricter caching protocols.</p>
+          </div>
+          <div class="guide-block">
+            <h3>SEO &amp; Crawl Budget Optimization</h3>
+            <p>Search engines allocate a finite "crawl budget" to every domain. If your site has excessively deep directories (e.g., nested 5 or more levels deep), contains legacy uncompressed media, or suffers from inconsistent trailing slashes (which look like duplicate pages), search bots may fail to index important content. Resolving deep folder nesting and utilizing clean URLs are fundamental optimization steps.</p>
+          </div>
+          <div class="guide-block">
+            <h3>DevOps &amp; Infrastructure Sizing</h3>
+            <p>From an infrastructure perspective, knowing the volume and structure of static pages versus dynamic endpoints helps DevOps engineers correctly size subnets, set up appropriate Cloudflare CDN caching boundaries, and write redirect rules. Separating assets (like CSS, JS, images) from application routes allows for better target group segregation on cloud load balancers.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
+      <div class="footer-links">
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/faq">FAQ</a>
+      </div>
+      <span>NO DATA LEAVES YOUR DEVICE</span>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  /* Custom Styles for Website Analyzer */
+  .analyzer-modes {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.25rem;
+  }
+
+  .mode-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .mode-btn:hover {
+    color: var(--text-primary);
+  }
+
+  .mode-btn.active {
+    background: rgba(var(--accent-network-rgb, 56, 189, 248), 0.12);
+    color: var(--accent-network);
+    font-weight: 600;
+  }
+
+  textarea#analyzer-input {
+    width: 100%;
+    background: var(--bg-code);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    resize: vertical;
+    transition: border-color var(--transition-fast);
+  }
+
+  textarea#analyzer-input:focus {
+    outline: none;
+    border-color: var(--accent-network);
+  }
+
+  .input-tip {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    line-height: 1.3;
+  }
+
+  .settings-card {
+    background: var(--bg-surface-tint);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+  }
+
+  .settings-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .rules-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .rules-list code {
+    font-size: 0.75rem;
+    background: var(--bg-code);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--accent-highlight);
+  }
+
+  /* Badges for Categories */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    min-width: 65px;
+    justify-content: center;
+  }
+
+  .blog-badge { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+  .product-badge { background: rgba(251, 146, 60, 0.12); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.2); }
+  .docs-badge { background: rgba(96, 165, 250, 0.12); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.2); }
+  .legal-badge { background: rgba(167, 139, 250, 0.12); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.2); }
+  .asset-badge { background: rgba(232, 121, 249, 0.12); color: #e879f9; border: 1px solid rgba(232, 121, 249, 0.2); }
+  .api-badge { background: rgba(244, 63, 94, 0.12); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); }
+  .general-badge { background: rgba(156, 163, 175, 0.12); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.2); }
+
+  /* Right column results styling */
+  .placeholder-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    border: 1px dashed var(--border-color);
+    background: rgba(255,255,255,0.01);
+  }
+
+  .placeholder-icon {
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    background: rgba(255,255,255,0.02);
+    padding: 1rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+  }
+
+  .placeholder-panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .placeholder-panel p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    max-width: 320px;
+    line-height: 1.5;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 500px) {
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  .text-warning { color: #fb923c !important; }
+  .text-success { color: #34d399 !important; }
+  .text-danger { color: #f43f5e !important; }
+  .text-info { color: #60a5fa !important; }
+
+  /* Download Panel */
+  .download-panel {
+    background: var(--bg-surface-tint);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .download-panel h3 {
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .download-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .dl-btn {
+    flex: 1;
+    min-width: 130px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all var(--transition-fast);
+  }
+
+  .dl-btn:hover {
+    background: rgba(var(--accent-network-rgb, 56, 189, 248), 0.08);
+    border-color: var(--accent-network);
+    color: var(--accent-network);
+  }
+
+  /* Bar Chart */
+  .bar-chart-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .bar-chart-container h4 {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+  }
+
+  .distribution-bar {
+    height: 16px;
+    width: 100%;
+    border-radius: 8px;
+    background: #1e293b;
+    display: flex;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .dist-segment {
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+
+  .dist-blog { background-color: #34d399; }
+  .dist-product { background-color: #fb923c; }
+  .dist-docs { background-color: #60a5fa; }
+  .dist-legal { background-color: #a78bfa; }
+  .dist-asset { background-color: #e879f9; }
+  .dist-api { background-color: #f43f5e; }
+  .dist-general { background-color: #9ca3af; }
+
+  .distribution-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  /* Categories Accordion */
+  .categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cat-group {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .cat-header {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color var(--transition-fast);
+  }
+
+  .cat-header:hover {
+    background: rgba(255, 255, 255, 0.01);
+  }
+
+  .cat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+  }
+
+  .cat-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .cat-chevron {
+    transition: transform var(--transition-fast);
+  }
+
+  .cat-group.open .cat-chevron {
+    transform: rotate(180deg);
+  }
+
+  .cat-body {
+    display: none;
+    border-top: 1px solid var(--border-color);
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.1);
+  }
+
+  .cat-group.open .cat-body {
+    display: block;
+  }
+
+  .url-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    text-align: left;
+  }
+
+  .url-table th, .url-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .url-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .url-table td.url-cell {
+    font-family: var(--font-mono);
+    word-break: break-all;
+    max-width: 250px;
+    color: var(--text-primary);
+  }
+
+  .url-table tr:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* Diagnostics tab */
+  .audit-issues {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+  }
+
+  .issue-card {
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .issue-card.issue-critical {
+    background: rgba(244, 63, 94, 0.06);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+  }
+
+  .issue-card.issue-warning {
+    background: rgba(251, 146, 60, 0.06);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+  }
+
+  .issue-card.issue-info {
+    background: rgba(96, 165, 250, 0.06);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+  }
+
+  .issue-icon {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .issue-critical .issue-icon { color: #f43f5e; }
+  .issue-warning .issue-icon { color: #fb923c; }
+  .issue-info .issue-icon { color: #60a5fa; }
+
+  .issue-details h4 {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.15rem;
+  }
+
+  .issue-details p {
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+  }
+
+  .issue-details .issue-rec {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .issue-details .issue-url {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    background: rgba(0,0,0,0.25);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+    word-break: break-all;
+    display: inline-block;
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+  }
+
+  /* Tree View */
+  .directory-tree-view {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-height: 400px;
+    overflow-y: auto;
+    color: var(--text-primary);
+  }
+
+  .tree-folder {
+    margin-left: 1rem;
+  }
+
+  .tree-folder[open] > summary::after {
+    content: "";
+  }
+
+  .tree-folder summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--accent-network);
+    font-weight: 600;
+    padding: 0.15rem 0;
+    list-style: none;
+  }
+
+  .tree-folder summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tree-folder summary:hover {
+    color: var(--text-primary);
+  }
+
+  .tree-file {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: 2.25rem;
+    color: var(--text-secondary);
+    padding: 0.1rem 0;
+  }
+
+  .tree-file:hover {
+    color: var(--text-primary);
+  }
+
+  .tree-icon {
+    flex-shrink: 0;
+  }
+
+  .no-issues-banner {
+    background: rgba(52, 211, 153, 0.06);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    color: #34d399;
+  }
+
+  .no-issues-banner h4 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+  }
+  
+  .no-issues-banner p {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+</style>
+
+<script>
+  // Dynamic Website Analysis logic
+
+  // Define interfaces for analysis
+  interface URLNode {
+    [key: string]: any;
+    _files?: string[];
+  }
+
+  interface URLData {
+    url: string;
+    normalized: string;
+    path: string;
+    category: string;
+    depth: number;
+    issues: string[];
+  }
+
+  function initWebsiteAnalyzer() {
+    const inputArea = document.getElementById('analyzer-input') as HTMLTextAreaElement;
+    const urlInput = document.getElementById('analyzer-url') as HTMLInputElement;
+    const loadExampleBtn = document.getElementById('btn-load-example') as HTMLButtonElement;
+    const runBtn = document.getElementById('btn-run-analysis') as HTMLButtonElement;
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const inputLabel = document.getElementById('input-label') as HTMLLabelElement;
+    const textContainer = document.getElementById('text-input-container') as HTMLDivElement;
+    const urlContainer = document.getElementById('url-input-container') as HTMLDivElement;
+
+    const placeholder = document.getElementById('results-placeholder');
+    const resultsContainer = document.getElementById('results-container');
+
+    const totalLinksEl = document.getElementById('stat-total-links');
+    const maxDepthEl = document.getElementById('stat-max-depth');
+    const issuesCountEl = document.getElementById('stat-issues-count');
+    const healthScoreEl = document.getElementById('stat-health-score');
+
+    const distBar = document.getElementById('dist-bar');
+    const distLegend = document.getElementById('dist-legend');
+    const categoriesContainer = document.getElementById('categories-container');
+    const auditContainer = document.getElementById('audit-issues-container');
+    const treeContainer = document.getElementById('tree-container');
+
+    let currentMode = 'sitemap';
+    let analyzedData: URLData[] = [];
+    let categories: Record<string, URLData[]> = {};
+    let auditIssues: { type: 'critical' | 'warning' | 'info'; title: string; desc: string; rec: string; url?: string }[] = [];
+
+    if (!inputArea || !runBtn) return;
+
+    // Switch mode handlers
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        modeBtns.forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('active');
+        currentMode = target.dataset.mode || 'sitemap';
+
+        // Update labels and visibility
+        if (currentMode === 'scan') {
+          if (textContainer) textContainer.style.display = 'none';
+          if (urlContainer) urlContainer.style.display = 'block';
+          if (inputLabel) inputLabel.textContent = 'Enter Sitemap URL or Web Address';
+        } else {
+          if (textContainer) textContainer.style.display = 'block';
+          if (urlContainer) urlContainer.style.display = 'none';
+          if (inputLabel) {
+            if (currentMode === 'sitemap') {
+              inputLabel.textContent = 'Paste Sitemap XML';
+              inputArea.placeholder = 'Paste your sitemap.xml content here...';
+            } else if (currentMode === 'list') {
+              inputLabel.textContent = 'Paste URL List (One per line)';
+              inputArea.placeholder = 'https://example.com/page-1\nhttps://example.com/page-2\n/relative/path-3';
+            } else {
+              inputLabel.textContent = 'Paste Page HTML Source';
+              inputArea.placeholder = 'Paste full HTML source <html>...</html> containing links...';
+            }
+          }
+        }
+      });
+    });
+
+    // Load example sitemap data
+    if (loadExampleBtn) {
+      loadExampleBtn.addEventListener('click', () => {
+        if (currentMode === 'scan') {
+          if (urlInput) urlInput.value = 'https://devsubnet.com/sitemap.xml';
+        } else if (currentMode === 'sitemap') {
+          inputArea.value = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://devsubnet.com/</loc>
+    <lastmod>2026-08-31</lastmod>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/about</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/contact</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/privacy-policy</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/terms-of-service</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/blog/how-to-calculate-subnet</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/blog/aws-vpc-subnet-planning-guide</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/blog/editorial/archives/2026/deep-nested-network-design-tips-for-enterprise</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/products/subnet-calculator-pro-cli-binary</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/products/pricing</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/docs/introduction</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/docs/api/v1/endpoints/subnet-math-engine</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/docs/faq</loc>
+  </url>
+  <url>
+    <loc>http://devsubnet.com/legacy-unsecure-http-link-checker</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/api/v1/subnet-calculator?api_key=secret_12345token&amp;cidr=24</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/assets/logo.png</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/assets/hero-banner-illustration.jpg</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/assets/style.css</loc>
+  </url>
+  <url>
+    <loc>https://devsubnet.com/assets/scripts.js</loc>
+  </url>
+</urlset>`;
+        } else if (currentMode === 'list') {
+          inputArea.value = `https://devsubnet.com/
+https://devsubnet.com/about
+https://devsubnet.com/blog/how-to-calculate-subnet
+https://devsubnet.com/blog/aws-vpc-subnet-planning-guide
+https://devsubnet.com/products/subnet-calculator-pro-cli-binary
+https://devsubnet.com/docs/introduction
+https://devsubnet.com/docs/api/v1/endpoints/subnet-math-engine
+http://devsubnet.com/legacy-unsecure-http-link-checker
+https://devsubnet.com/api/v1/subnet-calculator?api_key=secret_12345token
+https://devsubnet.com/assets/logo.png
+https://devsubnet.com/assets/style.css`;
+        } else if (currentMode === 'html') {
+          inputArea.value = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Mock Site Index</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/scripts.js"><\/script>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About Us</a>
+    <a href="/products/subnet-calculator-pro-cli-binary">Products</a>
+  </nav>
+  <main>
+    <h1>Welcome</h1>
+    <p>Check out our <a href="/blog/how-to-calculate-subnet">Subnet Guide</a>.</p>
+    <p>Read about AWS in <a href="/blog/aws-vpc-subnet-planning-guide">VPC Subnet Planning</a>.</p>
+    <p>API Endpoint: <a href="https://devsubnet.com/api/v1/subnet-calculator?api_key=secret_token_leak">API Calculation</a></p>
+    <img src="/assets/logo.png" alt="logo">
+    <img src="/assets/hero-banner-illustration.jpg" alt="hero">
+  </main>
+  <footer>
+    <a href="/privacy-policy">Privacy</a>
+    <a href="http://devsubnet.com/legacy-unsecure-http-link-checker">Unsecure Link</a>
+  </footer>
+</body>
+</html>`;
+        }
+      });
+    }
+
+    // Helper functions for categorization
+    function getCategory(urlStr: string): string {
+      const lower = urlStr.toLowerCase();
+      // Assets / Media
+      if (
+        lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') ||
+        lower.endsWith('.webp') || lower.endsWith('.svg') || lower.endsWith('.gif') ||
+        lower.endsWith('.css') || lower.endsWith('.js') || lower.endsWith('.woff') ||
+        lower.endsWith('.woff2') || lower.endsWith('.ttf') || lower.endsWith('.pdf') ||
+        lower.endsWith('.zip') || lower.includes('/assets/')
+      ) {
+        return 'assets';
+      }
+      
+      // API / Query / Dynamic
+      if (lower.includes('/api/') || lower.includes('/graphql') || lower.includes('?')) {
+        return 'api';
+      }
+
+      // Blog
+      if (lower.includes('/blog') || lower.includes('/post') || lower.includes('/article') || lower.includes('/news')) {
+        return 'blog';
+      }
+
+      // Products
+      if (lower.includes('/product') || lower.includes('/shop') || lower.includes('/store') || lower.includes('/item') || lower.includes('/pricing')) {
+        return 'products';
+      }
+
+      // Docs
+      if (lower.includes('/docs') || lower.includes('/guide') || lower.includes('/wiki') || lower.includes('/help') || lower.includes('/faq')) {
+        return 'docs';
+      }
+
+      // Static & Legal
+      if (
+        lower.includes('/about') || lower.includes('/contact') || lower.includes('/privacy') ||
+        lower.includes('/terms') || lower.includes('/legal') || lower.includes('/team') ||
+        lower.includes('/career') || lower.includes('/tos')
+      ) {
+        return 'legal';
+      }
+
+      return 'general';
+    }
+
+    function extractUrls(): string[] {
+      let urls: string[] = [];
+      const text = inputArea.value;
+
+      if (currentMode === 'sitemap') {
+        const locRegex = new RegExp('\\x3cloc\\x3e(https?:\\/\\/[^\\s\\x3c]+)\\x3c\\/loc\\x3e', 'gi');
+        let match;
+        while ((match = locRegex.exec(text)) !== null) {
+          urls.push(match[1]);
+        }
+      } else if (currentMode === 'list') {
+        urls = text.split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
+      } else if (currentMode === 'html') {
+        // Extract href from links/anchors
+        const hrefRegex = new RegExp('href=["\'](https?:\\/\\/[^"\']+|\\/[^"\']*)["\']', 'gi');
+        let match;
+        while ((match = hrefRegex.exec(text)) !== null) {
+          urls.push(match[1]);
+        }
+        // Extract src from script/images
+        const srcRegex = new RegExp('src=["\'](https?:\\/\\/[^"\']+|\\/[^"\']*)["\']', 'gi');
+        while ((match = srcRegex.exec(text)) !== null) {
+          urls.push(match[1]);
+        }
+      }
+      return urls;
+    }
+
+    function runAnalysis(rawUrls: string[]) {
+      if (rawUrls.length === 0) {
+        alert('No URLs found to analyze. Please check your inputs or click "Load Demo Example" to load mock data.');
+        return;
+      }
+
+      analyzedData = [];
+      categories = {
+        blog: [],
+        products: [],
+        docs: [],
+        legal: [],
+        assets: [],
+        api: [],
+        general: []
+      };
+      auditIssues = [];
+
+      // Clean and normalize URLs
+      const uniqueRaw = Array.from(new Set(rawUrls));
+      const baseDomain = detectBaseDomain(uniqueRaw);
+
+      uniqueRaw.forEach(rawUrl => {
+        let normalized = rawUrl.trim();
+        // Resolve relative paths if possible
+        if (normalized.startsWith('/')) {
+          normalized = (baseDomain ? baseDomain : 'https://example.com') + normalized;
+        }
+
+        try {
+          const parsed = new URL(normalized);
+          const path = parsed.pathname;
+          
+          // Folder depth
+          const cleanPath = path.replace(/\/$/, '').replace(/^\//, '');
+          const depth = cleanPath ? cleanPath.split('/').length : 0;
+
+          const category = getCategory(normalized);
+
+          const item: URLData = {
+            url: normalized,
+            normalized: normalized,
+            path: path,
+            category: category,
+            depth: depth,
+            issues: []
+          };
+
+          analyzedData.push(item);
+          if (categories[category]) {
+            categories[category].push(item);
+          } else {
+            categories.general.push(item);
+          }
+        } catch (e) {
+          // Fallback if not a valid absolute URL
+          const depth = rawUrl.replace(/\/$/, '').replace(/^\//, '').split('/').length;
+          const category = getCategory(rawUrl);
+          const item: URLData = {
+            url: rawUrl,
+            normalized: rawUrl,
+            path: rawUrl,
+            category: category,
+            depth: depth,
+            issues: []
+          };
+          analyzedData.push(item);
+          if (categories[category]) {
+            categories[category].push(item);
+          } else {
+            categories.general.push(item);
+          }
+        }
+      });
+
+      // Analyze Audit Issues
+      let healthScore = 100;
+      let mixedTrailingSlashesCount = 0;
+      const htmlTrailingSlashes = new Set<boolean>();
+
+      analyzedData.forEach(item => {
+        // Critical: HTTP links
+        if (item.url.startsWith('http://')) {
+          item.issues.push('Unsecure HTTP Connection');
+          auditIssues.push({
+            type: 'critical',
+            title: 'Unsecure HTTP Protocol',
+            desc: 'The URL uses unsecure http:// protocol, exposing traffic to interception.',
+            rec: 'Redirect to HTTPS, and update all database sitemaps to reference https:// URLs.',
+            url: item.url
+          });
+          healthScore -= 10;
+        }
+
+        // Critical: Secrets leak in query params
+        if (item.url.includes('?')) {
+          const lower = item.url.toLowerCase();
+          if (
+            lower.includes('api_key') || lower.includes('apikey') || lower.includes('token') ||
+            lower.includes('secret') || lower.includes('auth') || lower.includes('password')
+          ) {
+            item.issues.push('Sensitive Token Exposed in URL');
+            auditIssues.push({
+              type: 'critical',
+              title: 'Credential Exposure in Query Params',
+              desc: 'Sensitive keys, secrets, or API tokens were detected in the query parameters. URLs are logged in plain-text across routing hops, browser history, and CDN nodes.',
+              rec: 'Pass credentials via HTTP Authorization headers or POST bodies, never via URL query parameters.',
+              url: item.url
+            });
+            healthScore -= 15;
+          }
+        }
+
+        // Warning: Deep nesting
+        if (item.depth > 4) {
+          item.issues.push('Excessive Directory Nesting');
+          auditIssues.push({
+            type: 'warning',
+            title: 'Deep Nesting (>4 folders)',
+            desc: `This URL is nested ${item.depth} folders deep. Search engine crawl budgets penalize overly nested paths, reducing organic discovery speed.`,
+            rec: 'Refactor URL rewrite logic to keep important page routes shallow (under 4 folders deep).',
+            url: item.url
+          });
+          healthScore -= 5;
+        }
+
+        // Warning: Extremely Long URLs
+        if (item.url.length > 75) {
+          item.issues.push('Extremely Long URL (>75 characters)');
+          auditIssues.push({
+            type: 'warning',
+            title: 'Excessive URL Length',
+            desc: `This URL is ${item.url.length} characters long. Search engines prefer clean, human-readable URLs.`,
+            rec: 'Shorten category structures and slug lengths to keep URLs concise and semantic.',
+            url: item.url
+          });
+          healthScore -= 3;
+        }
+
+        // Warning: Old media format
+        const lowerUrl = item.url.toLowerCase();
+        if (
+          (lowerUrl.endsWith('.png') || lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg')) &&
+          !lowerUrl.includes('/logo') // Skip logo
+        ) {
+          item.issues.push('Legacy Image Format (PNG/JPG)');
+          auditIssues.push({
+            type: 'warning',
+            title: 'Uncompressed Image Asset (PNG/JPG)',
+            desc: 'The website references traditional PNG or JPG image formats. This increases payload sizes and load latency.',
+            rec: 'Compress assets and convert images to WebP or AVIF formats. Update the sitemap/HTML links to reference WebP/AVIF equivalents.',
+            url: item.url
+          });
+          healthScore -= 3;
+        }
+
+        // Info: Unminified Asset
+        if (
+          (lowerUrl.endsWith('.js') && !lowerUrl.endsWith('.min.js')) ||
+          (lowerUrl.endsWith('.css') && !lowerUrl.endsWith('.min.css'))
+        ) {
+          item.issues.push('Unminified Static Asset');
+          auditIssues.push({
+            type: 'info',
+            title: 'Unminified Code Asset',
+            desc: 'The website references unminified JS or CSS files. This increases payload size.',
+            rec: 'Integrate compression or minification steps in your build/bundling pipeline (e.g. using Esbuild/Terser) to output min.js / min.css files.',
+            url: item.url
+          });
+          healthScore -= 1;
+        }
+
+        // Check for mixed trailing slashes
+        if (item.category !== 'assets' && item.category !== 'api') {
+          const pathOnly = item.path.split('?')[0];
+          if (pathOnly && pathOnly !== '/') {
+            const hasTrailing = pathOnly.endsWith('/');
+            htmlTrailingSlashes.add(hasTrailing);
+          }
+        }
+      });
+
+      // Warning: Mixed Trailing Slashes
+      if (htmlTrailingSlashes.size > 1) {
+        auditIssues.push({
+          type: 'warning',
+          title: 'Mixed Slashes (SEO Duplicate Page Risk)',
+          desc: 'The URL set contains a mix of paths ending in a trailing slash and paths without it. Search engines treat /about/ and /about as distinct pages, risking duplicate content penalties.',
+          rec: 'Configure your web server (Nginx/Cloudflare Page Rules) to strictly enforce either trailing slashes or no slashes domain-wide.'
+        });
+        healthScore -= 5;
+      }
+
+      // Keep health score between 0 and 100
+      healthScore = Math.max(0, Math.min(100, healthScore));
+
+      // 1. Hide placeholder and show dashboard
+      if (placeholder) placeholder.style.display = 'none';
+      if (resultsContainer) resultsContainer.style.display = 'flex';
+
+      // 2. Render KPIs
+      if (totalLinksEl) totalLinksEl.textContent = String(analyzedData.length);
+      const maxDepth = analyzedData.reduce((max, item) => Math.max(max, item.depth), 0);
+      if (maxDepthEl) maxDepthEl.textContent = String(maxDepth);
+      if (issuesCountEl) {
+        issuesCountEl.textContent = String(auditIssues.length);
+        if (auditIssues.length > 0) {
+          issuesCountEl.className = 'stat-num text-warning';
+        } else {
+          issuesCountEl.className = 'stat-num text-success';
+        }
+      }
+      if (healthScoreEl) {
+        healthScoreEl.textContent = `${healthScore}%`;
+        if (healthScore >= 90) healthScoreEl.className = 'stat-num text-success';
+        else if (healthScore >= 70) healthScoreEl.className = 'stat-num text-warning';
+        else healthScoreEl.className = 'stat-num text-danger';
+      }
+
+      // 3. Render Categorical Distribution Chart
+      renderDistributionChart();
+
+      // 4. Render Segregated Groups Lists
+      renderCategorizedList();
+
+      // 5. Render Audit Issues List
+      renderAuditIssues();
+
+      // 6. Render Directory Tree
+      renderDirectoryTree();
+    }
+
+    function detectBaseDomain(urls: string[]): string {
+      for (const u of urls) {
+        if (u.startsWith('http://') || u.startsWith('https://')) {
+          try {
+            const parsed = new URL(u);
+            return parsed.origin;
+          } catch(e) {}
+        }
+      }
+      return '';
+    }
+
+    function renderDistributionChart() {
+      if (!distBar || !distLegend) return;
+      distBar.innerHTML = '';
+      distLegend.innerHTML = '';
+
+      const total = analyzedData.length;
+      if (total === 0) return;
+
+      const catMeta: Record<string, { label: string; class: string; color: string }> = {
+        blog: { label: 'Blog / Content', class: 'dist-blog', color: '#34d399' },
+        products: { label: 'Products', class: 'dist-product', color: '#fb923c' },
+        docs: { label: 'Docs / Guides', class: 'dist-docs', color: '#60a5fa' },
+        legal: { label: 'Static / Legal', class: 'dist-legal', color: '#a78bfa' },
+        assets: { label: 'Assets', class: 'dist-asset', color: '#e879f9' },
+        api: { label: 'API / Dynamic', class: 'dist-api', color: '#f43f5e' },
+        general: { label: 'General Pages', class: 'dist-general', color: '#9ca3af' }
+      };
+
+      Object.keys(categories).forEach(catKey => {
+        const count = categories[catKey].length;
+        if (count === 0) return;
+
+        const pct = (count / total) * 100;
+
+        // Add segment to bar
+        const segment = document.createElement('div');
+        segment.className = `dist-segment ${catMeta[catKey].class}`;
+        segment.style.width = `${pct}%`;
+        segment.title = `${catMeta[catKey].label}: ${count} URLs (${pct.toFixed(1)}%)`;
+        distBar.appendChild(segment);
+
+        // Add legend item
+        const legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.innerHTML = `
+          <span class="legend-color" style="background-color: ${catMeta[catKey].color};"></span>
+          <span>${catMeta[catKey].label} (${count})</span>
+        `;
+        distLegend.appendChild(legendItem);
+      });
+    }
+
+    function renderCategorizedList() {
+      if (!categoriesContainer) return;
+      categoriesContainer.innerHTML = '';
+
+      const catMeta: Record<string, { label: string; badge: string }> = {
+        blog: { label: 'Blog & Editorial', badge: 'blog-badge' },
+        products: { label: 'Products & Services', badge: 'product-badge' },
+        docs: { label: 'Documentation & Guides', badge: 'docs-badge' },
+        legal: { label: 'Static & Legal Pages', badge: 'legal-badge' },
+        assets: { label: 'Assets & Media files', badge: 'asset-badge' },
+        api: { label: 'API & Query Endpoints', badge: 'api-badge' },
+        general: { label: 'Uncategorized General Pages', badge: 'general-badge' }
+      };
+
+      Object.keys(categories).forEach((catKey, index) => {
+        const items = categories[catKey];
+        if (items.length === 0) return;
+
+        const group = document.createElement('div');
+        group.className = 'cat-group' + (index === 0 ? ' open' : '');
+
+        group.innerHTML = `
+          <button class="cat-header" type="button" aria-expanded="${index === 0 ? 'true' : 'false'}">
+            <span class="cat-header-title">
+              <span class="badge ${catMeta[catKey].badge}">${catKey}</span>
+              <span>${catMeta[catKey].label}</span>
+            </span>
+            <span class="cat-header-meta">
+              <span>${items.length} URL${items.length > 1 ? 's' : ''}</span>
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+          <div class="cat-body">
+            <table class="url-table">
+              <thead>
+                <tr>
+                  <th>URL Path / Path</th>
+                  <th>Folder Slashes</th>
+                  <th>Status / Issues</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${items.map(item => `
+                  <tr>
+                    <td class="url-cell">${item.url}</td>
+                    <td style="font-family: var(--font-mono); color: var(--text-secondary); text-align: center;">${item.depth}</td>
+                    <td>
+                      ${item.issues.length > 0 
+                        ? `<span style="color: #fb923c; font-weight:600; display: inline-flex; gap: 0.2rem; align-items:center;">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                             ${item.issues.length} Alert${item.issues.length > 1 ? 's' : ''}
+                           </span>` 
+                        : '<span style="color: #34d399; font-weight:600;">✓ Healthy</span>'
+                      }
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        // Toggle handler
+        const header = group.querySelector('.cat-header');
+        header?.addEventListener('click', () => {
+          const isOpen = group.classList.toggle('open');
+          header.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        categoriesContainer.appendChild(group);
+      });
+    }
+
+    function renderAuditIssues() {
+      if (!auditContainer) return;
+      auditContainer.innerHTML = '';
+
+      if (auditIssues.length === 0) {
+        auditContainer.innerHTML = `
+          <div class="no-issues-banner">
+            <h4>Awesome! Zero Issues Detected</h4>
+            <p>Your sitemap and path structure comply with clean URL, secure protocol, and SEO folder nesting practices.</p>
+          </div>
+        `;
+        return;
+      }
+
+      auditIssues.forEach(issue => {
+        const card = document.createElement('div');
+        card.className = `issue-card issue-${issue.type}`;
+
+        let iconMarkup = '';
+        if (issue.type === 'critical') {
+          iconMarkup = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        } else if (issue.type === 'warning') {
+          iconMarkup = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        } else {
+          iconMarkup = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        }
+
+        card.innerHTML = `
+          <div class="issue-icon">${iconMarkup}</div>
+          <div class="issue-details">
+            <h4>${issue.title}</h4>
+            <p>${issue.desc}</p>
+            <div class="issue-rec"><strong>Optimization recommendation:</strong> ${issue.rec}</div>
+            ${issue.url ? `<div class="issue-url">${issue.url}</div>` : ''}
+          </div>
+        `;
+
+        auditContainer.appendChild(card);
+      });
+    }
+
+    function renderDirectoryTree() {
+      if (!treeContainer) return;
+      treeContainer.innerHTML = '';
+
+      // Build tree object from paths
+      const rootNode: URLNode = {};
+
+      analyzedData.forEach(item => {
+        let cleanPath = item.path;
+        // Parse the path
+        if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+          try {
+            const p = new URL(cleanPath);
+            cleanPath = p.pathname;
+          } catch(e) {}
+        }
+        
+        const parts = cleanPath.split('/').map(p => p.trim()).filter(p => p.length > 0);
+        
+        let currentNode = rootNode;
+        parts.forEach((part, i) => {
+          if (i === parts.length - 1) {
+            // It is a leaf page
+            if (!currentNode._files) {
+              currentNode._files = [];
+            }
+            if (!currentNode._files.includes(part)) {
+              currentNode._files.push(part);
+            }
+          } else {
+            // It is a directory node
+            if (!currentNode[part]) {
+              currentNode[part] = {};
+            }
+            currentNode = currentNode[part];
+          }
+        });
+      });
+
+      // Recursive tree builder
+      function buildHTMLTree(node: URLNode, name: string): string {
+        let html = '';
+        const keys = Object.keys(node).filter(k => k !== '_files');
+        const files = node._files || [];
+
+        const folderIcon = `<svg class="tree-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: var(--accent-network);"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
+        const fileIcon = `<svg class="tree-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="color: var(--text-secondary);"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
+
+        if (name) {
+          html += `<details class="tree-folder" open>
+            <summary>${folderIcon} ${name}</summary>`;
+        }
+
+        // Render sub-folders first
+        keys.forEach(k => {
+          html += buildHTMLTree(node[k], k);
+        });
+
+        // Render files inside folder
+        files.forEach(f => {
+          html += `<span class="tree-file">${fileIcon} ${f || '/'}</span>`;
+        });
+
+        if (name) {
+          html += `</details>`;
+        }
+        return html;
+      }
+
+      const rootHTML = buildHTMLTree(rootNode, '/ (root domain)');
+      treeContainer.innerHTML = rootHTML;
+    }
+
+    if (runBtn) {
+      runBtn.addEventListener('click', async () => {
+        if (currentMode === 'scan') {
+          const urlVal = urlInput ? urlInput.value.trim() : '';
+          if (!urlVal) {
+            alert('Please enter a website URL.');
+            return;
+          }
+
+          // Use CORS proxy via Allorigins
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlVal)}`;
+          
+          runBtn.disabled = true;
+          runBtn.textContent = 'Crawling sitemap...';
+
+          try {
+            const resp = await fetch(proxyUrl);
+            if (!resp.ok) throw new Error('Proxy crawl failed');
+            const dataStr = await resp.text();
+            
+            // Check if XML sitemap
+            const locRegex = new RegExp('\\x3cloc\\x3e(https?:\\/\\/[^\\s\\x3c]+)\\x3c\\/loc\\x3e', 'gi');
+            const matches = [];
+            let m;
+            while ((m = locRegex.exec(dataStr)) !== null) {
+              matches.push(m[1]);
+            }
+
+            if (matches.length > 0) {
+              // It is a sitemap
+              runAnalysis(matches);
+            } else {
+              // Parse links in HTML
+              const hrefRegex = new RegExp('href=["\'](https?:\\/\\/[^"\']+|\\/[^"\']*)["\']', 'gi');
+              const htmlMatches = [];
+              while ((m = hrefRegex.exec(dataStr)) !== null) {
+                htmlMatches.push(m[1]);
+              }
+              
+              if (htmlMatches.length > 0) {
+                runAnalysis(htmlMatches);
+              } else {
+                throw new Error('No links or sitemaps detected in URL payload.');
+              }
+            }
+          } catch (e: any) {
+            console.error(e);
+            alert(`CORS request failed or blocked: ${e.message}. \n\nSecurity policies often restrict scraping from browsers. Please select 'Sitemap XML' or 'HTML Source' mode, copy-paste the code manually, and try again.`);
+          } finally {
+            runBtn.disabled = false;
+            runBtn.textContent = 'Analyze Website';
+          }
+        } else {
+          // Paste modes
+          const extracted = extractUrls();
+          runAnalysis(extracted);
+        }
+      });
+    }
+
+    // Export downloads
+    const dlBtns = document.querySelectorAll('.dl-btn');
+    dlBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const format = target.dataset.format;
+        if (analyzedData.length === 0) return;
+
+        let content = '';
+        let filename = `devsubnet-website-analysis.${format}`;
+        let mimeType = 'text/plain';
+
+        if (format === 'json') {
+          mimeType = 'application/json';
+          content = JSON.stringify({
+            total_urls: analyzedData.length,
+            categories: Object.keys(categories).reduce((acc, key) => {
+              acc[key] = categories[key].map(item => item.url);
+              return acc;
+            }, {} as Record<string, string[]>),
+            audit_issues: auditIssues
+          }, null, 2);
+        } else if (format === 'csv') {
+          mimeType = 'text/csv';
+          content = 'URL,Category,Folder Depth,Length,Issues\n' + 
+            analyzedData.map(item => {
+              const issuesStr = item.issues.join(' | ');
+              return `"${item.url}","${item.category}",${item.depth},${item.url.length},"${issuesStr}"`;
+            }).join('\n');
+        } else {
+          // txt file
+          content = analyzedData.map(item => item.url).join('\n');
+        }
+
+        const blob = new Blob([content], { type: mimeType });
+        const dlUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = dlUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(dlUrl);
+      });
+    });
+
+    // Tab switcher logic
+    const tabBtns = document.querySelectorAll('.export-tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => (c as HTMLElement).style.display = 'none');
+
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('active');
+        const tabId = target.dataset.tab;
+        
+        const contentEl = document.getElementById(`tab-${tabId}`);
+        if (contentEl) {
+          contentEl.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  // Bind init functions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWebsiteAnalyzer);
+  } else {
+    initWebsiteAnalyzer();
+  }
+  document.addEventListener('astro:page-load', initWebsiteAnalyzer);
+</script>

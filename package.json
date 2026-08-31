@@ -13,7 +13,9 @@
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
-    "astro": "^7.2.8"
+    "astro": "^7.2.8",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "allowScripts": {
     "esbuild": true

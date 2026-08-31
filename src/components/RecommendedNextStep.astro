@@ -1,0 +1,387 @@
+---
+import { translations, type SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  currentTool: string;
+  lang?: SupportedLanguage;
+}
+
+const { currentTool, lang = "en" } = Astro.props;
+
+const t = translations[lang] || translations.en;
+const langPrefix = lang === 'en' ? '' : `/${lang}`;
+
+// Pages that actually have localized versions in src/pages/[lang]/
+const LOCALIZED_PAGES = [
+  '/',
+  '/visual-subnet-splitter',
+  '/kubernetes-subnet-planner',
+  '/ipv6-subnet-calculator',
+  '/cidr-cheat-sheet'
+];
+
+interface Recommendation {
+  title: string;
+  description: string;
+  linkText: string;
+  href: string;
+  badge: string;
+  icon: 'splitter' | 'vlsm' | 'terraform' | 'ipv4' | 'aws' | 'k8s' | 'overlap' | 'cheatsheet';
+}
+
+const recommendations: Record<string, Recommendation> = {
+  ipv4: {
+    title: "Divide Network Blocks Visually",
+    description: "Ready to divide your subnet? Use the Visual Subnet Splitter to partition your IP blocks with live tree structures and export clean configurations.",
+    linkText: "Open Visual Splitter",
+    href: "/visual-subnet-splitter",
+    badge: "VISUAL TOOL",
+    icon: "splitter"
+  },
+  splitter: {
+    title: "Optimize for Custom Host Sizes",
+    description: "Need subnets sized to exact host requirements? Use the VLSM Calculator to automatically minimize address waste in your network design.",
+    linkText: "Open VLSM Calculator",
+    href: "/vlsm-calculator",
+    badge: "OPTIMIZATION",
+    icon: "vlsm"
+  },
+  vlsm: {
+    title: "Export Layouts to IaC",
+    description: "Generate infrastructure as code for your subnets. Plan your cloud subnets and export copy-pasteable HCL block configuration.",
+    linkText: "Open Terraform Planner",
+    href: "/terraform-subnet-planner",
+    badge: "INFRASTRUCTURE AS CODE",
+    icon: "terraform"
+  },
+  cheatsheet: {
+    title: "Calculate Interactively",
+    description: "Need to analyze a specific subnet or CIDR range? Open the interactive IPv4 Calculator to compute ranges, masks, and hosts.",
+    linkText: "Open IPv4 Calculator",
+    href: "/",
+    badge: "INTERACTIVE CALC",
+    icon: "ipv4"
+  },
+  terraform: {
+    title: "Plan Production Cloud VPCs",
+    description: "Design structured, multi-tier VPC subnets across Availability Zones with proper cloud provider IP reservations.",
+    linkText: "Open AWS VPC Calculator",
+    href: "/aws-vpc-subnet-calculator",
+    badge: "CLOUD PLANNING",
+    icon: "aws"
+  },
+  aws: {
+    title: "Generate Terraform HCL",
+    description: "Turn your VPC design into code. Use the Terraform Planner to export copy-pasteable configuration for subnets.",
+    linkText: "Open Terraform Planner",
+    href: "/terraform-subnet-planner",
+    badge: "IaC EXPORT",
+    icon: "terraform"
+  },
+  azure: {
+    title: "Generate Terraform HCL",
+    description: "Turn your VNet design into code. Use the Terraform Planner to export copy-pasteable Azure network subnets.",
+    linkText: "Open Terraform Planner",
+    href: "/terraform-subnet-planner",
+    badge: "IaC EXPORT",
+    icon: "terraform"
+  },
+  gcp: {
+    title: "Generate Terraform HCL",
+    description: "Turn your GCP subnet design into code. Use the Terraform Planner to export copy-pasteable GCP subnets.",
+    linkText: "Open Terraform Planner",
+    href: "/terraform-subnet-planner",
+    badge: "IaC EXPORT",
+    icon: "terraform"
+  },
+  k8s: {
+    title: "Size Cilium/Calico Overlay Networks",
+    description: "Size and plan pod, service, and node IP ranges for K8s CNIs including Cilium, Calico, and AWS CNI.",
+    linkText: "Open CNI CIDR Calculator",
+    href: "/k8s-cidr-calculator",
+    badge: "CONTAINER NETWORKING",
+    icon: "k8s"
+  },
+  'k8s-cidr': {
+    title: "Plan Node & Pod Sizing",
+    description: "Determine cluster node, pod, and service capacity based on maximum pods per node and routing strategies.",
+    linkText: "Open K8s IP Planner",
+    href: "/kubernetes-subnet-planner",
+    badge: "ARCHITECTURE",
+    icon: "k8s"
+  },
+  ipv6: {
+    title: "Compare with IPv4 Routing",
+    description: "Calculate and plan IPv4 subnets, broadcast addresses, and host ranges for legacy network transitions.",
+    linkText: "Open IPv4 Calculator",
+    href: "/",
+    badge: "INTERACTIVE CALC",
+    icon: "ipv4"
+  },
+  overlap: {
+    title: "Partition Networks Visually",
+    description: "Re-partition your subnets visually using the interactive splitter to prevent overlapping CIDR conflicts.",
+    linkText: "Open Visual Splitter",
+    href: "/visual-subnet-splitter",
+    badge: "VISUAL TOOL",
+    icon: "splitter"
+  },
+  supernet: {
+    title: "CIDR Prefix Reference",
+    description: "Browse CIDR subnets, host capacities, and subnet masks in our complete reference table cheat sheet.",
+    linkText: "Open Cheat Sheet",
+    href: "/cidr-cheat-sheet",
+    badge: "QUICK REFERENCE",
+    icon: "cheatsheet"
+  }
+};
+
+const rec = recommendations[currentTool] || recommendations.ipv4;
+
+// Safely prepend language prefix only if the target page is localized
+const targetHref = LOCALIZED_PAGES.includes(rec.href) 
+  ? `${langPrefix}${rec.href === '/' ? '' : rec.href}` 
+  : rec.href;
+---
+
+<div class="next-step-banner">
+  <div class="banner-glow" aria-hidden="true"></div>
+  <div class="banner-content">
+    <div class="banner-left">
+      <div class="banner-badge">
+        <span class="pulse-dot"></span>
+        RECOMMENDED NEXT STEP: {rec.badge}
+      </div>
+      <h3 class="banner-title">{rec.title}</h3>
+      <p class="banner-desc">{rec.description}</p>
+    </div>
+    <div class="banner-right">
+      <a href={targetHref} class="banner-btn">
+        <span>{rec.linkText}</span>
+        {rec.icon === 'splitter' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+            <path d="M12 2v20M2 12h20M12 12l5-5M12 12l-5 5"/>
+          </svg>
+        )}
+        {rec.icon === 'vlsm' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+            <line x1="15" y1="3" x2="15" y2="21"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+          </svg>
+        )}
+        {rec.icon === 'terraform' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 3h10M4 8h16M7 13h10M10 18h4"/>
+            <path d="M12 3v18"/>
+          </svg>
+        )}
+        {rec.icon === 'ipv4' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        )}
+        {rec.icon === 'aws' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        )}
+        {rec.icon === 'k8s' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        )}
+        {rec.icon === 'overlap' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        )}
+        {rec.icon === 'cheatsheet' && (
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        )}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .next-step-banner {
+    position: relative;
+    margin: 2.5rem 0 1.5rem 0;
+    padding: 1.5rem 2rem;
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    transition: all var(--transition-normal);
+  }
+
+  :root[data-theme="light"] .next-step-banner {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(161, 66, 244, 0.2);
+    box-shadow: 0 8px 24px rgba(161, 66, 244, 0.05);
+  }
+
+  .next-step-banner:hover {
+    border-color: rgba(161, 66, 244, 0.55);
+    box-shadow: var(--shadow-gemini), 0 8px 32px rgba(161, 66, 244, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .banner-glow {
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(161, 66, 244, 0.15) 0%, rgba(66, 133, 244, 0.05) 50%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+    z-index: 1;
+    transition: transform var(--transition-normal);
+  }
+
+  .next-step-banner:hover .banner-glow {
+    transform: translateX(10%) scale(1.1);
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .banner-left {
+    flex: 1;
+  }
+
+  .banner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent-host);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    background: rgba(161, 66, 244, 0.1);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(161, 66, 244, 0.18);
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-host);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--accent-host);
+    animation: banner-pulse 2s infinite;
+  }
+
+  .banner-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.01em;
+  }
+
+  .banner-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 650px;
+  }
+
+  .banner-right {
+    flex-shrink: 0;
+  }
+
+  .banner-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: linear-gradient(135deg, var(--accent-network), var(--accent-host));
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+    transition: all var(--transition-normal);
+  }
+
+  .banner-btn:hover {
+    box-shadow: 0 6px 20px rgba(161, 66, 244, 0.5);
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  .btn-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-fast);
+  }
+
+  .banner-btn:hover .btn-icon {
+    transform: translateX(3px);
+  }
+
+  @keyframes banner-pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(161, 66, 244, 0.5);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 6px rgba(161, 66, 244, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(161, 66, 244, 0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .banner-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .banner-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .banner-right {
+      width: 100%;
+    }
+
+    .next-step-banner {
+      padding: 1.25rem 1.5rem;
+    }
+  }
+</style>

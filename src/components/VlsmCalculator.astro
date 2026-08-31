@@ -250,7 +250,7 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
       updateCode(allocations);
     }
 
-    function updateCode(allocations: { name: string; cidr: string; network: string }[]) {
+    function updateCode(allocations: { name: string; cidr: string }[]) {
       if (!codeOutput) return;
       if (activeTab === 'tf') {
         let code = '# Terraform VLSM Subnet Allocations\n';

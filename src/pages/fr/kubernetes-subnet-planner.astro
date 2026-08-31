@@ -1,12 +1,15 @@
----
+---import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import MainShell from '../../components/MainShell.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="fr"
+  lang={lang}
   title="Planificateur de sous-réseau Kubernetes et calculateur d'IP de Pod | DevSubnet"
   description="Planifiez des CIDR de Nœuds et de Pods pour les clusters Kubernetes. Calculez les densités maximales de pods et évitez l'épuisement d'IP."
 >
-  <MainShell activeTab="k8s" navPath="kubernetes-subnet-planner" lang="fr" />
+  <MainShell activeTab="k8s" navPath="kubernetes-subnet-planner" lang={lang} />
 </Layout>

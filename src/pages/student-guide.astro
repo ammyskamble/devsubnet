@@ -1,16 +1,19 @@
----
+---import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
 import { translations } from '../utils/i18n';
 
 const t = translations.en;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout
+<Layout lang={lang}
   title="Subnet Calculator for Students | DevSubnet"
   description="Free IP subnet calculator designed for CCNA/CCNP students and networking learners. All calculations run locally in your browser."
 >
-  <MainShell activeTab="ipv4" defaultCloud="standard" lang="en">
+  <MainShell activeTab="ipv4" defaultCloud="standard" lang={lang}>
 
     <!-- Student-focused FAQ -->
     <section class="faq-section" style="margin-top: 4rem; padding: 2rem; background: var(--card-bg, rgba(255, 255, 255, 0.03)); border-radius: var(--radius-md);">

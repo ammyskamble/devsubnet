@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout 
+<Layout lang={lang} 
   title="How to Use Terraform cidrsubnet() Function | VPC Subnet Planning | DevSubnet"
   description="Complete guide to using Terraform's cidrsubnet() function for VPC subnet planning. Calculate subnet offsets, avoid CIDR overlaps, and generate production-ready HCL code for AWS, Azure, and GCP multi-AZ architectures."
 >
   <div class="app-shell">
-    <NavBar path='guide' />
+    <NavBar lang={lang} path='guide' />
 
     <main class="page-main">
       <div class="content-container">
@@ -109,17 +113,7 @@ resource "aws_subnet" "private" &#123;
       </div>
     </main>
 
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms & Conditions</a>
-        <a href="/faq">FAQ</a>
-      </div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

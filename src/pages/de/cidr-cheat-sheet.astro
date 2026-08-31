@@ -1,17 +1,21 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.de;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 <Layout
-  lang="de"
+  lang={lang}
   title="CIDR Spickzettel – Vollständige IPv4 Subnetz-Referenztabelle | DevSubnet"
   description="Vollständiger IPv4 CIDR Spickzettel von /0 bis /32 mit Subnetzmasken, Wildcard-Masken, Gesamt-IPs und nutzbaren Hosts."
 >
   <div class="app-shell">
-    <NavBar path="cheatsheet" lang="de" />
+    <NavBar path="cheatsheet" lang={lang} />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">REFERENZ / CIDR SPICKZETTEL</div>
@@ -68,16 +72,6 @@ const t = translations.de;
         </div>
       </section>
     </main>
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/de/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>

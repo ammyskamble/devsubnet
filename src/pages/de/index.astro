@@ -1,15 +1,18 @@
----
+---import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import MainShell from '../../components/MainShell.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.de;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="de"
+  lang={lang}
   title={t.meta.defaultTitle}
   description={t.meta.defaultDesc}
 >
-  <MainShell activeTab="ipv4" defaultCloud="standard" lang="de" />
+  <MainShell activeTab="ipv4" defaultCloud="standard" lang={lang} />
 </Layout>

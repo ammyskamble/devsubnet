@@ -1,12 +1,15 @@
----
+---import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import MainShell from '../../components/MainShell.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="ko"
+  lang={lang}
   title="IPv6 서브넷 계산기 & 접두사 위임 | DevSubnet"
   description="IPv6 주소를 압축 및 확장하고 접두사 위임(/48, /56, /64) 서브넷을 즉시 계산합니다."
 >
-  <MainShell activeTab="ipv6" navPath="ipv6-subnet-calculator" lang="ko" />
+  <MainShell activeTab="ipv6" navPath="ipv6-subnet-calculator" lang={lang} />
 </Layout>

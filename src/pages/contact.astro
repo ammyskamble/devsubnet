@@ -1,14 +1,18 @@
-﻿---
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout 
+<Layout lang={lang} 
   title="Contact DevSubnet – Feedback & Support"
   description="Contact the DevSubnet team with questions, feedback, or feature suggestions about our free IP subnet calculator and CIDR planning tools. We'd love to hear from you."
 >
   <div class="app-shell">
-    <NavBar path='contact' />
+    <NavBar lang={lang} path='contact' />
 
     <main class="page-main">
       <div class="content-container">
@@ -84,17 +88,7 @@ import NavBar from '../components/NavBar.astro';
       </div>
     </main>
 
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms & Conditions</a>
-        <a href="/faq">FAQ</a>
-      </div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout
+<Layout lang={lang}
   title="Terraform Subnet Planner – cidrsubnet() VPC Calculator | DevSubnet"
   description="Terraform subnet planner and cidrsubnet() calculator for AWS, Azure, and GCP VPCs. Generate HCL code, visualize AZ distributions, and calculate subnet offsets to prevent CIDR overlaps and state drift in infrastructure as code."
 >
   <div class="app-shell">
-    <NavBar path="terraform" />
+    <NavBar lang={lang} path="terraform" />
 
     <main>
       <!-- Hero Intro -->
@@ -170,17 +174,7 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
     </main>
 
     <!-- Footer -->
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR INFRASTRUCTURE AS CODE</span>
-      <div class="footer-links">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms</a>
-        <a href="/faq">FAQ</a>
-      </div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 
   <!-- FAQ Schema for SEO -->

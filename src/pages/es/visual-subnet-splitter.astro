@@ -1,12 +1,15 @@
----
+---import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import MainShell from '../../components/MainShell.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="es"
+  lang={lang}
   title="Divisor Visual de Subredes y Particionador CIDR | DevSubnet"
   description="Divida bloques de red visualmente en subredes personalizadas. Árbol dinámico y exportación a Terraform y Ansible."
 >
-  <MainShell activeTab="splitter" navPath="visual-subnet-splitter" lang="es" />
+  <MainShell activeTab="splitter" navPath="visual-subnet-splitter" lang={lang} />
 </Layout>

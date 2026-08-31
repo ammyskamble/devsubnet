@@ -1,18 +1,22 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.ja;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="ja"
+  lang={lang}
   title="IPサブネット & CIDR よくある質問 (FAQ) | DevSubnet"
   description="IPサブネット計算、CIDR、AWS/AzureクラウドVPC予約、Kubernetesネットワークに関する疑問をわかりやすく解説。"
 >
   <div class="app-shell">
-    <NavBar path="faq" lang="ja" />
+    <NavBar path="faq" lang={lang} />
 
     <main class="faq-main">
       <div class="faq-container">
@@ -99,17 +103,7 @@ const t = translations.ja;
       </div>
     </main>
 
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/ja/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

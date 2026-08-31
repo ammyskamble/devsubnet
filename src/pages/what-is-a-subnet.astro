@@ -1,14 +1,17 @@
----
+---import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout 
+<Layout lang={lang} 
   title="What is a Subnet? Prefix Length & Subnet Mask Cheat Sheet"
   description="Learn what a subnet is, how subnet prefix lengths work, and access our quick subnet mask cheat sheet for network planning."
 >
   <div class="app-shell">
-    <NavBar path="guide" />
+    <NavBar lang={lang} path="guide" />
 
     <main class="page-main">
       <div class="content-container">

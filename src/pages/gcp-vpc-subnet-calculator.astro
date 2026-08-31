@@ -1,11 +1,14 @@
----
+---import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
-<Layout
+<Layout lang={lang}
   title="GCP VPC Subnet Calculator – CIDR Planner with 4 Reserved IPs | DevSubnet"
   description="Calculate Google Cloud VPC subnets accounting for all 4 reserved IP addresses (network, gateway, future use, broadcast). Plan CIDR blocks and export Terraform for GCP instantly."
   canonicalUrl="https://devsubnet.com/gcp-vpc-subnet-calculator/"
 >
-  <MainShell activeTab="ipv4" defaultCloud="gcp" navPath="gcp" />
+  <MainShell lang={lang} activeTab="ipv4" defaultCloud="gcp" navPath="gcp" />
 </Layout>

@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import OverlapChecker from '../components/OverlapChecker.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
-<Layout
+<Layout lang={lang}
   title="Subnet Overlap Checker – CIDR Conflict Detector | DevSubnet"
   description="Subnet overlap checker detecting identical, overlapping, and contained CIDR ranges. Essential before VPC peering, VPN routing, firewall changes, and infrastructure deployments to prevent ambiguous routing and traffic loss."
 >
   <div class="app-shell">
-    <NavBar path="overlap" />
+    <NavBar lang={lang} path="overlap" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">CONFLICT DETECTION / CIDR OVERLAP CHECKER</div>
@@ -19,10 +23,6 @@ import NavBar from '../components/NavBar.astro';
         <OverlapChecker />
       </section>
     </main>
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links"><a href="/about">About Us</a><a href="/contact">Contact</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/faq">FAQ</a></div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>

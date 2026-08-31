@@ -1,17 +1,21 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.ko;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 <Layout
-  lang="ko"
+  lang={lang}
   title="CIDR 참조 테이블 – 전체 IPv4 서브넷 | DevSubnet"
   description="서브넷 마스크, 와일드카드 마스크, 전체 IP 수, 사용 가능한 호스트 수를 포함하는 /0부터 /32까지의 전체 IPv4 CIDR 참조 테이블입니다."
 >
   <div class="app-shell">
-    <NavBar path="cheatsheet" lang="ko" />
+    <NavBar path="cheatsheet" lang={lang} />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">참조 / CIDR 테이블</div>
@@ -68,16 +72,6 @@ const t = translations.ko;
         </div>
       </section>
     </main>
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/ko/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>

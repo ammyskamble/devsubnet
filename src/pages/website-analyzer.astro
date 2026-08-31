@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout
+<Layout lang={lang}
   title="Website Sitemap & Structure Analyzer | DevSubnet"
   description="Free online website analyzer and sitemap segregator. Parse sitemaps, URL lists, or HTML to group links by category, check directory depth, run SEO diagnostics, and download reports."
 >
   <div class="app-shell">
-    <NavBar path="website-analyzer" />
+    <NavBar lang={lang} path="website-analyzer" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">WEB UTILITIES / STRUCTURE &amp; OPTIMIZATION</div>
@@ -207,17 +211,7 @@ import NavBar from '../components/NavBar.astro';
 
     </main>
 
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms</a>
-        <a href="/faq">FAQ</a>
-      </div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 
@@ -961,10 +955,7 @@ https://devsubnet.com/assets/style.css`;
     <img src="/assets/logo.png" alt="logo">
     <img src="/assets/hero-banner-illustration.jpg" alt="hero">
   </main>
-  <footer>
-    <a href="/privacy-policy">Privacy</a>
-    <a href="http://devsubnet.com/legacy-unsecure-http-link-checker">Unsecure Link</a>
-  </footer>
+  <Footer lang={lang} />
 </body>
 </html>`;
         }

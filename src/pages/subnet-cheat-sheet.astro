@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout
+<Layout lang={lang}
   title="Subnet Mask Cheat Sheet – Complete Subnetting Reference Table | DevSubnet"
   description="Complete subnet mask cheat sheet covering prefix lengths from /0 to /32 with subnet masks, wildcard masks, total addresses, and usable hosts. Free networking resource."
 >
   <div class="app-shell">
-    <NavBar path="cheatsheet" />
+    <NavBar lang={lang} path="cheatsheet" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">REFERENCE / SUBNET CHEAT SHEET</div>
@@ -148,11 +152,7 @@ import NavBar from '../components/NavBar.astro';
         }
       </script>
     </main>
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links"><a href="/about">About Us</a><a href="/contact">Contact</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/faq">FAQ</a></div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 
   <style is:global>

@@ -1,18 +1,22 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.ko;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="ko"
+  lang={lang}
   title="IP 서브네팅 & CIDR FAQ – 자주 묻는 질문 | DevSubnet"
   description="IP 서브넷, CIDR, 클라우드 VPC 및 Kubernetes 네트워킹에 대한 질문과 답변. 계산법, AWS 예약 및 모범 사례를 알기 쉽게 설명합니다."
 >
   <div class="app-shell">
-    <NavBar path="faq" lang="ko" />
+    <NavBar path="faq" lang={lang} />
 
     <main class="faq-main">
       <div class="faq-container">
@@ -99,17 +103,7 @@ const t = translations.ko;
       </div>
     </main>
 
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/ko/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

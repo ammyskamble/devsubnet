@@ -1,17 +1,21 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.pt;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 <Layout
-  lang="pt"
+  lang={lang}
   title="Tabela de Referência CIDR – Sub-redes IPv4 Completas | DevSubnet"
   description="Tabela de referência CIDR IPv4 completa de /0 a /32 com máscaras de sub-rede, máscaras curinga, IPs totais e hosts utilizáveis."
 >
   <div class="app-shell">
-    <NavBar path="cheatsheet" lang="pt" />
+    <NavBar path="cheatsheet" lang={lang} />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">REFERÊNCIA / TABELA CIDR</div>
@@ -68,16 +72,6 @@ const t = translations.pt;
         </div>
       </section>
     </main>
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/pt/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>

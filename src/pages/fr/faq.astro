@@ -1,18 +1,22 @@
----
+---import Footer from '../../components/Footer.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
 import { translations } from '../../utils/i18n';
 
 const t = translations.fr;
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="fr"
+  lang={lang}
   title="FAQ sur le sous-réseau IP & CIDR – Questions fréquentes | DevSubnet"
   description="Réponses aux questions courantes sur les sous-réseaux IP, le CIDR, les VPC cloud et les réseaux Kubernetes. Calculs, réservations AWS et bonnes pratiques expliqués simplement."
 >
   <div class="app-shell">
-    <NavBar path="faq" lang="fr" />
+    <NavBar path="faq" lang={lang} />
 
     <main class="faq-main">
       <div class="faq-container">
@@ -99,17 +103,7 @@ const t = translations.fr;
       </div>
     </main>
 
-    <footer>
-      <span>{t.footer.tagline}</span>
-      <div class="footer-links">
-        <a href="/about">{t.footer.about}</a>
-        <a href="/contact">{t.footer.contact}</a>
-        <a href="/privacy">{t.footer.privacy}</a>
-        <a href="/terms">{t.footer.terms}</a>
-        <a href="/fr/faq">{t.footer.faq}</a>
-      </div>
-      <span>{t.footer.noData}</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

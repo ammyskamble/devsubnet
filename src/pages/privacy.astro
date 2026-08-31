@@ -1,14 +1,18 @@
-﻿---
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
-<Layout 
+<Layout lang={lang} 
   title="Privacy Policy | DevSubnet – No Data Collected"
   description="DevSubnet's privacy policy. Our IP subnet calculator runs entirely in your browser with no server-side processing. No data leaves your device. Ever."
 >
   <div class="app-shell">
-    <NavBar path='privacy' />
+    <NavBar lang={lang} path='privacy' />
 
     <main class="page-main">
       <div class="content-container">
@@ -61,17 +65,7 @@ import NavBar from '../components/NavBar.astro';
       </div>
     </main>
 
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links">
-        <a href="/about">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms & Conditions</a>
-        <a href="/faq">FAQ</a>
-      </div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>
 

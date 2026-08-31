@@ -1,0 +1,39 @@
+---
+import { translations, type SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const { lang = "en" } = Astro.props;
+const t = translations[lang] || translations.en;
+const langPrefix = lang === 'en' ? '' : `/${lang}`;
+
+const whatIsSubnetTranslations: Record<SupportedLanguage, string> = {
+  en: "What is a Subnet?",
+  de: "Was ist ein Subnetz?",
+  es: "¿Qué es una subred?",
+  ja: "サブネットとは？",
+  fr: "Qu'est-ce qu'un sous-réseau ?",
+  pt: "O que é uma sub-rede?",
+  ko: "서브넷이란?",
+  it: "Cos'è una subnet?"
+};
+
+const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslations.en;
+const cheatSheetText = t.nav.cheatsheet;
+---
+
+<footer>
+  <span>{t.footer.tagline}</span>
+  <div class="footer-links">
+    <a href={`${langPrefix}/about`}>{t.footer.about}</a>
+    <a href={`${langPrefix}/contact`}>{t.footer.contact}</a>
+    <a href={`${langPrefix}/privacy`}>{t.footer.privacy}</a>
+    <a href={`${langPrefix}/terms`}>{t.footer.terms}</a>
+    <a href={`${langPrefix}/faq`}>{t.footer.faq}</a>
+    <a href={`${langPrefix}/what-is-a-subnet`} style="font-weight: 500;">{whatIsSubnetText}</a>
+    <a href={`${langPrefix}/subnet-cheat-sheet`} style="font-weight: 500;">{cheatSheetText}</a>
+  </div>
+  <span>{t.footer.noData}</span>
+</footer>

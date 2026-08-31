@@ -1,12 +1,15 @@
----
+---import { type SupportedLanguage } from '../../utils/i18n';
+
 import Layout from '../../layouts/Layout.astro';
 import MainShell from '../../components/MainShell.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout 
-  lang="pt"
+  lang={lang}
   title="Calculadora de Sub-rede IPv6 e Delegação de Prefixo | DevSubnet"
   description="Comprima, expanda endereços IPv6 e calcule sub-redes com Delegação de Prefixo (/48, /56, /64) instantaneamente."
 >
-  <MainShell activeTab="ipv6" navPath="ipv6-subnet-calculator" lang="pt" />
+  <MainShell activeTab="ipv6" navPath="ipv6-subnet-calculator" lang={lang} />
 </Layout>

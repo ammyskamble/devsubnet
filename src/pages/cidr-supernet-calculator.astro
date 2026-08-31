@@ -1,14 +1,18 @@
----
+---import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
 import Layout from '../layouts/Layout.astro';
 import Supernetter from '../components/Supernetter.astro';
 import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
-<Layout
+<Layout lang={lang}
   title="CIDR Supernetting Calculator – Route Summarization Tool | DevSubnet"
   description="CIDR supernetting / route summarization calculator combining contiguous networks into single summary routes. Reduce routing table size, lower router memory use, and accelerate convergence for enterprise network designs."
 >
   <div class="app-shell">
-    <NavBar path="supernet" />
+    <NavBar lang={lang} path="supernet" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">SUPERNETTING / ROUTE SUMMARIZATION</div>
@@ -19,10 +23,6 @@ import NavBar from '../components/NavBar.astro';
         <Supernetter />
       </section>
     </main>
-    <footer>
-      <span>DEVSUBNET.COM / ENGINEERED FOR CLEAR NETWORKS</span>
-      <div class="footer-links"><a href="/about">About Us</a><a href="/contact">Contact</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/faq">FAQ</a></div>
-      <span>NO DATA LEAVES YOUR DEVICE</span>
-    </footer>
+    <Footer lang={lang} />
   </div>
 </Layout>

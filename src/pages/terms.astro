@@ -1,4 +1,5 @@
----import Footer from '../components/Footer.astro';
+---
+import Footer from '../components/Footer.astro';
 import { type SupportedLanguage } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
@@ -8,8 +9,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout lang={lang} 
-  title="Terms & Conditions | DevSubnet"
-  description="Terms of service for using DevSubnet's free IP subnet calculator and CIDR tools. Client-side only — simple, fair terms for a free networking utility."
+  title="Terms & Conditions | DevSubnet – Free IP Subnet Calculator Utility"
+  description="Terms of service and acceptable use policy for DevSubnet's free IP subnet calculator and CIDR tools. Complete rules for utility usage, AdSense disclosures, DMCA takedown procedures, and liability disclaimers."
 >
   <div class="app-shell">
     <NavBar lang={lang} path='terms' />
@@ -25,36 +26,90 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
           <div class="eyebrow">TERMS OF SERVICE</div>
           <h1>Terms & Conditions</h1>
           <p class="lede">
-            Last updated: August 27, 2026. Simple terms for using our open-source utilities.
+            Last updated: September 2, 2026. Fair and transparent terms governing the use of devsubnet.com.
           </p>
         </section>
 
         <section class="page-body">
           <div class="policy-block">
-            <h2>1. Acceptable Use</h2>
+            <h2>1. Acceptance of Terms</h2>
             <p>
-              devsubnet.com is provided free of charge for educational, professional, and personal networking calculations. You may use our calculators, planning tools, code exporters, and recursive visual splitting interfaces in any manner that does not interfere with the client-side operation of the site.
+              By accessing, browsing, or utilizing devsubnet.com ("the Website"), you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions. If you do not accept these terms in their entirety, you must cease using the Website immediately.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>2. No Warranties</h2>
+            <h2>2. Permitted & Acceptable Use</h2>
             <p>
-              devsubnet.com is provided on an "as-is" and "as-available" basis without warranties of any kind, whether express or implied. While we strive to maintain complete accuracy across all subnetting metrics, CIDR ranges, and Kubernetes planning allocations, we do not guarantee that the tool will be free of errors, or that its output is suitable for your specific production deployments.
+              devsubnet.com provides web-based calculation tools, visual subnet splitters, CIDR calculators, Kubernetes Pod density planners, and Infrastructure as Code (IaC) configuration generators for educational, personal, and professional networking purposes.
+            </p>
+            <ul class="policy-list">
+              <li><strong>Permitted Use:</strong> You may freely perform network calculations, export generated HCL/YAML code snippets, and link to our calculators in technical documentation or courses.</li>
+              <li><strong>Prohibited Conduct:</strong> You agree not to perform automated scraping, launch denial-of-service (DDoS) attacks, inject malicious payloads, or attempt to bypass site infrastructure rate limits or security controls.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>3. Third-Party Advertisements & Google AdSense</h2>
+            <p>
+              devsubnet.com is funded through advertisements served by <strong>Google AdSense</strong> and authorized ad exchanges.
+            </p>
+            <ul class="policy-list">
+              <li>Advertisements are delivered by third-party ad networks and do not represent an endorsement, guarantee, or warranty by devsubnet.com.</li>
+              <li>Interacting with third-party ads or external links directs you to third-party domains governed by their respective privacy policies and terms of service.</li>
+              <li>We hold no responsibility for products, software, or services promoted by third-party ad providers.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>4. Intellectual Property & Open Source Licensing</h2>
+            <p>
+              The devsubnet.com web interface design, visual branding, domain name, logos, and custom web components are protected by copyright and intellectual property laws. The core calculation algorithms and open-source codebase are hosted on GitHub. You may inspect, report issues, or contribute under the terms of the repository's open-source license.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>3. Limitation of Liability</h2>
+            <h2>5. Trademarks & Non-Affiliation Disclaimer</h2>
             <p>
-              Under no circumstances shall devsubnet.com, its developers, or its contributors be held liable for any damages (including, but not limited to, network outages, misallocated IP blocks, deployment delays, or loss of data) arising from the use of or inability to use our tools. Double-check all CIDR ranges before applying them to cloud or physical environments.
+              Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Kubernetes, Terraform, Cilium, and Calico are registered trademarks of their respective owners. devsubnet.com is an independent developer utility and is not affiliated with, endorsed by, sponsored by, or associated with Amazon.com Inc., Microsoft Corporation, Google LLC, The Linux Foundation, or HashiCorp Inc.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>4. Open Source and Contributions</h2>
+            <h2>6. Disclaimer of Warranties & Production Verification</h2>
             <p>
-              The code representing the devsubnet.com application is open source and hosted on GitHub. You are welcome to review the repository, report issues, or contribute improvements under the terms of the repository's open-source license.
+              devsubnet.com is provided strictly on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind, whether express, implied, or statutory.
+            </p>
+            <ul class="policy-list">
+              <li>While we maintain rigorous test suites based on IETF RFC standards, we do not warrant that calculations will be error-free or uninterrupted.</li>
+              <li><strong>Production Network Caution:</strong> Users are solely responsible for double-checking subnet ranges, CIDR masks, and IaC blocks prior to applying them in live cloud or physical enterprise networks.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>7. Limitation of Liability</h2>
+            <p>
+              To the fullest extent permitted by applicable law, devsubnet.com, its developers, operators, and contributors shall not be liable for any direct, indirect, incidental, special, or consequential damages (including, but not limited to, misallocated IP blocks, cloud routing errors, network downtime, lost profits, or data loss) resulting from the use of or inability to use our tools.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>8. DMCA & Copyright Takedown Policy</h2>
+            <p>
+              We respect the intellectual property of others. If you believe any content on devsubnet.com infringes upon your copyright, please submit a formal DMCA Takedown Notice to <a href="mailto:legal@devsubnet.com">legal@devsubnet.com</a> or <a href="mailto:support@devsubnet.com">support@devsubnet.com</a> with the following details:
+            </p>
+            <ul class="policy-list">
+              <li>Identification of the copyrighted work claimed to have been infringed.</li>
+              <li>Exact URL or description of the location of the allegedly infringing material.</li>
+              <li>Your contact details (name, email address, physical address).</li>
+              <li>A statement of good-faith belief that the use is not authorized by the copyright owner.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>9. Updates to Terms & Governing Law</h2>
+            <p>
+              We reserve the right to amend these Terms & Conditions at any time. Revisions become effective immediately upon being published on this page. Your continued use of devsubnet.com constitutes acceptance of all updated terms. For legal inquiries, contact <a href="mailto:legal@devsubnet.com">legal@devsubnet.com</a> or use our <a href="/contact">Contact Page</a>.
             </p>
           </div>
         </section>
@@ -149,6 +204,33 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     line-height: 1.7;
     color: var(--text-secondary);
     margin: 0;
+  }
+
+  .policy-block a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .policy-block a:hover {
+    text-decoration: underline;
+  }
+
+  .policy-list {
+    margin: 0.75rem 0 0 1.25rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .policy-list li {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .policy-list strong {
+    color: var(--text-primary);
   }
 
   .page-cta {

@@ -1,4 +1,5 @@
----import Footer from '../components/Footer.astro';
+---
+import Footer from '../components/Footer.astro';
 import { type SupportedLanguage } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
@@ -8,8 +9,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout lang={lang} 
-  title="About DevSubnet – Free IP Subnet Calculator Tool"
-  description="DevSubnet is a free, privacy-first IP subnet calculator and CIDR planner built for network engineers, sysadmins, cloud architects, students, and business professionals. All calculations run locally in your browser."
+  title="About DevSubnet – Free Client-Side IP Subnet Calculator & Tools"
+  description="Learn about DevSubnet's mission, privacy architecture, publisher standards, and commitment to free, zero-latency networking tools for sysadmins, cloud architects, and students."
 >
   <div class="app-shell">
     <NavBar lang={lang} path='about' />
@@ -22,10 +23,10 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
         </nav>
 
         <section class="page-header">
-          <div class="eyebrow">OUR MISSION</div>
+          <div class="eyebrow">OUR MISSION & TRANSPARENCY</div>
           <h1>About devsubnet.com</h1>
           <p class="lede">
-            We build next-generation, client-side tools to simplify complex network calculations.
+            Building modern, privacy-first, client-side networking utilities engineered for sysadmins, cloud architects, DevOps teams, and students worldwide.
           </p>
         </section>
 
@@ -34,22 +35,53 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
             <div class="info-card">
               <h2>Who We Are</h2>
               <p>
-                devsubnet.com was founded by a group of network engineers and cloud architects who grew tired of using slow, cluttered, ad-heavy subnet calculators from the early 2000s. We set out to create a modern, elegant, and lightning-fast alternative built for modern developer, DevOps, student, and business workflows.
+                devsubnet.com was built by a dedicated team of network engineers and cloud systems architects who set out to eliminate outdated, ad-cluttered, slow subnet calculators. Our goal is to provide a clean, modern, and accessible suite of IP calculation tools for developers, network administrators, and certification candidates worldwide.
               </p>
             </div>
             
             <div class="info-card">
-              <h2>Privacy First</h2>
+              <h2>Privacy-First Architecture</h2>
               <p>
-                Unlike traditional calculators that send your queries to a server, devsubnet.com runs <strong>entirely in your browser</strong>. All IP mathematical operations, CIDR conversions, and visual splits are calculated locally. No analytics track your IP ranges, and no data ever leaves your device.
+                Unlike traditional online tools that transmit query parameters to backend servers, devsubnet.com operates <strong>entirely inside your browser</strong>. All IP mathematical operations, CIDR conversions, Kubernetes node sizing, and visual subnet partitioning happen locally. Your network topology data never leaves your device.
               </p>
             </div>
           </div>
 
           <div class="text-block">
-            <h2>The Technology</h2>
+            <h2>Our Operational & Revenue Model</h2>
             <p>
-              devsubnet.com is built using Astro and TypeScript. By omitting heavy server-side requirements and rendering static assets with lightweight JavaScript, we achieve near-instant page transitions, responsive dark mode support, and seamless interactive visual tools like our recursive subnet splitter.
+              devsubnet.com is committed to remaining 100% free and accessible to all users worldwide without paywalls, subscriptions, or required account registration. To cover domain costs, CDN infrastructure, continuous feature development, and open-source maintenance, we display context-relevant advertisements served through <strong>Google AdSense</strong>.
+            </p>
+            <p style="margin-top: 0.75rem;">
+              We maintain strict separation between ad delivery and our core calculation logic. Advertisements are clearly demarcated and non-intrusive, ensuring your workflow remains smooth and efficient.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Technical & Editorial Standards</h2>
+            <p>
+              All IP mathematical routines, CIDR boundary calculations, and IaC code template generators (Terraform, Ansible) are rigorously tested against official IETF RFC standards (RFC 791, RFC 4632, RFC 1918, RFC 4291) and cloud provider documentation (AWS VPC, Azure VNet, GCP VPC, Kubernetes CNI).
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Trademarks & Non-Affiliation Statement</h2>
+            <p>
+              devsubnet.com is an independent developer utility tool. Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Kubernetes, Terraform, Cilium, and Calico are registered trademarks of their respective owners. devsubnet.com is not affiliated with, endorsed by, or sponsored by Amazon.com Inc., Microsoft Corporation, Google LLC, The Linux Foundation, or HashiCorp Inc.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Open Source & Community</h2>
+            <p>
+              We believe in open technical standards and community collaboration. The source code for devsubnet.com is hosted publicly on <a href="https://github.com/ammyskamble/devsubnet" target="_blank" rel="noopener noreferrer">GitHub</a>. Users and network professionals are invited to review the code, report issues, suggest feature enhancements, or contribute improvements.
+            </p>
+          </div>
+
+          <div class="text-block">
+            <h2>Get in Touch</h2>
+            <p>
+              Have questions, technical suggestions, or feedback? Visit our <a href="/contact">Contact Page</a> or reach out directly to our engineering team at <a href="mailto:support@devsubnet.com">support@devsubnet.com</a>.
             </p>
           </div>
         </section>
@@ -129,7 +161,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
   .page-body {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2.5rem;
   }
 
   .card-grid {
@@ -154,15 +186,15 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 
   .info-card p {
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--text-secondary);
     margin: 0;
   }
 
   .text-block h2 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 600;
-    margin: 0 0 1rem;
+    margin: 0 0 0.75rem;
     color: var(--text-primary);
   }
 
@@ -171,6 +203,15 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     line-height: 1.7;
     color: var(--text-secondary);
     margin: 0;
+  }
+
+  .text-block a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .text-block a:hover {
+    text-decoration: underline;
   }
 
   .page-cta {

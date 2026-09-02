@@ -255,6 +255,7 @@ export interface TranslationDictionary {
     contact: string;
     privacy: string;
     terms: string;
+    cookiePolicy: string;
     faq: string;
     noData: string;
   };
@@ -371,6 +372,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Contact",
       privacy: "Privacy Policy",
       terms: "Terms & Conditions",
+      cookiePolicy: "Cookie Policy",
       faq: "FAQ",
       noData: "NO DATA LEAVES YOUR DEVICE"
     }
@@ -485,6 +487,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Kontakt",
       privacy: "Datenschutz",
       terms: "AGB",
+      cookiePolicy: "Cookie-Richtlinie",
       faq: "FAQ",
       noData: "KEINE DATEN VERLASSEN IHR GERÄT"
     }
@@ -599,6 +602,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Contacto",
       privacy: "Política de Privacidad",
       terms: "Términos y Condiciones",
+      cookiePolicy: "Política de Cookies",
       faq: "Preguntas Frecuentes",
       noData: "NINGÚN DATO SALE DE TU DISPOSITIVO"
     }
@@ -713,6 +717,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "お問い合わせ",
       privacy: "プライバシーポリシー",
       terms: "利用規約",
+      cookiePolicy: "クッキーポリシー",
       faq: "よくある質問",
       noData: "データはお使いのブラウザ内でのみ処理されます"
     }
@@ -827,6 +832,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Contact",
       privacy: "Politique de confidentialité",
       terms: "Conditions d'utilisation",
+      cookiePolicy: "Politique des cookies",
       faq: "FAQ",
       noData: "AUCUNE DONNÉE NE QUITTE VOTRE APPAREIL"
     }
@@ -941,6 +947,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Contato",
       privacy: "Política de Privacidade",
       terms: "Terminos e Condições",
+      cookiePolicy: "Política de Cookies",
       faq: "FAQ",
       noData: "NENHUM DADO SAI DO SEU DISPOSITIVO"
     }
@@ -1055,6 +1062,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "문의",
       privacy: "개인정보처리방침",
       terms: "이용약관",
+      cookiePolicy: "쿠키 정책",
       faq: "FAQ",
       noData: "어떤 데이터도 장치를 벗어나지 않습니다"
     }
@@ -1169,6 +1177,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       contact: "Contatti",
       privacy: "Informativa sulla privacy",
       terms: "Termini di servizio",
+      cookiePolicy: "Informativa sui cookie",
       faq: "FAQ",
       noData: "NESSUN DATO LASCIA IL TUO DISPOSITIVO"
     }

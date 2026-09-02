@@ -5,6 +5,7 @@ import KubernetesPlanner from './KubernetesPlanner.astro';
 import IPv6Calculator from './IPv6Calculator.astro';
 import SubnetGuide from './SubnetGuide.astro';
 import NavBar from './NavBar.astro';
+import Footer from './Footer.astro';
 import { translations, type SupportedLanguage } from '../utils/i18n';
 
 interface Props {
@@ -23,7 +24,6 @@ const {
 
 const t = translations[lang] || translations.en;
 const introData = t.intro[activeTab] || t.intro.ipv4;
-const langPrefix = lang === 'en' ? '' : `/${lang}`;
 ---
 
 <div class="app-shell">
@@ -52,18 +52,6 @@ const langPrefix = lang === 'en' ? '' : `/${lang}`;
     <slot />
   </main>
 
-  <!-- Footer -->
-  <footer>
-    <span>{t.footer.tagline}</span>
-    <div class="footer-links">
-      <a href="/about">{t.footer.about}</a>
-      <a href="/contact">{t.footer.contact}</a>
-      <a href="/privacy">{t.footer.privacy}</a>
-      <a href="/terms">{t.footer.terms}</a>
-      <a href={`${langPrefix}/faq`}>{t.footer.faq}</a>
-      <a href="/what-is-a-subnet" style="font-weight: 500;">What is a Subnet?</a>
-      <a href="/subnet-cheat-sheet" style="font-weight: 500;">Subnet Cheat Sheet</a>
-    </div>
-    <span>{t.footer.noData}</span>
-  </footer>
+  <!-- Reoptimized Footer -->
+  <Footer lang={lang} />
 </div>

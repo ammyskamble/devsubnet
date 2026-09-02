@@ -1,0 +1,284 @@
+---
+import Footer from '../components/Footer.astro';
+import { type SupportedLanguage } from '../utils/i18n';
+
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/NavBar.astro';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+---
+
+<Layout lang={lang} 
+  title="Cookie Policy | DevSubnet – Transparency & Ad Preferences"
+  description="Learn how DevSubnet handles cookies and local storage. Information about essential local preferences, third-party advertising cookies (Google AdSense), and how to manage your privacy settings."
+>
+  <div class="app-shell">
+    <NavBar lang={lang} path='cookie-policy' />
+
+    <main class="page-main">
+      <div class="content-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span class="sep">/</span> <strong>Cookie Policy</strong>
+        </nav>
+
+        <section class="page-header">
+          <div class="eyebrow">TRANSPARENCY & CHOICE</div>
+          <h1>Cookie Policy</h1>
+          <p class="lede">
+            Last updated: September 2, 2026. Clear disclosures on local storage, web cookies, and advertising controls.
+          </p>
+        </section>
+
+        <section class="page-body">
+          <div class="policy-block">
+            <h2>1. What Are Cookies and Local Storage?</h2>
+            <p>
+              Cookies and local storage are small data files stored on your computer or mobile device when you visit websites. They are widely used to make websites work efficiently, remember your preferences, and provide analytical or personalized advertising capabilities.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>2. First-Party Essential Data (Local Storage)</h2>
+            <p>
+              devsubnet.com is engineered to run client-side. We do not use first-party tracking cookies to log your IP subnet queries or calculations. We utilize HTML5 <code>localStorage</code> strictly for non-sensitive UI settings:
+            </p>
+            <ul class="policy-list">
+              <li><strong>Theme Preference:</strong> Stored as <code>devsubnet-theme</code> (value: <code>light</code> or <code>dark</code>) to persist your preferred color mode across site sessions.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>3. Third-Party Advertising & AdSense Cookies</h2>
+            <p>
+              To keep devsubnet.com 100% free for network engineers, sysadmins, and students worldwide, we partner with <strong>Google AdSense</strong> to display advertisements.
+            </p>
+            <p style="margin-top: 0.75rem;">
+              Third-party vendors, including Google, use cookies (such as the Google DoubleClick cookie) to serve ads based on your prior visits to devsubnet.com or other websites across the Internet. Google's use of advertising cookies enables it and its partners to serve personalized ads based on your navigation history.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>4. How to Opt-Out of Personalized Advertising</h2>
+            <p>
+              You have complete control over how advertising cookies are used on your device. You may manage or opt-out of personalized advertising at any time:
+            </p>
+            <ul class="policy-list">
+              <li>
+                <strong>Google Ads Settings:</strong> Visit <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings</a> to customize or disable personalized Google advertisements.
+              </li>
+              <li>
+                <strong>Industry Opt-Out Portals:</strong> Visit <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">AboutAds.info Choices</a> or the <a href="http://www.networkadvertising.org/choices/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative (NAI) Opt-Out Page</a> to opt-out of third-party interest-based advertising networks.
+              </li>
+              <li>
+                <strong>Browser Controls:</strong> Adjust your web browser settings to block or clear third-party cookies (refer to your browser's Help menu for detailed instructions).
+              </li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>5. Web Analytics & Log Data</h2>
+            <p>
+              Our hosting CDN infrastructure (such as Cloudflare or Vercel) may record standard technical server access logs (including IP address, user-agent string, and timestamp) solely for security, DDoS protection, and server health diagnostics. No network calculation payload is included in these operational logs.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>6. Updates to This Cookie Policy</h2>
+            <p>
+              We may update this policy periodically to reflect operational, legal, or regulatory changes. Any updates will be posted directly to this page with an adjusted revision date.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>7. Contact Us</h2>
+            <p>
+              If you have any questions regarding our use of cookies or privacy settings, please contact our team at <a href="mailto:support@devsubnet.com">support@devsubnet.com</a> or visit our <a href="/contact">Contact Page</a>.
+            </p>
+          </div>
+        </section>
+
+        <div class="page-cta">
+          <a href="/" class="btn-return">← Return to Calculator</a>
+        </div>
+      </div>
+    </main>
+
+    <Footer lang={lang} />
+  </div>
+</Layout>
+
+<style>
+  .page-main {
+    flex: 1;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .content-container {
+    max-width: 54rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--text-secondary); }
+
+  .page-header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2.5rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+    line-height: 1.1;
+  }
+
+  .page-header .lede {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 40rem;
+    margin: 0;
+  }
+
+  .page-header .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .policy-block h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+    color: var(--text-primary);
+  }
+
+  .policy-block p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .policy-block a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .policy-block a:hover {
+    text-decoration: underline;
+  }
+
+  .policy-list {
+    margin: 0.75rem 0 0 1.25rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .policy-list li {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .policy-list strong {
+    color: var(--text-primary);
+  }
+
+  .policy-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    background: var(--bg-secondary);
+    padding: 0.1em 0.3em;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .page-cta {
+    margin-top: 3.5rem;
+  }
+
+  .btn-return {
+    display: inline-block;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .btn-return:hover { opacity: 0.85; }
+
+  /* Theme Toggle */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .theme-toggle .sun { display: none; width: 1.25rem; height: 1.25rem; }
+  .theme-toggle .moon { display: block; width: 1.25rem; height: 1.25rem; }
+
+  :root[data-theme="light"] .theme-toggle .sun  { display: block; }
+  :root[data-theme="light"] .theme-toggle .moon { display: none; }
+</style>
+
+<script>
+  const themeBtn = document.getElementById('theme-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const doc = document.documentElement;
+      const next = doc.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      doc.setAttribute('data-theme', next);
+      localStorage.setItem('devsubnet-theme', next);
+    });
+  }
+</script>

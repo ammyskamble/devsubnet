@@ -1,4 +1,5 @@
----import Footer from '../components/Footer.astro';
+---
+import Footer from '../components/Footer.astro';
 import { type SupportedLanguage } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
@@ -8,8 +9,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout lang={lang} 
-  title="Privacy Policy | DevSubnet – No Data Collected"
-  description="DevSubnet's privacy policy. Our IP subnet calculator runs entirely in your browser with no server-side processing. No data leaves your device. Ever."
+  title="Privacy Policy | DevSubnet – Client-Side Privacy & Data Protection"
+  description="DevSubnet's privacy policy. Learn about our zero server-side network calculation processing, HTML5 local storage usage, Google AdSense third-party cookie disclosures, GDPR/CCPA rights, and privacy controls."
 >
   <div class="app-shell">
     <NavBar lang={lang} path='privacy' />
@@ -22,39 +23,98 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
         </nav>
 
         <section class="page-header">
-          <div class="eyebrow">DATA PROTECTION</div>
+          <div class="eyebrow">DATA PROTECTION & PRIVACY</div>
           <h1>Privacy Policy</h1>
           <p class="lede">
-            Last updated: August 27, 2026. Your network privacy is our top priority.
+            Last updated: September 2, 2026. Your network privacy, calculation security, and data transparency are our highest priorities.
           </p>
         </section>
 
         <section class="page-body">
           <div class="policy-block">
-            <h2>1. Zero Server-Side Transmission</h2>
+            <h2>1. Zero Server-Side Network Payload Processing</h2>
             <p>
-              devsubnet.com is built as a client-side application. Every calculation you perform — including subnet configurations, IP splitting, CIDR checks, Kubernetes range planning, and cloud VPC setups — happens entirely in your local browser's memory. We do not transmit your network details, host counts, or IP ranges to any server.
+              devsubnet.com is engineered as a client-side web application. All calculations — including IPv4 and IPv6 subnet masking, CIDR conversions, wildcard boundaries, Kubernetes Pod IP density planning, and cloud VPC allocations — occur locally inside your browser's JavaScript engine. We do not collect, transmit, log, or store your IP ranges, subnet blocks, or network configuration payloads on any external server.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>2. No Local Storage Tracking</h2>
+            <h2>2. Browser Local Storage Usage</h2>
             <p>
-              We only use the browser's <code>localStorage</code> API to store your theme preferences (light or dark mode) so that your next visit preserves your UI choice. We do not store subnet ranges or IP addresses in persistent browser storage.
+              We do not use persistent tracking cookies for user profiling. We utilize HTML5 <code>localStorage</code> solely to persist user interface settings across sessions:
+            </p>
+            <ul class="policy-list">
+              <li><code>devsubnet-theme</code>: Remembers your preferred color theme (<code>light</code> or <code>dark</code> mode) so your choice is maintained when returning to the site.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>3. Google AdSense & Third-Party Advertising Cookies</h2>
+            <p>
+              To maintain devsubnet.com as a free utility for sysadmins, DevOps engineers, and students worldwide, we partner with <strong>Google AdSense</strong> to display advertisements.
+            </p>
+            <p style="margin-top: 0.75rem;">
+              <strong>Google DART & DoubleClick Cookie Disclosure:</strong> Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve advertisements based on your prior visits to devsubnet.com or other websites across the Internet. Google's use of advertising cookies enables it and its advertising partners to serve ads based on your browsing history.
+            </p>
+            <p style="margin-top: 0.75rem;">
+              <strong>Opting Out of Personalized Advertising:</strong>
+            </p>
+            <ul class="policy-list">
+              <li>You can opt out of personalized Google advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>.</li>
+              <li>You can opt out of third-party vendors' cookies for interest-based advertising by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">AboutAds.info Choices</a> or the <a href="http://www.networkadvertising.org/choices/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative (NAI) Opt-Out Page</a>.</li>
+              <li>European users may also visit the <a href="https://www.youronlinechoices.eu/" target="_blank" rel="noopener noreferrer">EDAA Your Online Choices</a> portal to manage ad preferences.</li>
+              <li>For more details on cookie management, read our dedicated <a href="/cookie-policy">Cookie Policy</a>.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>4. Web Server Access Logs & CDN Diagnostics</h2>
+            <p>
+              Our web hosting and Content Delivery Network (CDN) providers (e.g., Cloudflare, Vercel) collect standard server access logs when pages are fetched. These technical logs contain basic metrics such as your IP address, browser user-agent string, referring URL, and access timestamp. These logs are used strictly for security monitoring, DDoS prevention, and system diagnostic health, and are never linked to your subnet calculations.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>3. Third-Party Analytics and Cookies</h2>
+            <h2>5. European General Data Protection Regulation (GDPR / EEA)</h2>
             <p>
-              devsubnet.com does not use tracking cookies, retargeting pixels, or intrusive analytics suites. We do not sell, trade, or share user details because we do not collect them in the first place.
+              If you reside in the European Economic Area (EEA), United Kingdom, or Switzerland, you possess specific data privacy rights under the GDPR:
+            </p>
+            <ul class="policy-list">
+              <li><strong>Right of Access & Erasure:</strong> You may request access to or deletion of any technical log data maintained by our infrastructure.</li>
+              <li><strong>Right to Object & Restrict:</strong> You may object to data processing or withdraw consent for personalized advertising cookies at any time.</li>
+              <li><strong>Data Officer Contact:</strong> To exercise your GDPR rights, contact our privacy compliance team at <a href="mailto:privacy@devsubnet.com">privacy@devsubnet.com</a>.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>6. California Consumer Privacy Rights (CCPA / CPRA)</h2>
+            <p>
+              Under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA):
+            </p>
+            <ul class="policy-list">
+              <li><strong>No Sale or Sharing of Personal Data:</strong> devsubnet.com does not sell, rent, or trade your personal information or network calculation payloads to third parties.</li>
+              <li><strong>Right to Know & Delete:</strong> California residents have the right to request details on personal information collected via analytics or logging and request its erasure.</li>
+            </ul>
+          </div>
+
+          <div class="policy-block">
+            <h2>7. Children's Online Privacy Protection (COPPA)</h2>
+            <p>
+              devsubnet.com is a technical utility intended for IT professionals, network engineers, sysadmins, and computer science students. We do not knowingly collect personal information from children under 13 years of age. If you believe a child has provided us with personal data, contact us immediately for prompt deletion.
             </p>
           </div>
 
           <div class="policy-block">
-            <h2>4. Changes to This Policy</h2>
+            <h2>8. Trademarks & Non-Affiliation Disclaimer</h2>
             <p>
-              We may update this Privacy Policy from time to time. Any changes will be reflected on this page with an updated date, but the core principle of client-side local calculation will never change.
+              devsubnet.com is an independent developer utility tool. Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), Kubernetes, Terraform, Cilium, and Calico are registered trademarks of their respective owners. devsubnet.com is not affiliated with, endorsed by, or sponsored by Amazon.com Inc., Microsoft Corporation, Google LLC, The Linux Foundation, or HashiCorp Inc.
+            </p>
+          </div>
+
+          <div class="policy-block">
+            <h2>9. Privacy Policy Updates & Contact</h2>
+            <p>
+              We may revise this Privacy Policy periodically to reflect legal, technical, or operational updates. All changes will be published directly on this page. If you have questions regarding this policy, please email us at <a href="mailto:privacy@devsubnet.com">privacy@devsubnet.com</a> or <a href="mailto:support@devsubnet.com">support@devsubnet.com</a>.
             </p>
           </div>
         </section>
@@ -149,6 +209,33 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     line-height: 1.7;
     color: var(--text-secondary);
     margin: 0;
+  }
+
+  .policy-block a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .policy-block a:hover {
+    text-decoration: underline;
+  }
+
+  .policy-list {
+    margin: 0.75rem 0 0 1.25rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .policy-list li {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .policy-list strong {
+    color: var(--text-primary);
   }
 
   .policy-block code {

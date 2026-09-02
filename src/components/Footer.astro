@@ -21,19 +21,71 @@ const whatIsSubnetTranslations: Record<SupportedLanguage, string> = {
 };
 
 const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslations.en;
-const cheatSheetText = t.nav.cheatsheet;
 ---
 
-<footer>
-  <span>{t.footer.tagline}</span>
-  <div class="footer-links">
-    <a href={`${langPrefix}/about`}>{t.footer.about}</a>
-    <a href={`${langPrefix}/contact`}>{t.footer.contact}</a>
-    <a href={`${langPrefix}/privacy`}>{t.footer.privacy}</a>
-    <a href={`${langPrefix}/terms`}>{t.footer.terms}</a>
-    <a href={`${langPrefix}/faq`}>{t.footer.faq}</a>
-    <a href={`${langPrefix}/what-is-a-subnet`} style="font-weight: 500;">{whatIsSubnetText}</a>
-    <a href={`${langPrefix}/subnet-cheat-sheet`} style="font-weight: 500;">{cheatSheetText}</a>
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <!-- Column 1: Brand & Tagline -->
+      <div class="footer-col brand-col">
+        <a href={langPrefix || "/"} class="footer-brand">
+          <span class="brand-badge">Dev</span>
+          <span class="brand-text">Subnet.com</span>
+        </a>
+        <div class="footer-tagline">{t.footer.tagline}</div>
+        <p class="footer-desc">
+          Privacy-first, client-side networking utilities engineered for sysadmins, cloud architects, DevOps teams, and students.
+        </p>
+      </div>
+
+      <!-- Column 2: Calculators & Tools -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Calculators & Tools</h4>
+        <ul class="footer-menu">
+          <li><a href={`${langPrefix}/`}>{t.nav.ipv4}</a></li>
+          <li><a href={`${langPrefix}/visual-subnet-splitter`}>{t.nav.splitter}</a></li>
+          <li><a href={`${langPrefix}/kubernetes-subnet-planner`}>{t.nav.k8s}</a></li>
+          <li><a href={`${langPrefix}/ipv6-subnet-calculator`}>{t.nav.ipv6}</a></li>
+          <li><a href={`${langPrefix}/terraform-subnet-planner`}>{t.nav.terraform}</a></li>
+          <li><a href={`${langPrefix}/k8s-cidr-calculator`}>{t.nav.k8sCidr}</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: Reference & Guides -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Reference & Guides</h4>
+        <ul class="footer-menu">
+          <li><a href={`${langPrefix}/what-is-a-subnet`}>{whatIsSubnetText}</a></li>
+          <li><a href={`${langPrefix}/subnet-cheat-sheet`}>{t.nav.cheatsheet}</a></li>
+          <li><a href={`${langPrefix}/vlsm-calculator`}>{t.nav.vlsm}</a></li>
+          <li><a href={`${langPrefix}/subnet-overlap-checker`}>{t.nav.overlap}</a></li>
+          <li><a href={`${langPrefix}/cidr-supernet-calculator`}>{t.nav.supernet}</a></li>
+          <li><a href={`${langPrefix}/faq`}>{t.footer.faq}</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Company & Legal -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Company & Legal</h4>
+        <ul class="footer-menu">
+          <li><a href={`${langPrefix}/about`}>{t.footer.about}</a></li>
+          <li><a href={`${langPrefix}/contact`}>{t.footer.contact}</a></li>
+          <li><a href={`${langPrefix}/privacy`}>{t.footer.privacy}</a></li>
+          <li><a href={`${langPrefix}/terms`}>{t.footer.terms}</a></li>
+          <li><a href={`${langPrefix}/cookie-policy`}>{t.footer.cookiePolicy}</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        © 2026 devsubnet.com. All rights reserved. Built for clear, privacy-focused network engineering.
+      </div>
+      <div class="footer-security-badge">
+        <span class="security-dot"></span>
+        <span>{t.footer.noData}</span>
+      </div>
+    </div>
   </div>
-  <span>{t.footer.noData}</span>
 </footer>

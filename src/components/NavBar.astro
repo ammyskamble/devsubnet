@@ -207,105 +207,7 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
 </style>
 
 <script is:inline>
-  function setupMacDockMagnifier() {
-    const navContainer = document.querySelector('.nav-links');
-    if (!navContainer) return;
-
-    const tabs = Array.from(navContainer.querySelectorAll('.nav-tab'));
-    if (tabs.length === 0) return;
-
-    const maxScale = 1.35; // Center hovered tab scales up to 135%
-    const maxDistance = 130; // Pixel radius for neighbor wave expansion
-
-    function resetScales() {
-      tabs.forEach(function(tab) {
-        tab.style.transform = 'scale(1)';
-        tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
-      });
-    }
-
-    navContainer.addEventListener('mousemove', function(e) {
-      const mouseX = e.clientX;
-
-      // Perf Fix B: batch all reads first (avoids forced reflow per-tab)
-      const rects = tabs.map(function(tab) {
-        return tab.getBoundingClientRect();
-      });
-
-      // Then batch all writes inside a single rAF
-      requestAnimationFrame(function() {
-        tabs.forEach(function(tab, i) {
-          const rect = rects[i];
-          const tabCenterX = rect.left + rect.width / 2;
-          const distance = Math.abs(mouseX - tabCenterX);
-
-          if (distance < maxDistance) {
-            const factor = Math.cos((distance / maxDistance) * (Math.PI / 2));
-            const scale = 1 + (maxScale - 1) * Math.pow(factor, 2);
-            tab.style.transform = 'scale(' + scale.toFixed(3) + ')';
-            tab.style.zIndex = '10';
-          } else {
-            tab.style.transform = 'scale(1)';
-            tab.style.zIndex = tab.classList.contains('active') ? '2' : '1';
-          }
-        });
-      });
-    });
-
-    navContainer.addEventListener('mouseleave', function() {
-      resetScales();
-    });
-  }
-
-  function setupMacPill() {
-    const navContainer = document.querySelector('.nav-links');
-    const pill = document.getElementById('mac-nav-pill');
-    if (!navContainer || !pill) return;
-
-    const tabs = Array.from(navContainer.querySelectorAll('.nav-tab'));
-    if (tabs.length === 0) return;
-
-    const activeTab = navContainer.querySelector('.nav-tab.active') || tabs[0];
-
-    function movePillTo(target) {
-      if (!target) return;
-      // Perf Fix B: batch reads first, then write in rAF to avoid forced reflow
-      const containerRect = navContainer.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      const left = targetRect.left - containerRect.left;
-      const top = targetRect.top - containerRect.top;
-      const width = targetRect.width;
-      const height = targetRect.height;
-
-      requestAnimationFrame(function() {
-        pill.style.transform = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
-        pill.style.width = width + 'px';
-        pill.style.height = height + 'px';
-        pill.style.opacity = '1';
-      });
-    }
-
-    if (activeTab) movePillTo(activeTab);
-
-    tabs.forEach(function(tab) {
-      tab.addEventListener('mouseenter', function() { movePillTo(tab); });
-    });
-
-    navContainer.addEventListener('mouseleave', function() {
-      const currentActive = navContainer.querySelector('.nav-tab.active') || tabs[0];
-      if (currentActive) movePillTo(currentActive);
-    });
-
-    window.addEventListener('resize', function() {
-      const currentActive = navContainer.querySelector('.nav-tab.active') || tabs[0];
-      if (currentActive) movePillTo(currentActive);
-    }, { passive: true });
-  }
-
   function setupNavBar() {
-    setupMacPill();
-    setupMacDockMagnifier();
-
     const themeBtn = document.getElementById('theme-btn');
     if (themeBtn) {
       themeBtn.onclick = function() {
@@ -314,7 +216,6 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
         const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
         doc.setAttribute('data-theme', targetTheme);
         localStorage.setItem('devsubnet-theme', targetTheme);
-        setTimeout(setupMacPill, 50);
       };
     }
 

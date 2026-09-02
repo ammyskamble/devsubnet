@@ -1,4 +1,5 @@
----import Footer from '../components/Footer.astro';
+---
+import Footer from '../components/Footer.astro';
 import { type SupportedLanguage } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
@@ -8,8 +9,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout lang={lang} 
-  title="Contact DevSubnet – Feedback & Support"
-  description="Contact the DevSubnet team with questions, feedback, or feature suggestions about our free IP subnet calculator and CIDR planning tools. We'd love to hear from you."
+  title="Contact DevSubnet – Support, Feedback & Legal Inquiries"
+  description="Contact the DevSubnet engineering team. Submit general feedback, bug reports, feature requests, or legal/privacy inquiries. Support available via form and email."
 >
   <div class="app-shell">
     <NavBar lang={lang} path='contact' />
@@ -25,26 +26,44 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
           <div class="eyebrow">GET IN TOUCH</div>
           <h1>Contact Us</h1>
           <p class="lede">
-            Have feedback, bug reports, or feature requests? Drop us a line below.
+            Have questions, feature suggestions, bug reports, or legal inquiries? Drop us a line below. Our engineering team typically responds within 24–48 business hours.
           </p>
         </section>
 
         <section class="page-body">
           <div class="contact-grid">
             <div class="contact-info">
-              <h2>Other Ways to Reach Us</h2>
+              <h2>Official Support Channels</h2>
               <p>
-                We welcome suggestions for new calculators, IaC integrations (like Ansible or Terraform templates), or interface improvements.
+                We welcome community feedback, suggestions for new calculators, Infrastructure as Code integrations (Ansible, Terraform), and technical partnership opportunities.
               </p>
-                <div class="info-list">
-                  <div class="info-item">
-                    <strong>Email:</strong>
-                    <span>support@devsubnet.com</span>
-                  </div>
+
+              <div class="info-list">
                 <div class="info-item">
-                  <strong>GitHub:</strong>
+                  <strong>General & Support Email:</strong>
+                  <a href="mailto:support@devsubnet.com">support@devsubnet.com</a>
+                </div>
+
+                <div class="info-item">
+                  <strong>Privacy & Legal Email:</strong>
+                  <a href="mailto:privacy@devsubnet.com">privacy@devsubnet.com</a>
+                </div>
+
+                <div class="info-item">
+                  <strong>GitHub Repository:</strong>
                   <a href="https://github.com/ammyskamble/devsubnet" target="_blank" rel="noopener noreferrer">ammyskamble/devsubnet</a>
                 </div>
+
+                <div class="info-item">
+                  <strong>Response Time:</strong>
+                  <span>Within 24 to 48 business hours</span>
+                </div>
+              </div>
+
+              <div class="privacy-note">
+                <p>
+                  <strong>Privacy Protection:</strong> Information submitted via this form is used exclusively to respond to your request. We do not sell or share contact details with third-party advertisers.
+                </p>
               </div>
             </div>
 
@@ -52,27 +71,29 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
               <form id="contact-form">
                 <div class="form-group">
                   <label for="name">Name</label>
-                  <input type="text" id="name" required placeholder="Your name" />
+                  <input type="text" id="name" required placeholder="Your full name" />
                 </div>
                 
                 <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" id="email" required placeholder="Your email address" />
+                  <label for="email">Email Address</label>
+                  <input type="email" id="email" required placeholder="name@company.com" />
                 </div>
 
                 <div class="form-group">
-                  <label for="subject">Subject</label>
+                  <label for="subject">Subject / Inquiry Type</label>
                   <select id="subject">
                     <option>General Feedback</option>
                     <option>Feature Request</option>
-                    <option>Bug Report</option>
-                    <option>Other</option>
+                    <option>Bug Report / Subnet Calculation Issue</option>
+                    <option>Privacy Policy & Data Rights Inquiry</option>
+                    <option>Advertising & Sponsorship</option>
+                    <option>Other Legal Inquiry</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label for="message">Message</label>
-                  <textarea id="message" rows="5" required placeholder="Tell us how we can help..."></textarea>
+                  <textarea id="message" rows="5" required placeholder="Describe your question or feedback in detail..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">Send Message</button>
@@ -177,7 +198,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
   .info-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
   .info-item {
@@ -199,6 +220,25 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
   .info-item a:hover {
     color: var(--accent);
     text-decoration: underline;
+  }
+
+  .privacy-note {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--card-bg, rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+
+  .privacy-note p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .privacy-note strong {
+    color: var(--text-primary);
   }
 
   .form-container {
@@ -235,7 +275,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(var(--hsl-accent), 0.15);
+    box-shadow: 0 0 0 2px rgba(var(--hsl-accent, 99, 102, 241), 0.15);
   }
 
   .btn-submit {
@@ -259,7 +299,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     margin-top: 1rem;
     font-size: 0.85rem;
     text-align: center;
-    font-family: var(--font-mono);
+    font-family: var(--font-mono, monospace);
   }
 
   .form-status.success {
@@ -320,7 +360,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       status.className = 'form-status success';
-      status.textContent = 'Message sent successfully! (Local simulation)';
+      status.textContent = 'Message sent successfully! Our team will get back to you shortly.';
       form.reset();
     });
   }

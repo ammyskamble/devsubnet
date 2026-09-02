@@ -1,4 +1,4 @@
-import type { SupportedLanguage, AvailableLanguage } from './i18n';
+import type { SupportedLanguage } from './i18n';
 
 export interface TerraformTranslationDictionary {
   panelHeading: string;
@@ -64,7 +64,7 @@ export interface TerraformTranslationDictionary {
   faqA5: string;
 }
 
-export const terraformTranslations: Record<AvailableLanguage, TerraformTranslationDictionary> = {
+export const terraformTranslations: Record<SupportedLanguage, TerraformTranslationDictionary> = {
   en: {
     panelHeading: "Terraform VPC & Subnet Configuration",
     liveLabel: "HCL GENERATOR",

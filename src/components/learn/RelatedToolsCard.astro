@@ -1,0 +1,166 @@
+---
+interface ToolLink {
+  title: string;
+  description: string;
+  href: string;
+  icon?: string;
+  tag?: string;
+}
+
+interface Props {
+  headline?: string;
+  subheadline?: string;
+  tools: ToolLink[];
+}
+
+const {
+  headline = "Put Theory Into Practice",
+  subheadline = "Apply these concepts immediately with DevSubnet's client-side, zero-latency network tools.",
+  tools
+} = Astro.props;
+---
+
+<aside class="related-tools-card">
+  <div class="card-header">
+    <div class="header-icon">🛠️</div>
+    <div>
+      <h3 class="card-headline">{headline}</h3>
+      <p class="card-subheadline">{subheadline}</p>
+    </div>
+  </div>
+
+  <div class="tools-grid">
+    {tools.map(tool => (
+      <a href={tool.href} class="tool-link-item">
+        <div class="tool-item-content">
+          <div class="tool-item-title-row">
+            <span class="tool-icon">{tool.icon || '⚡'}</span>
+            <span class="tool-name">{tool.title}</span>
+            {tool.tag && <span class="tool-tag">{tool.tag}</span>}
+          </div>
+          <p class="tool-item-desc">{tool.description}</p>
+        </div>
+        <div class="tool-arrow" aria-hidden="true">→</div>
+      </a>
+    ))}
+  </div>
+</aside>
+
+<style>
+  .related-tools-card {
+    background: linear-gradient(135deg, rgba(26, 115, 232, 0.08) 0%, rgba(161, 66, 244, 0.08) 100%);
+    border: 1px solid rgba(66, 133, 244, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 3rem 0;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-icon {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: rgba(59, 130, 246, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-headline {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .card-subheadline {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .tool-link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tool-link-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-network);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tool-item-content {
+    flex: 1;
+    padding-right: 1rem;
+  }
+
+  .tool-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .tool-icon {
+    font-size: 1.1rem;
+  }
+
+  .tool-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .tool-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.45rem;
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--accent-network);
+    border-radius: var(--radius-full);
+  }
+
+  .tool-item-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .tool-arrow {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    transition: transform var(--transition-fast), color var(--transition-fast);
+  }
+
+  .tool-link-item:hover .tool-arrow {
+    transform: translateX(4px);
+    color: var(--accent-network);
+  }
+</style>

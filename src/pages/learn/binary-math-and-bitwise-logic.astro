@@ -1,0 +1,358 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleHeader from '../../components/learn/ArticleHeader.astro';
+import BitwiseVisualizer from '../../components/learn/BitwiseVisualizer.astro';
+import RelatedToolsCard from '../../components/learn/RelatedToolsCard.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+
+const articleKeywords = [
+  'Subnet Binary Math',
+  'Bitwise AND Operation',
+  'Powers of 2 in Networking',
+  'Boolean Logic Subnetting',
+  'Prefix Length Math'
+];
+---
+
+<Layout
+  lang={lang}
+  title="The Binary Math & Bitwise Logic Behind Subnetting | DevSubnet"
+  description="Learn the computer science and mathematical Boolean logic behind IP subnet masks, bitwise AND operations, and the 2^(32-n)-2 usable host formula."
+>
+  <div class="app-shell">
+    <NavBar lang={lang} path="learn" />
+
+    <main class="page-main">
+      <article class="content-container article-layout">
+        <ArticleHeader
+          category="science"
+          title="The Binary Math & Bitwise Logic Behind Subnetting"
+          description="Behind every dot-decimal IP address lies a raw 32-bit binary integer. Discover the Boolean logic, powers of 2, and silicon hardware algorithms that modern routers use to calculate routing paths in nanoseconds."
+          publishDate="March 2026"
+          readingTime="8 min read"
+          keywords={articleKeywords}
+        />
+
+        <div class="article-content">
+          <!-- Section 1 -->
+          <section class="content-section">
+            <h2>The Reality Underneath the Dots: 32 Continuous Bits</h2>
+            <p>
+              To human engineers, an IPv4 address looks like four numbers separated by periods (such as <code>192.168.1.1</code>). But network interface cards (NICs), ASIC switches, and router processors never see dots or decimals. To a CPU, an IPv4 address is strictly an unsigned <strong>32-bit binary integer</strong>.
+            </p>
+            <p>
+              Each of the four numbers is called an <strong>octet</strong> because it consists of exactly 8 bits ($8 \times 4 = 32$ bits). Each octet evaluates values from <code>00000000</code> ($0$) to <code>11111111</code> ($255$) using powers of two:
+            </p>
+
+            <div class="table-responsive">
+              <table class="bit-weight-table">
+                <thead>
+                  <tr>
+                    <th>Bit Position</th>
+                    <th>Bit 7</th>
+                    <th>Bit 6</th>
+                    <th>Bit 5</th>
+                    <th>Bit 4</th>
+                    <th>Bit 3</th>
+                    <th>Bit 2</th>
+                    <th>Bit 1</th>
+                    <th>Bit 0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Binary Weight</strong></td>
+                    <td>2<sup>7</sup></td>
+                    <td>2<sup>6</sup></td>
+                    <td>2<sup>5</sup></td>
+                    <td>2<sup>4</sup></td>
+                    <td>2<sup>3</sup></td>
+                    <td>2<sup>2</sup></td>
+                    <td>2<sup>1</sup></td>
+                    <td>2<sup>0</sup></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Decimal Value</strong></td>
+                    <td><code>128</code></td>
+                    <td><code>64</code></td>
+                    <td><code>32</code></td>
+                    <td><code>16</code></td>
+                    <td><code>8</code></td>
+                    <td><code>4</code></td>
+                    <td><code>2</code></td>
+                    <td><code>1</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              For example, converting decimal <strong>192</strong> into binary involves summing the active power-of-two bits:
+              <br />
+              <code>128 + 64 + 0 + 0 + 0 + 0 + 0 + 0 = 192</code> &rarr; <code>11000000</code> in binary.
+            </p>
+          </section>
+
+          <!-- Section 2: Bitwise AND Logic -->
+          <section class="content-section">
+            <h2>The Boolean Logic: The Bitwise AND (&amp;) Operator</h2>
+            <p>
+              How does a router determine whether a packet's destination IP is on the <em>local subnet</em> or requires forwarding to the <em>default gateway</em>?
+            </p>
+            <p>
+              It applies a fundamental digital logic gate: the <strong>Bitwise AND operation</strong> between the destination IP address and the configured Subnet Mask.
+            </p>
+
+            <div class="truth-table-wrapper">
+              <div class="truth-table-card">
+                <h3>Boolean AND (&amp;) Truth Table</h3>
+                <p>The output bit is <code>1</code> if and only if <strong>both</strong> input bits are <code>1</code>:</p>
+                <table class="truth-table">
+                  <thead>
+                    <tr>
+                      <th>IP Bit (A)</th>
+                      <th>Mask Bit (B)</th>
+                      <th>Result: Network Bit (A &amp; B)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>0</td><td>0</td><td><strong>0</strong></td></tr>
+                    <tr><td>0</td><td>1</td><td><strong>0</strong></td></tr>
+                    <tr><td>1</td><td>0</td><td><strong>0</strong> (Host bit masked out)</td></tr>
+                    <tr><td>1</td><td>1</td><td><strong>1</strong> (Network bit preserved)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <p>
+              Notice the mathematical property: When the subnet mask bit is <code>1</code>, the IP bit passes through untouched ($A \land 1 = A$). When the subnet mask bit is <code>0</code>, the output is forced to <code>0</code> ($A \land 0 = 0$). This cleanly zeroes out all host bits, leaving only the pure <strong>Network Address</strong>!
+            </p>
+          </section>
+
+          <!-- Interactive Simulator Section -->
+          <section class="content-section">
+            <h2>Interactive Bitwise Simulator</h2>
+            <p>
+              Use the live simulator below to inspect how individual bits are filtered by the Boolean AND operation in real time:
+            </p>
+
+            <!-- Embedded Live Component -->
+            <BitwiseVisualizer />
+          </section>
+
+          <!-- Section 3: Mathematical Proof -->
+          <section class="content-section">
+            <h2>The Mathematical Formula: Why We Subtract 2</h2>
+            <p>
+              Network engineers memorize the classic formula for usable IP addresses:
+            </p>
+            <div class="formula-banner">
+              <span class="formula-text">Usable Hosts = 2<sup>(32 &minus; Prefix)</sup> &minus; 2</span>
+            </div>
+            <p>
+              Where does the minus 2 come from? In binary arithmetic, with <em>h</em> = 32 &minus; Prefix host bits, there are 2<sup><em>h</em></sup> total combinations. However, two states are reserved by RFC standards:
+            </p>
+            <ol class="math-proof-list">
+              <li>
+                <strong>All Host Bits Set to 0:</strong> Represents the <em>Network Identifier</em> itself (e.g. <code>192.168.1.0</code>). It denotes the entire wire or broadcast domain, not an individual device.
+              </li>
+              <li>
+                <strong>All Host Bits Set to 1:</strong> Represents the <em>Directed Broadcast Address</em> (e.g. <code>192.168.1.255</code>). Any packet sent to this destination address is replicated by switches and sent to every host in the broadcast domain.
+              </li>
+            </ol>
+            <p>
+              Because neither the network wire ID nor the broadcast address can be bound to a network interface card (NIC), exactly <strong>2 addresses</strong> are deducted from every standard subnet.
+            </p>
+          </section>
+
+          <!-- Section 4: Hardware TCAM -->
+          <section class="content-section">
+            <h2>How Hardware Executes This: TCAM &amp; Longest Prefix Match</h2>
+            <p>
+              In enterprise core routers running at 400 Gbps or 800 Gbps line rates, performing software loops to compare masks would introduce unacceptable latency.
+            </p>
+            <p>
+              Instead, high-speed routing switches use specialized silicon memory called <strong>TCAM (Ternary Content-Addressable Memory)</strong>. Unlike standard RAM which takes an address and returns data, TCAM takes data (the packet's destination IP) and searches the entire routing table in a <em>single clock cycle</em> (under 5 nanoseconds) to find the <strong>Longest Prefix Match (LPM)</strong>.
+            </p>
+          </section>
+
+          <!-- Related Tools CTA -->
+          <RelatedToolsCard
+            headline="Calculate Subnets With Exact Bitwise Precision"
+            subheadline="DevSubnet's online calculators run high-performance bitwise math directly inside your browser."
+            tools={[
+              {
+                title: 'IPv4 Subnet Calculator',
+                description: 'Instant network, broadcast, wildcard, and usable host range calculations.',
+                href: '/',
+                icon: '⚡',
+                tag: 'Popular'
+              },
+              {
+                title: 'Visual Subnet Splitter',
+                description: 'Divide networks visually and see bit boundary allocations in real time.',
+                href: '/visual-subnet-splitter',
+                icon: '📊',
+                tag: 'Visual'
+              },
+              {
+                title: 'VLSM Calculator',
+                description: 'Design variable-length subnet masks for networks with differing host counts.',
+                href: '/vlsm-calculator',
+                icon: '🧮',
+                tag: 'Advanced'
+              }
+            ]}
+          />
+        </div>
+      </article>
+    </main>
+
+    <Footer lang={lang} />
+  </div>
+</Layout>
+
+<style>
+  .article-layout {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 5rem 1.25rem;
+  }
+
+  .article-content {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .content-section {
+    margin-bottom: 3rem;
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2.25rem 0 1rem 0;
+    letter-spacing: -0.015em;
+  }
+
+  .content-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1.5rem 0 0.5rem 0;
+  }
+
+  .content-section p {
+    margin-bottom: 1.25rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+
+  .bit-weight-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .bit-weight-table th, .bit-weight-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+  }
+
+  .bit-weight-table th {
+    background: rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .truth-table-wrapper {
+    margin: 2rem 0;
+  }
+
+  .truth-table-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .truth-table-card h3 {
+    margin: 0 0 0.5rem 0;
+  }
+
+  .truth-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .truth-table th, .truth-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  .truth-table th {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-muted);
+  }
+
+  .formula-banner {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid var(--accent-network);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 2rem;
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+
+  .formula-text {
+    font-family: var(--font-mono);
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #60a5fa;
+    letter-spacing: 0.02em;
+  }
+
+  .math-proof-list {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .math-proof-list li {
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .article-layout {
+      padding: 1.5rem 0.85rem 3.5rem 0.85rem;
+    }
+    .formula-banner {
+      padding: 1rem 0.75rem;
+    }
+    .formula-text {
+      font-size: 1.1rem;
+    }
+  }
+</style>

@@ -1,0 +1,439 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleHeader from '../../components/learn/ArticleHeader.astro';
+import RelatedToolsCard from '../../components/learn/RelatedToolsCard.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+
+const articleKeywords = [
+  'History of CIDR',
+  'RFC 1519',
+  'Classful Addressing',
+  'ARPANET IP History',
+  'IPv4 Depletion'
+];
+---
+
+<Layout
+  lang={lang}
+  title="The History of CIDR & IP Addressing: From ARPANET to RFC 1519 | DevSubnet"
+  description="How the near-collapse of the internet routing table and Class B IP depletion in 1992 forced engineers to invent Classless Inter-Domain Routing (CIDR)."
+>
+  <div class="app-shell">
+    <NavBar lang={lang} path="learn" />
+
+    <main class="page-main">
+      <article class="content-container article-layout">
+        <ArticleHeader
+          category="history"
+          title="The History of CIDR & IP Addressing: From ARPANET to RFC 1519"
+          description="In the early 1990s, the internet faced an existential crisis: global routing tables were ballooning exponentially, and the pool of mid-sized Class B addresses was projected to run out within 24 months. Here is the story of how engineers saved the internet by inventing CIDR."
+          publishDate="March 2026"
+          readingTime="9 min read"
+          keywords={articleKeywords}
+        />
+
+        <div class="article-content">
+          <!-- Section 1 -->
+          <section class="content-section">
+            <h2>The Dawn of IP Addressing: RFC 791 (1981)</h2>
+            <p>
+              When Vint Cerf and Bob Kahn formulated the Internet Protocol in the late 1970s, formalized as <strong>RFC 791</strong> in September 1981, they designed a 32-bit address space yielding <code>4,294,967,296</code> unique addresses. At the time, with only a few hundred computers networked across ARPANET, four billion addresses appeared to be virtually inexhaustible.
+            </p>
+            <p>
+              To simplify routing tables and keep router CPU loads manageable with 1980s hardware, the Internet Engineering Task Force (IETF) instituted a rigid <strong>classful addressing architecture</strong> based on the leading bits of the first octet:
+            </p>
+
+            <div class="table-responsive">
+              <table class="historic-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Leading Bits</th>
+                    <th>Network Range</th>
+                    <th>Fixed Mask</th>
+                    <th>Networks Available</th>
+                    <th>Usable Hosts / Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Class A</strong></td>
+                    <td><code>0...</code></td>
+                    <td><code>1.0.0.0 – 126.0.0.0</code></td>
+                    <td><code>255.0.0.0 (/8)</code></td>
+                    <td>126</td>
+                    <td>16,777,214</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Class B</strong></td>
+                    <td><code>10...</code></td>
+                    <td><code>128.0.0.0 – 191.255.0.0</code></td>
+                    <td><code>255.255.0.0 (/16)</code></td>
+                    <td>16,384</td>
+                    <td>65,534</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Class C</strong></td>
+                    <td><code>110...</code></td>
+                    <td><code>192.0.0.0 – 223.255.255.0</code></td>
+                    <td><code>255.255.255.0 (/24)</code></td>
+                    <td>2,097,152</td>
+                    <td>254</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section 2 -->
+          <section class="content-section">
+            <h2>The 1992 Crisis: The Goldilocks Problem &amp; Route Explosion</h2>
+            <p>
+              By 1992, commercial internet usage exploded. Network architects quickly ran into what became known as the <em>"Goldilocks Dilemma"</em> of classful networking:
+            </p>
+            <ul>
+              <li><strong>Class A was too huge:</strong> Only 126 organizations (mostly universities, military institutions, and early giants like IBM, Xerox, and Apple) could get a Class A, tying up 16.7 million IPs per organization, the vast majority of which went completely unused.</li>
+              <li><strong>Class C was too small:</strong> A Class C network only allowed 254 host computers. Any company with more than 300 employees could not use a single Class C network.</li>
+              <li><strong>Class B was requested by everyone:</strong> Because Class C was too tiny, every medium or large business requested a Class B network (65,534 hosts)—even if they only needed 1,000 devices!</li>
+            </ul>
+
+            <div class="callout-box warning-callout">
+              <div class="callout-icon">⚠️</div>
+              <div class="callout-body">
+                <strong>The Imminent Doomsday Date:</strong>
+                <p>
+                  In November 1992, the IETF's ROAD (Routing and Addressing) group calculated that Class B addresses would be completely exhausted by March 1994. Furthermore, because ISPs had to issue multiple Class C blocks as a workaround, core BGP routing tables jumped from 5,000 routes in 1990 to over 20,000 routes by 1993, threatening to crash global backbone routers.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3 -->
+          <section class="content-section">
+            <h2>The Breakthrough: RFC 1519 &amp; The Invention of CIDR (1993)</h2>
+            <p>
+              In September 1993, Vince Fuller, Tony Li, Jessica Yu, and Kannan Varadhan published <strong>RFC 1519</strong>: <em>"Classless Inter-Domain Routing (CIDR): an Address Assignment and Aggregation Strategy."</em>
+            </p>
+            <p>
+              CIDR introduced two fundamental revolutions that still power today's internet:
+            </p>
+
+            <div class="feature-grid">
+              <div class="feature-card">
+                <div class="feat-num">01</div>
+                <h3>Abolition of Address Classes</h3>
+                <p>
+                  Subnet masks were no longer tied to octet boundaries (8, 16, or 24). A network could now have an arbitrary prefix length—like <code>/20</code> (4,096 addresses), <code>/22</code> (1,024 addresses), or <code>/27</code> (32 addresses). Organizations were assigned only what they needed.
+                </p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feat-num">02</div>
+                <h3>Route Aggregation (Supernetting)</h3>
+                <p>
+                  Instead of advertising thousands of distinct <code>/24</code> networks in BGP, upstream providers could summarize contiguous blocks into a single prefix (e.g., sixteen contiguous <code>/24</code> blocks summarized as one <code>/20</code>). This halted router memory exhaustion in its tracks.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4: Timeline -->
+          <section class="content-section">
+            <h2>Milestones in IP History: 1981 to Present</h2>
+            <div class="timeline">
+              <div class="timeline-step">
+                <div class="timeline-marker">1981</div>
+                <div class="timeline-details">
+                  <h4>RFC 791 - IPv4 Formal Specification</h4>
+                  <p>32-bit addressing established with rigid Class A, B, and C boundary rules.</p>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-marker">1985</div>
+                <div class="timeline-details">
+                  <h4>RFC 950 - Subnetting Introduced</h4>
+                  <p>Allowed internal networks to subdivide classful allocations using fixed subnet masks.</p>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-marker">1993</div>
+                <div class="timeline-details">
+                  <h4>RFC 1519 - CIDR Deployment</h4>
+                  <p>Class boundaries discarded. Prefix length notation (<code>/24</code>) adopted globally.</p>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-marker">1996</div>
+                <div class="timeline-details">
+                  <h4>RFC 1918 &amp; NAT</h4>
+                  <p>Private IP allocations created, extending IPv4 lifespan alongside stateful NAT.</p>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-marker">2011</div>
+                <div class="timeline-details">
+                  <h4>IANA Pool Depletion</h4>
+                  <p>IANA assigned its final free /8 IPv4 blocks to the regional internet registries (RIRs).</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 5: Why It Matters for Cloud Today -->
+          <section class="content-section">
+            <h2>Why CIDR Still Dictates Cloud Engineering in 2026</h2>
+            <p>
+              Today, cloud providers like Amazon Web Services (AWS), Microsoft Azure, and Google Cloud Platform (GCP) build their entire Virtual Private Cloud (VPC) architectures directly around CIDR blocks.
+            </p>
+            <p>
+              When you configure a <code>10.0.0.0/16</code> VPC in AWS and subdivide it into <code>/24</code> public and private subnets across Availability Zones, you are directly executing the classless routing architecture pioneered in RFC 1519.
+            </p>
+          </section>
+
+          <!-- Related Tools CTA -->
+          <RelatedToolsCard
+            headline="Inspect CIDR Blocks & Subnet Masks"
+            subheadline="Use our fast, browser-native CIDR calculators to explore prefix lengths, host capacities, and cloud subnet splits."
+            tools={[
+              {
+                title: 'CIDR & Subnet Cheat Sheet',
+                description: 'Explore full table of IPv4 prefixes from /1 to /32 with host capacities and masks.',
+                href: '/subnet-cheat-sheet',
+                icon: '📋',
+                tag: 'Cheat Sheet'
+              },
+              {
+                title: 'Visual Subnet Splitter',
+                description: 'Graphically split any CIDR block into smaller subnets with interactive visual feedback.',
+                href: '/visual-subnet-splitter',
+                icon: '✂️',
+                tag: 'Interactive'
+              },
+              {
+                title: 'AWS VPC Subnet Calculator',
+                description: 'Plan cloud VPC subnets accounting for AWS 5-IP per-subnet internal reservations.',
+                href: '/aws-vpc-subnet-calculator',
+                icon: '☁️',
+                tag: 'Cloud'
+              }
+            ]}
+          />
+        </div>
+      </article>
+    </main>
+
+    <Footer lang={lang} />
+  </div>
+</Layout>
+
+<style>
+  .article-layout {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 5rem 1.25rem;
+  }
+
+  .article-content {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .content-section {
+    margin-bottom: 3rem;
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2.25rem 0 1rem 0;
+    letter-spacing: -0.015em;
+  }
+
+  .content-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1.5rem 0 0.5rem 0;
+  }
+
+  .content-section p {
+    margin-bottom: 1.25rem;
+  }
+
+  .content-section ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .content-section li {
+    margin-bottom: 0.75rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+
+  .historic-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface);
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .historic-table th, .historic-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .historic-table th {
+    background: rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .historic-table code {
+    font-family: var(--font-mono);
+    color: var(--accent-network);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .callout-box {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin: 2rem 0;
+    border: 1px solid;
+  }
+
+  .warning-callout {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: var(--text-primary);
+  }
+
+  .callout-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .callout-body strong {
+    display: block;
+    color: #f59e0b;
+    margin-bottom: 0.35rem;
+    font-size: 1.05rem;
+  }
+
+  .callout-body p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .feature-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .feat-num {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--accent-network);
+    opacity: 0.4;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.15rem;
+  }
+
+  .feature-card p {
+    margin: 0;
+    font-size: 0.925rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .timeline {
+    border-left: 2px solid rgba(59, 130, 246, 0.3);
+    padding-left: 1.75rem;
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .timeline-step {
+    position: relative;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -2.65rem;
+    top: 0;
+    background: var(--accent-network);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-full);
+  }
+
+  .timeline-details h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+
+  .timeline-details p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .article-layout {
+      padding: 1.5rem 0.85rem 3.5rem 0.85rem;
+    }
+    .timeline {
+      padding-left: 1.25rem;
+      gap: 1.25rem;
+    }
+    .timeline-marker {
+      left: -2.15rem;
+      font-size: 0.7rem;
+    }
+  }
+</style>

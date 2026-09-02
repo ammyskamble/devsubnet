@@ -53,13 +53,14 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
 
       <!-- Column 3: Reference & Guides -->
       <div class="footer-col">
-        <h4 class="footer-heading">Reference & Guides</h4>
+        <h4 class="footer-heading">Knowledge & Guides</h4>
         <ul class="footer-menu">
+          <li><a href="/learn" style="font-weight: 600; color: var(--accent-network);">📚 Knowledge Hub</a></li>
+          <li><a href="/learn/history-of-cidr-and-ip-addressing">History of CIDR & RFC 1519</a></li>
+          <li><a href="/learn/binary-math-and-bitwise-logic">Binary Math & Bitwise Logic</a></li>
+          <li><a href="/learn/rfc-1918-private-addresses-explained">RFC 1918 Private IPs & NAT</a></li>
           <li><a href={`${langPrefix}/what-is-a-subnet`}>{whatIsSubnetText}</a></li>
           <li><a href={`${langPrefix}/subnet-cheat-sheet`}>{t.nav.cheatsheet}</a></li>
-          <li><a href={`${langPrefix}/vlsm-calculator`}>{t.nav.vlsm}</a></li>
-          <li><a href={`${langPrefix}/subnet-overlap-checker`}>{t.nav.overlap}</a></li>
-          <li><a href={`${langPrefix}/cidr-supernet-calculator`}>{t.nav.supernet}</a></li>
           <li><a href={`${langPrefix}/faq`}>{t.footer.faq}</a></li>
         </ul>
       </div>

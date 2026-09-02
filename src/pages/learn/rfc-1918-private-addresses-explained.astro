@@ -1,0 +1,349 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleHeader from '../../components/learn/ArticleHeader.astro';
+import RelatedToolsCard from '../../components/learn/RelatedToolsCard.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+
+const articleKeywords = [
+  'RFC 1918 Explained',
+  'Private IP Address Ranges',
+  '192.168 History',
+  '10.0.0.0/8 Range',
+  'NAT and Private IPs',
+  'Cloud VPC Subnetting'
+];
+---
+
+<Layout
+  lang={lang}
+  title="RFC 1918 Explained: The History of Private IP Addresses & NAT | DevSubnet"
+  description="Why are 10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16 private? Explore the history of RFC 1918, Network Address Translation (NAT), and modern cloud VPC design."
+>
+  <div class="app-shell">
+    <NavBar lang={lang} path="learn" />
+
+    <main class="page-main">
+      <article class="content-container article-layout">
+        <ArticleHeader
+          category="concepts"
+          title="RFC 1918 Explained: The History of Private IP Addresses & NAT"
+          description="Almost every home Wi-Fi, enterprise LAN, and cloud VPC in the world operates inside three specific address ranges. Learn why RFC 1918 was created in 1996, how NAT saved IPv4, and how to avoid subnet collisions in modern cloud infrastructure."
+          publishDate="March 2026"
+          readingTime="7 min read"
+          keywords={articleKeywords}
+        />
+
+        <div class="article-content">
+          <!-- Section 1 -->
+          <section class="content-section">
+            <h2>The Three Golden Ranges of RFC 1918</h2>
+            <p>
+              In February 1996, the Internet Engineering Task Force published <strong>RFC 1918</strong>: <em>"Address Allocation for Private Internets."</em> It carved out three distinct chunks of the IPv4 address space and declared them permanently non-routable on the global public internet:
+            </p>
+
+            <div class="table-responsive">
+              <table class="rfc-table">
+                <thead>
+                  <tr>
+                    <th>RFC 1918 Block</th>
+                    <th>CIDR Prefix</th>
+                    <th>Subnet Mask</th>
+                    <th>Total IP Addresses</th>
+                    <th>Historical Origin</th>
+                    <th>Typical Modern Usage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>10.0.0.0 – 10.255.255.255</code></td>
+                    <td><code>10.0.0.0/8</code></td>
+                    <td><code>255.0.0.0</code></td>
+                    <td>16,777,216</td>
+                    <td>1 Class A Network</td>
+                    <td>Enterprise LANs, Large Cloud VPCs, Kubernetes Pod CIDRs</td>
+                  </tr>
+                  <tr>
+                    <td><code>172.16.0.0 – 172.31.255.255</code></td>
+                    <td><code>172.16.0.0/12</code></td>
+                    <td><code>255.240.0.0</code></td>
+                    <td>1,048,576</td>
+                    <td>16 Contiguous Class B Networks</td>
+                    <td>Corporate Branch Offices, Docker Default Bridges</td>
+                  </tr>
+                  <tr>
+                    <td><code>192.168.0.0 – 192.168.255.255</code></td>
+                    <td><code>192.168.0.0/16</code></td>
+                    <td><code>255.255.0.0</code></td>
+                    <td>65,536</td>
+                    <td>256 Contiguous Class C Networks</td>
+                    <td>Home Wi-Fi Routers, Small Office LANs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section 2 -->
+          <section class="content-section">
+            <h2>Why Was RFC 1918 Created?</h2>
+            <p>
+              Before RFC 1918, every computer connected to any network—even if it never needed to communicate outside the building—was assigned a globally unique public IP address.
+            </p>
+            <p>
+              As computers became ubiquitous in corporate offices and schools, the IETF realized two critical issues:
+            </p>
+            <ol>
+              <li>
+                <strong>Public Address Exhaustion:</strong> Billions of devices would connect to LANs (printers, internal database servers, employee desktops) that had no reason to receive unsolicited incoming traffic from the public web.
+              </li>
+              <li>
+                <strong>Security:</strong> Direct public routability meant any misconfigured host was instantly vulnerable to internet port scanning and external compromise.
+              </li>
+            </ol>
+            <p>
+              RFC 1918 solved both problems by setting aside blocks that internet backbone routers (ISPs) would simply drop if received on transit links.
+            </p>
+          </section>
+
+          <!-- Section 3 -->
+          <section class="content-section">
+            <h2>The Secret Weapon: How NAT Made RFC 1918 Usable</h2>
+            <p>
+              Private IP addresses cannot traverse the internet on their own. For private hosts to browse web pages or download updates, they required a translator.
+            </p>
+            <p>
+              That translator is <strong>Network Address Translation (NAT)</strong>, specifically <strong>NAPT (Network Address Port Translation)</strong> or <strong>PAT (Port Address Translation)</strong>:
+            </p>
+
+            <div class="concept-card">
+              <div class="concept-header">
+                <span class="concept-icon">🔄</span>
+                <h3>The 4-Tuple NAT State Table</h3>
+              </div>
+              <p>
+                When your laptop with private IP <code>192.168.1.50</code> sends a packet to a web server at <code>93.184.216.34:443</code>, your home router intercepts the packet:
+              </p>
+              <ul>
+                <li>It replaces the source IP with the router's single public IP (e.g. <code>203.0.113.1</code>).</li>
+                <li>It assigns a unique ephemeral source port (e.g. <code>:54123</code>).</li>
+                <li>It logs this mapping into an internal memory table.</li>
+                <li>When the web server replies to <code>203.0.113.1:54123</code>, the router looks up the port and rewrites the destination IP back to <code>192.168.1.50</code> before forwarding it to your laptop.</li>
+              </ul>
+              <p>
+                Through this mechanism, hundreds of devices on a private network can seamlessly access the internet simultaneously using just <strong>one single public IPv4 address</strong>!
+              </p>
+            </div>
+          </section>
+
+          <!-- Section 4: Modern Cloud Architecture -->
+          <section class="content-section">
+            <h2>Modern Cloud VPCs: The Danger of Subnet Overlaps</h2>
+            <p>
+              Today, RFC 1918 is standard across cloud hyperscalers. When designing infrastructure in AWS (VPC), Microsoft Azure (VNet), or Google Cloud (VPC), almost all engineers choose CIDR blocks from RFC 1918:
+            </p>
+            <ul>
+              <li><strong>AWS VPC Defaults:</strong> Often configured as <code>10.0.0.0/16</code> (65,536 IPs) or <code>172.31.0.0/16</code>.</li>
+              <li><strong>Kubernetes Clusters:</strong> Frequently use <code>10.244.0.0/16</code> for Pod CIDRs and <code>10.96.0.0/12</code> for Service CIDRs.</li>
+            </ul>
+
+            <div class="callout-box info-callout">
+              <div class="callout-icon">💡</div>
+              <div class="callout-body">
+                <strong>The Subnet Overlap Warning:</strong>
+                <p>
+                  Because anyone can use any RFC 1918 address, IP space is not unique between different organizations. If Company A uses <code>10.0.0.0/16</code> and Company B uses <code>10.0.0.0/16</code>, they <strong>cannot</strong> connect via AWS VPC Peering, AWS Transit Gateway, or Site-to-Site VPN without complex NAT or IP renumbering.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Related Tools CTA -->
+          <RelatedToolsCard
+            headline="Design Non-Overlapping Cloud Subnets"
+            subheadline="DevSubnet provides dedicated tools to verify subnet boundaries and plan cloud VPCs without IP collision risks."
+            tools={[
+              {
+                title: 'Subnet Overlap Checker',
+                description: 'Test multiple CIDR ranges simultaneously to detect conflicting or overlapping IP blocks.',
+                href: '/subnet-overlap-checker',
+                icon: '🔍',
+                tag: 'Audit'
+              },
+              {
+                title: 'AWS VPC Subnet Calculator',
+                description: 'Plan VPC CIDR blocks with automatic AWS 5-reserved-IP calculation per subnet.',
+                href: '/aws-vpc-subnet-calculator',
+                icon: '☁️',
+                tag: 'Cloud'
+              },
+              {
+                title: 'Kubernetes Subnet Planner',
+                description: 'Calculate Node, Pod, and Service IP requirements to prevent K8s IP exhaustion.',
+                href: '/kubernetes-subnet-planner',
+                icon: '☸️',
+                tag: 'DevOps'
+              }
+            ]}
+          />
+        </div>
+      </article>
+    </main>
+
+    <Footer lang={lang} />
+  </div>
+</Layout>
+
+<style>
+  .article-layout {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 5rem 1.25rem;
+  }
+
+  .article-content {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .content-section {
+    margin-bottom: 3rem;
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2.25rem 0 1rem 0;
+    letter-spacing: -0.015em;
+  }
+
+  .content-section p {
+    margin-bottom: 1.25rem;
+  }
+
+  .content-section ul, .content-section ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .content-section li {
+    margin-bottom: 0.75rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+
+  .rfc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface);
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .rfc-table th, .rfc-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .rfc-table th {
+    background: rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .rfc-table code {
+    font-family: var(--font-mono);
+    color: var(--accent-network);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .concept-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    margin: 2rem 0;
+  }
+
+  .concept-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .concept-icon {
+    font-size: 1.5rem;
+  }
+
+  .concept-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+  }
+
+  .callout-box {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin: 2rem 0;
+    border: 1px solid;
+  }
+
+  .info-callout {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: var(--text-primary);
+  }
+
+  .callout-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .callout-body strong {
+    display: block;
+    color: #60a5fa;
+    margin-bottom: 0.35rem;
+    font-size: 1.05rem;
+  }
+
+  .callout-body p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .article-layout {
+      padding: 1.5rem 0.85rem 3.5rem 0.85rem;
+    }
+    .concept-card {
+      padding: 1.25rem 1rem;
+    }
+    .callout-box {
+      padding: 1.25rem 1rem;
+      gap: 0.75rem;
+    }
+  }
+</style>

@@ -1,0 +1,268 @@
+---
+interface Props {
+  category: 'history' | 'science' | 'concepts';
+  title: string;
+  description: string;
+  publishDate: string;
+  readingTime: string;
+  keywords: string[];
+}
+
+const {
+  category,
+  title,
+  description,
+  publishDate,
+  readingTime,
+  keywords
+} = Astro.props;
+
+const categoryMeta = {
+  history: {
+    icon: '📜',
+    label: 'History & Evolution',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.25)',
+    bg: 'rgba(245, 158, 11, 0.1)'
+  },
+  science: {
+    icon: '🔬',
+    label: 'Computer Science & Math',
+    color: '#38bdf8',
+    border: 'rgba(56, 189, 248, 0.25)',
+    bg: 'rgba(56, 189, 248, 0.1)'
+  },
+  concepts: {
+    icon: '💡',
+    label: 'Architecture & RFCs',
+    color: '#c084fc',
+    border: 'rgba(192, 132, 252, 0.25)',
+    bg: 'rgba(192, 132, 252, 0.1)'
+  }
+}[category];
+
+const currentUrl = Astro.url.href;
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": title,
+  "description": description,
+  "datePublished": publishDate,
+  "keywords": keywords.join(", "),
+  "inLanguage": "en",
+  "author": {
+    "@type": "Organization",
+    "name": "DevSubnet Engineering"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DevSubnet",
+    "url": "https://devsubnet.com"
+  },
+  "mainEntityOfPage": currentUrl
+};
+---
+
+<header class="article-header">
+  <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+  
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/learn">Knowledge Hub</a>
+    <span class="sep">/</span>
+    <span class="current">{categoryMeta.label}</span>
+  </nav>
+
+  <div class="category-badge" style={`color: ${categoryMeta.color}; border-color: ${categoryMeta.border}; background: ${categoryMeta.bg};`}>
+    <span class="category-icon" aria-hidden="true">{categoryMeta.icon}</span>
+    <span>{categoryMeta.label}</span>
+  </div>
+
+  <h1 class="article-title">{title}</h1>
+
+  <p class="article-description">{description}</p>
+
+  <div class="article-meta-row">
+    <div class="meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      <span>{readingTime}</span>
+    </div>
+    <span class="meta-divider">•</span>
+    <div class="meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <span>Updated {publishDate}</span>
+    </div>
+    <span class="meta-divider">•</span>
+    <div class="meta-item verified-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>Peer-Reviewed Technical Reference</span>
+    </div>
+  </div>
+
+  <div class="keyword-tags">
+    <span class="tags-label">Key Topics:</span>
+    {keywords.map(kw => (
+      <span class="keyword-pill">{kw}</span>
+    ))}
+  </div>
+</header>
+
+<style>
+  .article-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--accent-network);
+  }
+
+  .breadcrumb .sep {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .breadcrumb .current {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid;
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .article-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+  }
+
+  .article-description {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 780px;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .article-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-divider {
+    opacity: 0.4;
+  }
+
+  .verified-badge {
+    color: #10b981;
+    font-weight: 500;
+  }
+
+  .keyword-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+  }
+
+  .tags-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .keyword-pill {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 640px) {
+    .article-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+    }
+    .article-title {
+      font-size: clamp(1.75rem, 6vw, 2.25rem);
+    }
+    .article-description {
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+    .article-meta-row {
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+    }
+    .breadcrumb {
+      font-size: 0.8125rem;
+      gap: 0.35rem;
+    }
+    .breadcrumb a {
+      padding: 0.2rem 0;
+    }
+  }
+</style>

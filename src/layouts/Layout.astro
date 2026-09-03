@@ -13,6 +13,7 @@ interface Props {
   description?: string;
   canonicalUrl?: string;
   lang?: SupportedLanguage;
+  noindex?: boolean;
 }
 
 const {
@@ -20,6 +21,7 @@ const {
   title = "Free IP Subnet Calculator & CIDR Planner | DevSubnet",
   description = "Free online IPv4 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly.",
   canonicalUrl = Astro.url.href,
+  noindex = false,
 } = Astro.props;
 
 const hreflangLinks = getHrefLangAlternates(Astro.url.pathname);
@@ -110,11 +112,20 @@ const currentLangInfo = languages[lang] || languages.en;
     <!-- PWA Offline Service Worker Registration -->
     <script is:inline>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('PWA Service Worker registered:', reg.scope))
-            .catch(err => console.error('PWA Service Worker registration failed:', err));
-        });
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(regs => {
+            for (let r of regs) r.unregister();
+          });
+          if ('caches' in window) {
+            caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+              .catch(err => console.error('PWA Service Worker registration failed:', err));
+          });
+        }
       }
     </script>
 
@@ -122,6 +133,7 @@ const currentLangInfo = languages[lang] || languages.en;
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
     <link rel="canonical" href={canonicalUrl} />
     <meta name="theme-color" content="#0d111c" />
     <meta name="generator" content={Astro.generator} />
@@ -175,58 +187,60 @@ const currentLangInfo = languages[lang] || languages.en;
     </script>
 
     <!-- WebApplication / SoftwareApplication Schema JSON-LD for Rich Results -->
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        name: "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
-        url: "https://devsubnet.com/",
-        inLanguage: lang,
-        applicationCategory: "UtilitiesApplication",
-        applicationSubCategory: "Networking & Cloud Infrastructure",
-        operatingSystem:
-          "All (Web Browser, Linux, macOS, Windows, iOS, Android)",
-        browserRequirements:
-          "Requires JavaScript. Compatible with all modern browsers.",
-        description: description,
-        author: {
-          "@type": "Organization",
-          name: "DevSubnet",
+    {!noindex && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
           url: "https://devsubnet.com/",
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "DevSubnet",
-          url: "https://devsubnet.com/",
-        },
-        offers: {
-          "@type": "Offer",
-          price: "0",
-          priceCurrency: "USD",
-          availability: "https://schema.org/InStock",
-        },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "4.9",
-          ratingCount: "148",
-          bestRating: "5",
-          worstRating: "1",
-        },
-        featureList: [
-          "IPv4 & IPv6 subnet calculation",
-          "CIDR prefix planning and binary visualization",
-          "Cloud-aware reserved IP calculation for AWS VPC, Azure VNet, and GCP",
-          "Visual Subnet Splitter with live partition tree",
-          "Terraform cidrsubnet() planner and HCL exporter",
-          "Kubernetes CIDR calculator (Cilium, Calico, AWS VPC CNI, Azure CNI)",
-          "VLSM hierarchical subnet segmenter",
-          "Subnet overlap conflict detector",
-          "CIDR supernetting and route aggregation",
-          "Complete CIDR cheat sheet reference",
-        ],
-      })}
-    />
+          inLanguage: lang,
+          applicationCategory: "UtilitiesApplication",
+          applicationSubCategory: "Networking & Cloud Infrastructure",
+          operatingSystem:
+            "All (Web Browser, Linux, macOS, Windows, iOS, Android)",
+          browserRequirements:
+            "Requires JavaScript. Compatible with all modern browsers.",
+          description: description,
+          author: {
+            "@type": "Organization",
+            name: "DevSubnet",
+            url: "https://devsubnet.com/",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "DevSubnet",
+            url: "https://devsubnet.com/",
+          },
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "4.9",
+            ratingCount: "148",
+            bestRating: "5",
+            worstRating: "1",
+          },
+          featureList: [
+            "IPv4 & IPv6 subnet calculation",
+            "CIDR prefix planning and binary visualization",
+            "Cloud-aware reserved IP calculation for AWS VPC, Azure VNet, and GCP",
+            "Visual Subnet Splitter with live partition tree",
+            "Terraform cidrsubnet() planner and HCL exporter",
+            "Kubernetes CIDR calculator (Cilium, Calico, AWS VPC CNI, Azure CNI)",
+            "VLSM hierarchical subnet segmenter",
+            "Subnet overlap conflict detector",
+            "CIDR supernetting and route aggregation",
+            "Complete CIDR cheat sheet reference",
+          ],
+        })}
+      />
+    )}
   </head>
   <body>
     <!-- Background Decor Blobs -->

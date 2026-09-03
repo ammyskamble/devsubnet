@@ -10,65 +10,58 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 <Layout 
   lang={lang} 
   noindex={true}
-  title="500 – Internal Server Error | DevSubnet"
-  description="Something went wrong internally while generating network configurations. Return to DevSubnet's client-side subnet calculator tools."
+  title="503 – Service Temporarily Unavailable | DevSubnet"
+  description="Our edge servers are temporarily undergoing scheduled maintenance or experiencing capacity limits. DevSubnet will be back shortly."
 >
   <div class="app-shell">
     <NavBar lang={lang} path="error" />
 
     <main class="error-main">
       <div class="error-container">
-        <!-- Diagnostic Status Pill -->
+        <!-- Status Badge -->
         <div class="status-badge" role="status">
-          <span class="pulse-dot"></span>
-          <span class="badge-code">ERR_500_ROUTING_EXCEPTION</span>
+          <span class="maint-icon">🔧</span>
+          <span class="badge-code">ERR_503_SERVICE_MAINTENANCE</span>
         </div>
 
         <h1 class="error-title">
-          <span class="code-number">500</span>
-          <span class="title-text">Core Engine Error</span>
+          <span class="code-number">503</span>
+          <span class="title-text">Service Temporarily Unavailable</span>
         </h1>
 
         <p class="error-description">
-          An unexpected routing exception occurred while processing this request. Our telemetry logging has recorded the incident.
+          Our edge routing infrastructure is undergoing scheduled upgrades or traffic re-routing. The service will resume normal operations in moments.
         </p>
 
-        <!-- Dynamic Diagnostic Incident Box -->
-        <div class="diagnostic-card" aria-label="Incident Diagnostic Data">
-          <div class="diag-header">
-            <span class="diag-title">TELEMETRY INCIDENT TRACE</span>
-            <span class="diag-status">AUTO-REPORTED</span>
+        <!-- Live Countdown & Status Box -->
+        <div class="maintenance-card" aria-label="Maintenance Status & Auto Retry">
+          <div class="maint-header">
+            <span class="maint-title">EDGE GATEWAY RE-SYNCHRONIZATION</span>
+            <span class="maint-pulse-badge">UPGRADE IN PROGRESS</span>
           </div>
-          <div class="diag-body">
-            <div class="diag-row">
-              <span class="diag-key">Incident ID:</span>
-              <div class="diag-val-wrapper">
-                <code id="incident-id" class="diag-code">REQ-2026-9B41-FA02</code>
-                <button type="button" id="copy-btn" class="copy-btn" title="Copy Incident ID" aria-label="Copy Incident ID">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  <span id="copy-feedback">Copy</span>
-                </button>
-              </div>
+
+          <div class="countdown-section">
+            <span class="countdown-label">Automatically attempting reconnect in:</span>
+            <div class="timer-display">
+              <span id="seconds-left" class="timer-number">30</span>
+              <span class="timer-unit">seconds</span>
             </div>
-            <div class="diag-row">
-              <span class="diag-key">Subsystem:</span>
-              <span class="diag-text">Cloudflare Edge Worker / Dynamic Engine</span>
-            </div>
-            <div class="diag-row">
-              <span class="diag-key">Client Mode:</span>
-              <span class="diag-badge-local">Browser Client Ready</span>
+            <div class="progress-bar-wrap" aria-hidden="true">
+              <div id="countdown-bar" class="progress-bar-fill"></div>
             </div>
           </div>
-          <div class="diag-footer">
-            <small>DevSubnet calculators run 100% locally in your browser. Core bitwise subnet calculations remain fully functional.</small>
+
+          <div class="offline-note">
+            <span class="note-icon">⚡</span>
+            <span>Tip: Pre-cached calculators operate entirely client-side without server roundtrips.</span>
           </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button type="button" id="retry-btn" class="btn-primary">
+          <button type="button" id="force-retry-btn" class="btn-primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-            Retry Request
+            Retry Now
           </button>
           <a href="/" class="btn-secondary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -107,9 +100,9 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(168, 85, 247, 0.12);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
     padding: 0.35rem 1rem;
     border-radius: var(--radius-full);
     font-family: var(--font-mono);
@@ -118,18 +111,9 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     margin-bottom: 1.5rem;
   }
 
-  .pulse-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-full);
-    background-color: #ef4444;
-    box-shadow: 0 0 8px #ef4444;
-    animation: pulseGlow 1.8s infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
+  .maint-icon {
+    font-size: 0.95rem;
+    line-height: 1;
   }
 
   /* Error Heading */
@@ -147,7 +131,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     font-size: clamp(3.5rem, 9vw, 5.5rem);
     font-weight: 800;
     letter-spacing: -0.05em;
-    background: linear-gradient(135deg, #ef4444 0%, #f97316 50%, #eab308 100%);
+    background: linear-gradient(135deg, #c084fc 0%, #38bdf8 50%, #34d399 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -168,8 +152,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     margin: 0 0 2.25rem;
   }
 
-  /* Diagnostic Incident Box */
-  .diagnostic-card {
+  /* Maintenance Card */
+  .maintenance-card {
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -181,7 +165,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     text-align: left;
   }
 
-  .diag-header {
+  .maint-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -192,93 +176,85 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     margin-bottom: 1.25rem;
   }
 
-  .diag-title {
+  .maint-title {
     color: var(--text-muted);
     font-weight: 600;
   }
 
-  .diag-status {
-    color: #34d399;
-    font-weight: 700;
-  }
-
-  .diag-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    font-size: 0.9rem;
-  }
-
-  .diag-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .diag-key {
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: 0.85rem;
-  }
-
-  .diag-val-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .diag-code {
-    font-family: var(--font-mono);
-    background: var(--bg-secondary);
-    padding: 0.25rem 0.6rem;
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-  }
-
-  .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 0.25rem 0.6rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-family: var(--font-mono);
-    cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast);
-  }
-
-  .copy-btn:hover {
-    background: var(--panel-bg);
-    color: var(--text-primary);
-  }
-
-  .diag-text {
-    color: var(--text-primary);
-    font-size: 0.85rem;
-  }
-
-  .diag-badge-local {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
+  .maint-pulse-badge {
     color: #38bdf8;
     background: rgba(56, 189, 248, 0.12);
-    padding: 0.2rem 0.5rem;
+    padding: 0.2rem 0.6rem;
     border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.7rem;
   }
 
-  .diag-footer {
+  .countdown-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .countdown-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .timer-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .timer-number {
+    font-family: var(--font-mono);
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .timer-unit {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 20rem;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #38bdf8, #a855f7);
+    border-radius: var(--radius-full);
+    transition: width 1s linear;
+  }
+
+  .offline-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     margin-top: 1.25rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border-color);
     font-size: 0.8rem;
     color: var(--text-muted);
+  }
+
+  .note-icon {
+    color: #eab308;
   }
 
   /* Actions */
@@ -333,35 +309,30 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 </style>
 
 <script>
-  // Generate random session incident trace ID
-  const incidentEl = document.getElementById('incident-id');
-  if (incidentEl) {
-    const randomHex = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-    incidentEl.textContent = `REQ-${randomHex}-${randomSuffix}`;
-  }
+  let seconds = 30;
+  const initialSeconds = 30;
+  const timerEl = document.getElementById('seconds-left');
+  const barEl = document.getElementById('countdown-bar');
+  const forceBtn = document.getElementById('force-retry-btn');
 
-  // One-click copy
-  const copyBtn = document.getElementById('copy-btn');
-  const copyFeedback = document.getElementById('copy-feedback');
-  if (copyBtn && incidentEl && copyFeedback) {
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(incidentEl.textContent || '');
-        copyFeedback.textContent = 'Copied!';
-        setTimeout(() => {
-          copyFeedback.textContent = 'Copy';
-        }, 2000);
-      } catch (err) {
-        copyFeedback.textContent = 'Copied';
-      }
-    });
-  }
+  const interval = setInterval(() => {
+    seconds -= 1;
+    if (timerEl) {
+      timerEl.textContent = String(seconds);
+    }
+    if (barEl) {
+      barEl.style.width = `${(seconds / initialSeconds) * 100}%`;
+    }
 
-  // Instant retry
-  const retryBtn = document.getElementById('retry-btn');
-  if (retryBtn) {
-    retryBtn.addEventListener('click', () => {
+    if (seconds <= 0) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 1000);
+
+  if (forceBtn) {
+    forceBtn.addEventListener('click', () => {
+      clearInterval(interval);
       window.location.reload();
     });
   }

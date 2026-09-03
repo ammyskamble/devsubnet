@@ -23,57 +23,222 @@ const whatIsSubnetTranslations: Record<SupportedLanguage, string> = {
 const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslations.en;
 ---
 
-<footer class="site-footer">
+<footer class="site-footer option-2" role="contentinfo">
   <div class="footer-container">
-    <div class="footer-grid">
-      <!-- Column 1: Brand & Tagline -->
-      <div class="footer-col brand-col">
-        <a href={langPrefix || "/"} class="footer-brand">
-          <span class="brand-badge">Dev</span>
+    <div class="footer-grid-5col">
+      <!-- Column 1: Brand & Fast Lanes -->
+      <div class="footer-brand-col">
+        <a href={langPrefix || "/"} class="footer-brand" aria-label="DevSubnet.com Home">
+          <span class="brand-badge">
+            <svg class="brand-navicon" viewBox="0 0 512 512" width="16" height="16" aria-hidden="true">
+              <circle cx="256" cy="140" r="40" fill="#ffffff"/>
+              <path d="M256 180 v70 M150 290 h212 M150 250 v40 M362 250 v40 M150 290 v60 M362 290 v60" fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round"/>
+              <circle cx="150" cy="370" r="32" fill="#ffffff"/>
+              <circle cx="362" cy="370" r="32" fill="#ffffff"/>
+              <path d="M280 190 l-48 80" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+            </svg>
+            Dev
+          </span>
           <span class="brand-text">Subnet.com</span>
         </a>
-        <div class="footer-tagline">{t.footer.tagline}</div>
+        <div class="footer-tagline">100% Client-Side CIDR Tools</div>
         <p class="footer-desc">
-          Privacy-first, client-side networking utilities engineered for sysadmins, cloud architects, DevOps teams, and students.
+          Precision network & cloud VPC calculators with zero server logging. Built for speed and mathematical accuracy.
         </p>
+        <div class="brand-fast-lanes">
+          <span class="fast-lanes-title">Fast Lanes:</span>
+          <div class="fast-lanes-row">
+            <a href="/aws-vpc-subnet-calculator" class="fast-pill devops-pill" title="Cloud VPC & DevOps Tools">
+              <span>🛠️ DevOps</span>
+            </a>
+            <a href="/learn" class="fast-pill student-pill" title="Student Knowledge Hub">
+              <span>🎓 Students</span>
+            </a>
+          </div>
+        </div>
       </div>
 
-      <!-- Column 2: Calculators & Tools -->
+      <!-- Column 2: Core Calculators -->
       <div class="footer-col">
-        <h4 class="footer-heading">Calculators & Tools</h4>
-        <ul class="footer-menu">
-          <li><a href={`${langPrefix}/`}>{t.nav.ipv4}</a></li>
-          <li><a href={`${langPrefix}/visual-subnet-splitter`}>{t.nav.splitter}</a></li>
-          <li><a href={`${langPrefix}/kubernetes-subnet-planner`}>{t.nav.k8s}</a></li>
-          <li><a href={`${langPrefix}/ipv6-subnet-calculator`}>{t.nav.ipv6}</a></li>
-          <li><a href={`${langPrefix}/terraform-subnet-planner`}>{t.nav.terraform}</a></li>
-          <li><a href={`${langPrefix}/k8s-cidr-calculator`}>{t.nav.k8sCidr}</a></li>
+        <div class="col-heading" style="--accent-bar: #38bdf8;">
+          <span class="col-icon">🧮</span>
+          <h4>Core Tools</h4>
+        </div>
+        <ul class="col-links">
+          <li>
+            <a href={`${langPrefix}/`} class="col-link">
+              <span>IPv4 Subnet</span>
+              <span class="col-tag tag-core">Core</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/visual-subnet-splitter`} class="col-link">
+              <span>Visual Splitter</span>
+              <span class="col-tag tag-visual">Tree</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vlsm-calculator" class="col-link">
+              <span>VLSM Calculator</span>
+              <span class="col-tag tag-vlsm">VLSM</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/ipv6-subnet-calculator`} class="col-link">
+              <span>IPv6 Subnet</span>
+              <span class="col-tag tag-ipv6">IPv6</span>
+            </a>
+          </li>
+          <li>
+            <a href="/cidr-supernet-calculator" class="col-link">
+              <span>CIDR Supernet</span>
+              <span class="col-tag tag-cidr">CIDR</span>
+            </a>
+          </li>
+          <li>
+            <a href="/subnet-overlap-checker" class="col-link">
+              <span>Overlap Checker</span>
+              <span class="col-tag tag-audit">Audit</span>
+            </a>
+          </li>
         </ul>
       </div>
 
-      <!-- Column 3: Reference & Guides -->
+      <!-- Column 3: Cloud VPC & DevOps -->
       <div class="footer-col">
-        <h4 class="footer-heading">Knowledge & Guides</h4>
-        <ul class="footer-menu">
-          <li><a href="/learn" style="font-weight: 600; color: var(--accent-network);">📚 Knowledge Hub</a></li>
-          <li><a href="/learn/history-of-cidr-and-ip-addressing">History of CIDR & RFC 1519</a></li>
-          <li><a href="/learn/binary-math-and-bitwise-logic">Binary Math & Bitwise Logic</a></li>
-          <li><a href="/learn/rfc-1918-private-addresses-explained">RFC 1918 Private IPs & NAT</a></li>
-          <li><a href={`${langPrefix}/what-is-a-subnet`}>{whatIsSubnetText}</a></li>
-          <li><a href={`${langPrefix}/subnet-cheat-sheet`}>{t.nav.cheatsheet}</a></li>
-          <li><a href={`${langPrefix}/faq`}>{t.footer.faq}</a></li>
+        <div class="col-heading" style="--accent-bar: #a855f7;">
+          <span class="col-icon">☁️</span>
+          <h4>Cloud VPC</h4>
+        </div>
+        <ul class="col-links">
+          <li>
+            <a href="/aws-vpc-subnet-calculator" class="col-link">
+              <span>AWS VPC Calc</span>
+              <span class="col-tag tag-aws">AWS</span>
+            </a>
+          </li>
+          <li>
+            <a href="/azure-vnet-subnet-calculator" class="col-link">
+              <span>Azure VNet Calc</span>
+              <span class="col-tag tag-azure">Azure</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gcp-vpc-subnet-calculator" class="col-link">
+              <span>GCP VPC Calc</span>
+              <span class="col-tag tag-gcp">GCP</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/kubernetes-subnet-planner`} class="col-link">
+              <span>K8s Sizing</span>
+              <span class="col-tag tag-k8s">K8s</span>
+            </a>
+          </li>
+          <li>
+            <a href="/terraform-subnet-planner" class="col-link">
+              <span>Terraform IaC</span>
+              <span class="col-tag tag-iac">IaC</span>
+            </a>
+          </li>
+          <li>
+            <a href="/k8s-cidr-calculator" class="col-link">
+              <span>K8s CNI Tool</span>
+              <span class="col-tag tag-cni">CNI</span>
+            </a>
+          </li>
         </ul>
       </div>
 
-      <!-- Column 4: Company & Legal -->
+      <!-- Column 4: Knowledge & Guides -->
       <div class="footer-col">
-        <h4 class="footer-heading">Company & Legal</h4>
-        <ul class="footer-menu">
-          <li><a href={`${langPrefix}/about`}>{t.footer.about}</a></li>
-          <li><a href={`${langPrefix}/contact`}>{t.footer.contact}</a></li>
-          <li><a href={`${langPrefix}/privacy`}>{t.footer.privacy}</a></li>
-          <li><a href={`${langPrefix}/terms`}>{t.footer.terms}</a></li>
-          <li><a href={`${langPrefix}/cookie-policy`}>{t.footer.cookiePolicy}</a></li>
+        <div class="col-heading" style="--accent-bar: #10b981;">
+          <span class="col-icon">📚</span>
+          <h4>Knowledge</h4>
+        </div>
+        <ul class="col-links">
+          <li>
+            <a href="/learn" class="col-link highlight">
+              <span>Knowledge Hub</span>
+              <span class="col-tag tag-daily">Daily</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/what-is-a-subnet`} class="col-link">
+              <span>{whatIsSubnetText}</span>
+              <span class="col-tag tag-primer">Guide</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/subnet-cheat-sheet`} class="col-link">
+              <span>Subnet Cheat Sheet</span>
+              <span class="col-tag tag-quick-ref">Ref</span>
+            </a>
+          </li>
+          <li>
+            <a href="/student-guide" class="col-link">
+              <span>Student Exam Guide</span>
+              <span class="col-tag tag-ccna">CCNA</span>
+            </a>
+          </li>
+          <li>
+            <a href="/website-analyzer" class="col-link">
+              <span>Website Analyzer</span>
+              <span class="col-tag tag-dns">DNS</span>
+            </a>
+          </li>
+          <li>
+            <a href="/learn/rfc-1918-private-addresses-explained" class="col-link">
+              <span>RFC 1918 Private IPs</span>
+              <span class="col-tag tag-rfc">RFC</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 5: Platform & Legal -->
+      <div class="footer-col">
+        <div class="col-heading" style="--accent-bar: #6366f1;">
+          <span class="col-icon">🛡️</span>
+          <h4>Platform</h4>
+        </div>
+        <ul class="col-links">
+          <li>
+            <a href={`${langPrefix}/about`} class="col-link">
+              <span>About DevSubnet</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/contact`} class="col-link">
+              <span>Contact & Support</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/faq`} class="col-link">
+              <span>FAQ & Help</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/privacy`} class="col-link">
+              <span>Privacy Policy</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/terms`} class="col-link">
+              <span>Terms of Service</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${langPrefix}/cookie-policy`} class="col-link">
+              <span>Cookie Policy</span>
+            </a>
+          </li>
+          <li>
+            <a href="/offline" class="col-link">
+              <span>Offline Mode</span>
+              <span class="col-tag tag-pwa">PWA</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -81,12 +246,405 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
     <!-- Bottom Bar -->
     <div class="footer-bottom">
       <div class="footer-copy">
-        © 2026 devsubnet.com. All rights reserved. Built for clear, privacy-focused network engineering.
+        © 2026 DevSubnet.com. Built for clear, privacy-focused network engineering.
       </div>
-      <div class="footer-security-badge">
-        <span class="security-dot"></span>
-        <span>{t.footer.noData}</span>
+      <div class="footer-trust">
+        <div class="trust-pill">
+          <span class="dot green"></span>
+          <span>{t.footer.noData}</span>
+        </div>
+        <div class="trust-pill">
+          <span class="icon">⚡</span>
+          <span>100% Client-Side</span>
+        </div>
+        <a href="/offline" class="trust-pill link-pill" title="Works offline via PWA cache">
+          <span class="icon">📶</span>
+          <span>Offline Ready</span>
+        </a>
+        <button type="button" class="top-btn" id="footer-back-to-top" aria-label="Back to top">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+          <span>Top</span>
+        </button>
       </div>
     </div>
   </div>
 </footer>
+
+<style>
+  .site-footer.option-2 {
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    padding: 2rem 1.5rem 1.25rem;
+    color: var(--text-secondary);
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Single 5-Column Grid */
+  .footer-grid-5col {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr 1fr 0.85fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  /* Brand Column */
+  .footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+
+  .footer-tagline {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-network);
+    text-transform: uppercase;
+  }
+
+  .footer-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .brand-fast-lanes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+  }
+
+  .fast-lanes-title {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .fast-lanes-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .fast-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .fast-pill:hover {
+    transform: translateY(-1px);
+  }
+
+  .devops-pill:hover {
+    border-color: rgba(168, 85, 247, 0.5);
+    background: rgba(168, 85, 247, 0.1);
+    color: #c084fc;
+  }
+
+  .student-pill:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+  }
+
+  /* Link Columns */
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .col-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1.5px solid var(--accent-bar, var(--border-color));
+  }
+
+  .col-icon {
+    font-size: 0.85rem;
+  }
+
+  .col-heading h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .col-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .col-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    padding: 0.22rem 0.35rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+
+  .col-link:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+  }
+
+  :root[data-theme="light"] .col-link:hover {
+    background: rgba(0, 0, 0, 0.035);
+    border-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .col-link.highlight {
+    font-weight: 600;
+    color: var(--accent-network);
+  }
+
+  .col-link span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Micro Tags */
+  .col-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.06rem 0.32rem;
+    border-radius: 3px;
+    letter-spacing: 0.02em;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+
+  .tag-core, .tag-k8s {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+  }
+
+  .tag-visual, .tag-quick-ref {
+    background: rgba(6, 182, 212, 0.12);
+    color: #22d3ee;
+  }
+
+  .tag-vlsm, .tag-iac, .tag-primer {
+    background: rgba(168, 85, 247, 0.12);
+    color: #c084fc;
+  }
+
+  .tag-aws, .tag-audit {
+    background: rgba(249, 115, 22, 0.12);
+    color: #fb923c;
+  }
+
+  .tag-gcp, .tag-cidr, .tag-daily, .tag-pwa {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+  }
+
+  .tag-azure {
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+  }
+
+  .tag-ccna, .tag-dns, .tag-rfc, .tag-cni {
+    background: rgba(99, 102, 241, 0.12);
+    color: #a5b4fc;
+  }
+
+  /* Bottom Bar */
+  .footer-bottom {
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+  }
+
+  .footer-trust {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .trust-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+  }
+
+  .trust-pill.link-pill {
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .trust-pill.link-pill:hover {
+    color: #c084fc;
+    border-color: rgba(168, 85, 247, 0.4);
+  }
+
+  .trust-pill .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+  }
+
+  .trust-pill .icon {
+    font-size: 0.75rem;
+  }
+
+  .top-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .top-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-network);
+    color: var(--accent-network);
+    transform: translateY(-1px);
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .footer-grid-5col {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .footer-brand-col {
+      grid-column: span 3;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-grid-5col {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+    .footer-brand-col {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .site-footer.option-2 {
+      padding: 1.5rem 1rem 1rem;
+    }
+    .footer-grid-5col {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .footer-brand-col {
+      grid-column: span 1;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.75rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  function setupFooterBackToTop() {
+    const btn = document.getElementById('footer-back-to-top');
+    if (btn) {
+      btn.onclick = function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      };
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFooterBackToTop);
+  } else {
+    setupFooterBackToTop();
+  }
+  document.addEventListener('astro:page-load', setupFooterBackToTop);
+</script>

@@ -1,6 +1,7 @@
-const CACHE_NAME = 'devsubnet-cache-v1';
+const CACHE_NAME = 'devsubnet-cache-v3';
 const PRECACHE_ASSETS = [
   '/',
+  '/offline',
   '/visual-subnet-splitter',
   '/kubernetes-subnet-planner',
   '/ipv6-subnet-calculator',
@@ -55,6 +56,10 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
+  // Bypass cache during local development
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -80,7 +85,9 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       }).catch(() => {
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          return caches.match('/offline').then((offlineResponse) => {
+            return offlineResponse || caches.match('/');
+          });
         }
       });
     })

@@ -40,5 +40,43 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=()
 
+# Error pages & Offline Fallback - Noindex & CDN Cache Policies
+/400
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/403
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/404
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/500
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/503
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/offline
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
 https://devsubnet-com.ammyskamble.workers.dev/*
   X-Robots-Tag: noindex
+

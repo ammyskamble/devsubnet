@@ -15,27 +15,62 @@ const t = translations[lang] || translations.en;
 const currentLangInfo = languages[lang] || languages.en;
 const langPrefix = lang === 'en' ? '' : `/${lang}`;
 
-const primaryLinks = [
-  { href: `${langPrefix}/` || '/', label: t.nav.ipv4, key: "ipv4" },
-  { href: `${langPrefix}/visual-subnet-splitter`, label: t.nav.splitter, key: "splitter" },
-  { href: `${langPrefix}/kubernetes-subnet-planner`, label: t.nav.k8s, key: "k8s" },
-  { href: `${langPrefix}/ipv6-subnet-calculator`, label: t.nav.ipv6, key: "ipv6" }
+const devopsLinks = [
+  { href: `${langPrefix}/` || '/', label: "⚡ IPv4 Calculator", key: "ipv4" },
+  { href: `${langPrefix}/kubernetes-subnet-planner`, label: "☸️ Kubernetes", key: "k8s" },
+  { href: `/terraform-subnet-planner`, label: "📜 Terraform", key: "terraform" },
+  { href: `/aws-vpc-subnet-calculator`, label: "☁️ Cloud VPCs", key: "aws" }
 ];
 
-const moreTools = [
-  { href: `/learn`, label: "📚 Knowledge Hub", key: "learn" },
-  { href: `/what-is-a-subnet`, label: "What is a Subnet?", key: "what-is-a-subnet" },
-  { href: `/subnet-cheat-sheet`, label: "Subnet Cheat Sheet", key: "subnet-cheat-sheet" },
-  { href: `/terraform-subnet-planner`, label: t.nav.terraform, key: "terraform" },
-  { href: `/k8s-cidr-calculator`, label: t.nav.k8sCidr, key: "k8s-cidr" },
-  { href: `/vlsm-calculator`, label: t.nav.vlsm, key: "vlsm" },
-  { href: `/subnet-overlap-checker`, label: t.nav.overlap, key: "overlap" },
-  { href: `/cidr-supernet-calculator`, label: t.nav.supernet, key: "supernet" },
-  { href: `${langPrefix}/cidr-cheat-sheet`, label: t.nav.cheatsheet, key: "cheatsheet" },
-  { href: `/aws-vpc-subnet-calculator`, label: t.nav.aws, key: "aws" },
-  { href: `/azure-vnet-subnet-calculator`, label: t.nav.azure, key: "azure" },
-  { href: `/gcp-vpc-subnet-calculator`, label: t.nav.gcp, key: "gcp" }
+const studentLinks = [
+  { href: `/learn`, label: "📚 Knowledge Hub", key: "learn", badge: "Daily" },
+  { href: `${langPrefix}/visual-subnet-splitter`, label: "🔀 Visual Splitter", key: "splitter" },
+  { href: `/what-is-a-subnet`, label: "💡 What is a Subnet?", key: "what-is-a-subnet" },
+  { href: `/subnet-cheat-sheet`, label: "📋 Cheat Sheet", key: "subnet-cheat-sheet" }
 ];
+
+const toolCategories = [
+  {
+    name: "Core Calculators",
+    icon: "🧮",
+    color: "#38bdf8",
+    tools: [
+      { href: `${langPrefix}/` || '/', label: "IPv4 Subnet Calculator", desc: "Instant bitwise network & host solver", tag: "Core", key: "ipv4" },
+      { href: `${langPrefix}/visual-subnet-splitter`, label: "Visual Subnet Splitter", desc: "Interactive drag & split tree", tag: "Visual", key: "splitter" },
+      { href: `/vlsm-calculator`, label: "VLSM Calculator", desc: "Variable length subnet mask planning", tag: "VLSM", key: "vlsm" },
+      { href: `${langPrefix}/ipv6-subnet-calculator`, label: "IPv6 Calculator", desc: "128-bit hex & prefix explorer", tag: "IPv6", key: "ipv6" },
+      { href: `/subnet-overlap-checker`, label: "Overlap Checker", desc: "Audit colliding network blocks", tag: "Audit", key: "overlap" },
+      { href: `/cidr-supernet-calculator`, label: "CIDR Supernetting", desc: "Route summarization solver", tag: "CIDR", key: "supernet" }
+    ]
+  },
+  {
+    name: "Cloud VPC & DevOps",
+    icon: "☁️",
+    color: "#a855f7",
+    tools: [
+      { href: `${langPrefix}/kubernetes-subnet-planner`, label: "Kubernetes Planner", desc: "Node, Pod & Service CIDR sizing", tag: "K8s", key: "k8s" },
+      { href: `/terraform-subnet-planner`, label: "Terraform Planner", desc: "Auto cidrsubnet() HCL generator", tag: "IaC", key: "terraform" },
+      { href: `/aws-vpc-subnet-calculator`, label: "AWS VPC Calculator", desc: "Multi-AZ with 5 reserved IPs", tag: "AWS", key: "aws" },
+      { href: `/azure-vnet-subnet-calculator`, label: "Azure VNet Calculator", desc: "GatewaySubnet & 5 reserved IPs", tag: "Azure", key: "azure" },
+      { href: `/gcp-vpc-subnet-calculator`, label: "GCP VPC Calculator", desc: "Regional CIDRs with 4 reserved IPs", tag: "GCP", key: "gcp" }
+    ]
+  },
+  {
+    name: "Knowledge & Guides",
+    icon: "📚",
+    color: "#10b981",
+    tools: [
+      { href: `/learn`, label: "Knowledge Hub", desc: "Daily student networking articles", tag: "Daily New", key: "learn", highlight: true },
+      { href: `/what-is-a-subnet`, label: "What is a Subnet?", desc: "Beginner network & mask primer", tag: "Primer", key: "what-is-a-subnet" },
+      { href: `/subnet-cheat-sheet`, label: "Subnet Cheat Sheet", desc: "/1 to /32 quick lookup table", tag: "Quick Ref", key: "subnet-cheat-sheet" },
+      { href: `/student-guide`, label: "Student Exam Guide", desc: "CCNA formulas & exam shortcuts", tag: "Guide", key: "student-guide" },
+      { href: `/website-analyzer`, label: "Website Analyzer", desc: "DNS, TLS & network diagnostics", tag: "Diagnostic", key: "website-analyzer" }
+    ]
+  }
+];
+
+// Flat list for active state checks
+const allTools = toolCategories.flatMap(c => c.tools);
 
 // Resolve the current path to a key for active-state highlighting
 const nonDefaultLangs = Object.keys(languages).filter(l => l !== 'en');
@@ -66,29 +101,103 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
     </a>
 
     <nav class="nav-links" aria-label="Primary navigation">
-      <div class="mac-pill-indicator" id="mac-nav-pill"></div>
-      {primaryLinks.map((link) => (
-        <a class={`nav-tab ${isActive(link) ? 'active' : ''}`} href={link.href}>
-          {link.label}
-        </a>
-      ))}
+      <!-- Persona Mode Switcher: 🛠️ DevOps vs 🎓 Student -->
+      <div class="persona-switch" role="radiogroup" aria-label="Navigation Mode Filter">
+        <button type="button" class="persona-btn active" id="btn-mode-devops" data-mode="devops" role="radio" aria-checked="true" title="Switch to DevOps & Cloud Architecture tabs">
+          <span class="persona-icon">🛠️</span>
+          <span class="persona-text">DevOps</span>
+        </button>
+        <button type="button" class="persona-btn" id="btn-mode-student" data-mode="student" role="radio" aria-checked="false" title="Switch to Student & Learning Curriculum tabs">
+          <span class="persona-icon">🎓</span>
+          <span class="persona-text">Student</span>
+        </button>
+      </div>
 
+      <!-- DevOps Tab Group -->
+      <div class="nav-tab-group nav-group-devops" id="nav-group-devops">
+        {devopsLinks.map((link) => (
+          <a class={`nav-tab ${isActive(link) ? 'active' : ''}`} href={link.href}>
+            {link.label}
+          </a>
+        ))}
+      </div>
+
+      <!-- Student Tab Group -->
+      <div class="nav-tab-group nav-group-student" id="nav-group-student" style="display: none;">
+        {studentLinks.map((link) => (
+          <a class={`nav-tab ${isActive(link) ? 'active' : ''}`} href={link.href}>
+            {link.label}
+            {link.badge && <span class="tab-pill-badge">{link.badge}</span>}
+          </a>
+        ))}
+      </div>
+
+      <!-- Categorized Mega-Menu Dropdown -->
       <div class="nav-more">
-        <button class="nav-tab nav-more-btn" type="button" aria-label="Toggle more subnetting tools dropdown menu" aria-haspopup="true" aria-expanded="false">
-          {t.nav.moreTools}
+        <button class="nav-tab nav-more-btn" type="button" aria-label="Explore all subnetting tools and knowledge hub" aria-haspopup="true" aria-expanded="false">
+          <span class="nav-more-icon">❖</span>
+          <span>{t.nav.moreTools}</span>
+          <span class="nav-count-badge">15+</span>
           <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
-        <div class="nav-more-menu">
-          {moreTools.map((tool) => (
-            <a class={`nav-more-item ${isActive(tool) ? 'active' : ''}`} href={tool.href}>
-              {tool.label}
+
+        <div class="mega-menu-panel" role="menu" aria-label="Tools and Guides Directory">
+          <div class="mega-menu-grid">
+            {toolCategories.map((cat) => (
+              <div class="mega-col">
+                <div class="mega-col-header">
+                  <span class="mega-col-icon">{cat.icon}</span>
+                  <h3 class="mega-col-title">{cat.name}</h3>
+                </div>
+                <div class="mega-col-links">
+                  {cat.tools.map((tool) => (
+                    <a 
+                      class={`mega-item ${isActive(tool) ? 'active' : ''} ${tool.highlight ? 'item-highlight' : ''}`} 
+                      href={tool.href}
+                      role="menuitem"
+                    >
+                      <div class="mega-item-main">
+                        <div class="mega-item-top">
+                          <span class="mega-item-label">{tool.label}</span>
+                          <span class={`mega-tag mega-tag-${tool.tag.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>{tool.tag}</span>
+                        </div>
+                        <p class="mega-item-desc">{tool.desc}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <!-- Bottom Footer Bar -->
+          <div class="mega-menu-footer">
+            <div class="mega-footer-tip">
+              <span class="mega-tip-icon">🎲</span>
+              <span><strong>Quick Tip:</strong> Press <kbd class="footer-kbd">S</kbd> anywhere to randomly shuffle & discover a new tool!</span>
+            </div>
+            <a href="/learn" class="mega-footer-link">
+              Explore Knowledge Hub <span class="arrow">→</span>
             </a>
-          ))}
+          </div>
         </div>
       </div>
     </nav>
 
     <div class="nav-actions">
+      <!-- Shuffle / Surprise Tool Discovery Button -->
+      <button 
+        class="shuffle-btn" 
+        id="shuffle-tool-btn" 
+        type="button" 
+        aria-label="Surprise Me: Jump to a random subnetting tool or learning guide" 
+        title="Surprise Tool / Random Discovery (Hotkey: S)"
+      >
+        <span class="shuffle-dice" aria-hidden="true">🎲</span>
+        <span class="shuffle-label">Shuffle</span>
+        <kbd class="shuffle-key">S</kbd>
+      </button>
+
       <!-- Language Switcher Dropdown -->
       <div class="lang-picker">
         <button class="lang-btn" type="button" aria-label="Toggle language settings dropdown" aria-haspopup="true" aria-expanded="false" title="Change Language / Sprache / Idioma / 言語">
@@ -127,6 +236,15 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
+    </div>
+  </div>
+
+  <!-- Shuffle Teleport Toast Notification -->
+  <div class="shuffle-toast" id="shuffle-toast" role="status" aria-live="polite">
+    <span class="toast-dice">🎲</span>
+    <div class="toast-body">
+      <div class="toast-title">Shuffling DevSubnet...</div>
+      <div class="toast-target" id="shuffle-toast-target">Teleporting to a random tool...</div>
     </div>
   </div>
 </header>
@@ -205,9 +323,516 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
     color: var(--text-primary);
     font-weight: 600;
   }
+
+  /* Mega Menu Header Badge & Icon */
+  .nav-more-icon {
+    font-size: 0.9rem;
+    color: var(--accent-network);
+  }
+
+  .nav-count-badge {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: #c084fc;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.38rem;
+    border-radius: var(--radius-full);
+    line-height: 1;
+  }
+
+  /* Mega Menu Flyout Panel */
+  .mega-menu-panel {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    right: 0;
+    width: 780px;
+    max-width: calc(100vw - 2rem);
+    background: rgba(13, 18, 30, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(28px) saturate(190%);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.99);
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  :root[data-theme="light"] .mega-menu-panel {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18), 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-more.open .mega-menu-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .mega-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .mega-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mega-col-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.25rem;
+  }
+
+  .mega-col-icon {
+    font-size: 1.15rem;
+  }
+
+  .mega-col-title {
+    margin: 0;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .mega-col-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .mega-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .mega-item:hover {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.2);
+    transform: translateX(2px);
+  }
+
+  .mega-item.active {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+
+  .mega-item.item-highlight {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(56, 189, 248, 0.08) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .mega-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .mega-item-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+  }
+
+  .mega-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.12rem 0.4rem;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .mega-tag-core, .mega-tag-k8s, .mega-tag-blue {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+  }
+
+  .mega-tag-visual, .mega-tag-quick-ref, .mega-tag-cyan {
+    background: rgba(6, 182, 212, 0.15);
+    color: #22d3ee;
+  }
+
+  .mega-tag-vlsm, .mega-tag-iac, .mega-tag-primer, .mega-tag-purple {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+  }
+
+  .mega-tag-aws, .mega-tag-audit, .mega-tag-guide, .mega-tag-orange {
+    background: rgba(249, 115, 22, 0.15);
+    color: #fb923c;
+  }
+
+  .mega-tag-gcp, .mega-tag-cidr, .mega-tag-daily-new, .mega-tag-emerald {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+  }
+
+  .mega-item-desc {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  .mega-item:hover .mega-item-desc {
+    color: var(--text-secondary);
+  }
+
+  /* Mega Menu Footer */
+  .mega-menu-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-top: 1px solid var(--border-color);
+  }
+
+  :root[data-theme="light"] .mega-menu-footer {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  .mega-footer-tip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  .footer-kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.72rem;
+  }
+
+  .mega-footer-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-network);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    transition: gap 0.2s;
+  }
+
+  .mega-footer-link:hover {
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 960px) {
+    .mega-menu-panel {
+      width: calc(100vw - 2rem);
+      right: -2rem;
+    }
+    .mega-menu-grid {
+      grid-template-columns: 1fr;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .mega-menu-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+
+    /* Persona Mode Switcher */
+    .persona-switch {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-full);
+      padding: 2px;
+      gap: 2px;
+      margin-right: 0.35rem;
+    }
+
+    :root[data-theme="light"] .persona-switch {
+      background: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .persona-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .persona-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .persona-btn.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.8), rgba(99, 102, 241, 0.85));
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
+    }
+
+    .persona-btn#btn-mode-student.active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(56, 189, 248, 0.85));
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+    }
+
+    .persona-icon {
+      font-size: 0.85rem;
+      line-height: 1;
+    }
+
+    .nav-tab-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      animation: tabGroupFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes tabGroupFade {
+      from {
+        opacity: 0;
+        transform: translateY(-3px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tab-pill-badge {
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #34d399;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.05rem 0.35rem;
+      border-radius: var(--radius-full);
+      margin-left: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 900px) {
+      .persona-text {
+        display: none;
+      }
+      .persona-btn {
+        padding: 0.3rem 0.45rem;
+      }
+    }
+
+    /* Interactive Shuffle Tool Button */
+  .shuffle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: var(--text-primary);
+    padding: 0.38rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shuffle-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.3) 100%);
+    border-color: rgba(168, 85, 247, 0.6);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
+  }
+
+  .shuffle-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .shuffle-dice {
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .shuffle-btn.spinning .shuffle-dice {
+    transform: rotate(720deg) scale(1.25);
+  }
+
+  .shuffle-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-muted);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 0.05rem 0.3rem;
+    line-height: 1.2;
+  }
+
+  /* Shuffle Toast Notification */
+  .shuffle-toast {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-150%);
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(168, 85, 247, 0.45);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(168, 85, 247, 0.35);
+    backdrop-filter: blur(16px);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .shuffle-toast.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .toast-dice {
+    font-size: 1.5rem;
+    animation: diceRoll 0.8s infinite ease-in-out;
+  }
+
+  @keyframes diceRoll {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.15); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  .toast-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .toast-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #c084fc;
+    font-weight: 700;
+  }
+
+  .toast-target {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .shuffle-key {
+      display: none;
+    }
+    .shuffle-btn {
+      padding: 0.35rem 0.55rem;
+    }
+  }
 </style>
 
 <script is:inline>
+  const SHUFFLE_POOL = [
+    { name: "IPv4 Subnet Calculator", url: "/" },
+    { name: "Visual Subnet Splitter", url: "/visual-subnet-splitter" },
+    { name: "Kubernetes Subnet Planner", url: "/kubernetes-subnet-planner" },
+    { name: "Terraform Subnet Planner", url: "/terraform-subnet-planner" },
+    { name: "IPv6 Subnet Calculator", url: "/ipv6-subnet-calculator" },
+    { name: "VLSM Calculator", url: "/vlsm-calculator" },
+    { name: "Subnet Overlap Checker", url: "/subnet-overlap-checker" },
+    { name: "CIDR Supernet Calculator", url: "/cidr-supernet-calculator" },
+    { name: "Subnet Cheat Sheet", url: "/subnet-cheat-sheet" },
+    { name: "What is a Subnet Guide", url: "/what-is-a-subnet" },
+    { name: "AWS VPC Calculator", url: "/aws-vpc-subnet-calculator" },
+    { name: "Azure VNet Calculator", url: "/azure-vnet-subnet-calculator" },
+    { name: "GCP VPC Calculator", url: "/gcp-vpc-subnet-calculator" },
+    { name: "Networking Knowledge Hub", url: "/learn" },
+    { name: "IP vs MAC Postal Analogy", url: "/learn/ip-address-vs-mac-address-postal-analogy" },
+    { name: "Binary Math & Bitwise Logic", url: "/learn/binary-math-and-bitwise-logic" },
+    { name: "History of CIDR & IP Addressing", url: "/learn/history-of-cidr-and-ip-addressing" },
+    { name: "RFC 1918 Private IP Guide", url: "/learn/rfc-1918-private-addresses-explained" }
+  ];
+
+  function triggerShuffle() {
+    const shuffleBtn = document.getElementById('shuffle-tool-btn');
+    const toast = document.getElementById('shuffle-toast');
+    const toastTarget = document.getElementById('shuffle-toast-target');
+
+    if (shuffleBtn) shuffleBtn.classList.add('spinning');
+
+    const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+    const available = SHUFFLE_POOL.filter(item => {
+      const itemPath = item.url.replace(/\/$/, '') || '/';
+      return itemPath !== currentPath;
+    });
+
+    const selected = available[Math.floor(Math.random() * available.length)] || SHUFFLE_POOL[0];
+
+    if (toast && toastTarget) {
+      toastTarget.textContent = `Teleporting to: ${selected.name}...`;
+      toast.classList.add('visible');
+    }
+
+    setTimeout(() => {
+      window.location.href = selected.url;
+    }, 550);
+  }
+
   function setupNavBar() {
     const themeBtn = document.getElementById('theme-btn');
     if (themeBtn) {
@@ -217,6 +842,14 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
         const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
         doc.setAttribute('data-theme', targetTheme);
         localStorage.setItem('devsubnet-theme', targetTheme);
+      };
+    }
+
+    const shuffleBtn = document.getElementById('shuffle-tool-btn');
+    if (shuffleBtn) {
+      shuffleBtn.onclick = function(e) {
+        e.preventDefault();
+        triggerShuffle();
       };
     }
 
@@ -245,7 +878,104 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
         if (moreW) moreW.classList.remove('open');
       };
     }
-  }
+
+    const devopsBtn = document.getElementById('btn-mode-devops');
+    const studentBtn = document.getElementById('btn-mode-student');
+
+      function setPersonaMode(mode, save = true) {
+        const dBtn = document.getElementById('btn-mode-devops');
+        const sBtn = document.getElementById('btn-mode-student');
+        const dGrp = document.getElementById('nav-group-devops');
+        const sGrp = document.getElementById('nav-group-student');
+
+        if (mode === 'student') {
+          if (sBtn) {
+            sBtn.classList.add('active');
+            sBtn.setAttribute('aria-checked', 'true');
+          }
+          if (dBtn) {
+            dBtn.classList.remove('active');
+            dBtn.setAttribute('aria-checked', 'false');
+          }
+          if (sGrp) sGrp.style.display = 'flex';
+          if (dGrp) dGrp.style.display = 'none';
+        } else {
+          if (dBtn) {
+            dBtn.classList.add('active');
+            dBtn.setAttribute('aria-checked', 'true');
+          }
+          if (sBtn) {
+            sBtn.classList.remove('active');
+            sBtn.setAttribute('aria-checked', 'false');
+          }
+          if (dGrp) dGrp.style.display = 'flex';
+          if (sGrp) sGrp.style.display = 'none';
+        }
+
+        if (save) {
+          try {
+            localStorage.setItem('devsubnet-persona-mode', mode);
+          } catch (e) {}
+        }
+      }
+
+      if (devopsBtn) {
+        devopsBtn.onclick = function() {
+          setPersonaMode('devops', true);
+        };
+      }
+      if (studentBtn) {
+        studentBtn.onclick = function() {
+          setPersonaMode('student', true);
+        };
+      }
+
+      // Restore saved persona mode or default by route
+      try {
+        const savedMode = localStorage.getItem('devsubnet-persona-mode');
+        const path = window.location.pathname;
+        const isStudentPath = path.includes('/learn') || path.includes('/what-is-a-subnet') || path.includes('/cheat-sheet') || path.includes('/student-guide');
+
+        if (savedMode) {
+          setPersonaMode(savedMode, false);
+        } else if (isStudentPath) {
+          setPersonaMode('student', false);
+        } else {
+          setPersonaMode('devops', false);
+        }
+      } catch (e) {}
+    }
+
+  // Global keyboard shortcuts: 'S' for shuffle, 'Escape' to close menus
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const moreWrap = document.querySelector('.nav-more');
+      const moreBtn = document.querySelector('.nav-more-btn');
+      const langPicker = document.querySelector('.lang-picker');
+      const langBtn = document.querySelector('.lang-btn');
+      if (moreWrap) {
+        moreWrap.classList.remove('open');
+        if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+      }
+      if (langPicker) {
+        langPicker.classList.remove('open');
+        if (langBtn) langBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    if (e.key === 's' || e.key === 'S') {
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.isContentEditable
+      );
+      if (!isInput && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        triggerShuffle();
+      }
+    }
+  });
 
   document.addEventListener('click', function(e) {
     const moreWrap = document.querySelector('.nav-more');

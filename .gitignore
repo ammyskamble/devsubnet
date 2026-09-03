@@ -24,4 +24,5 @@ pnpm-debug.log*
 .idea/
 
 # scratch directory
-scratch/
+scratch/*
+!scratch/daily_content_curriculum.json

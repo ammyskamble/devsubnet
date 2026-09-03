@@ -8,6 +8,17 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 
 const articles = [
   {
+    slug: '/learn/ip-address-vs-mac-address-postal-analogy',
+    title: 'IP Address vs MAC Address: The Postal Mail Analogy Explained Simply',
+    description: 'Understand the exact difference between an IP address and a MAC address using the intuitive postal mail analogy. Discover why routers rewrite MACs but preserve IPs across the internet.',
+    category: 'concepts',
+    categoryLabel: 'Architecture & RFCs',
+    categoryIcon: '💡',
+    readingTime: '6 min read',
+    date: 'September 2026',
+    keywords: ['IP vs MAC', 'Postal Analogy', 'ARP Protocol', 'Layer 2 vs 3']
+  },
+  {
     slug: '/learn/history-of-cidr-and-ip-addressing',
     title: 'The History of CIDR & IP Addressing: From ARPANET to RFC 1519',
     description: 'How runaway BGP routing tables and the near-collapse of Class B networks in the early 1990s forced engineers to invent Classless Inter-Domain Routing.',
@@ -91,7 +102,7 @@ const articles = [
           <!-- Category Filter Tabs -->
           <div class="filter-bar" id="learn-filter-bar">
             <button type="button" class="filter-btn active" data-category="all">
-              All Guides <span class="count-pill">5</span>
+              All Guides <span class="count-pill">6</span>
             </button>
             <button type="button" class="filter-btn" data-category="history">
               <span>📜</span> History & Evolution <span class="count-pill">1</span>
@@ -100,7 +111,7 @@ const articles = [
               <span>🔬</span> Science & Math <span class="count-pill">2</span>
             </button>
             <button type="button" class="filter-btn" data-category="concepts">
-              <span>💡</span> Architecture & RFCs <span class="count-pill">2</span>
+              <span>💡</span> Architecture & RFCs <span class="count-pill">3</span>
             </button>
           </div>
         </section>

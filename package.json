@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "publish-daily-article": "node scripts/publish_daily_article.mjs",
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {

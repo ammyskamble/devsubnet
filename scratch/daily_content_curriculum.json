@@ -1,0 +1,117 @@
+{
+  "teachingPhilosophy": {
+    "targetAudience": "Absolute beginners, networking students, and junior developers",
+    "tone": "Warm, encouraging, crystal-clear, pedagogical, and highly visual",
+    "coreRules": [
+      "Always start with a familiar real-world analogy (e.g. apartment buildings, postal mail, postal zip codes, shipping containers).",
+      "Break down every single piece of jargon the first time it appears.",
+      "Include a 'Think of it Like This' visual comparison or diagram.",
+      "Add a 'Test Your Understanding' mini-quiz with 2-3 simple questions and explanations.",
+      "End with a clear '3 Key Takeaways to Remember' summary.",
+      "Connect theory directly to a DevSubnet tool so students can experiment."
+    ]
+  },
+  "topics": [
+    {
+      "id": 1,
+      "status": "published",
+      "publishedDate": "2026-09-03T19:46:00+05:30",
+      "slug": "ip-address-vs-mac-address-postal-analogy",
+      "title": "IP Address vs MAC Address: The Postal Mail Analogy Explained Simply",
+      "category": "concepts",
+      "categoryLabel": "Architecture & RFCs",
+      "targetKeywords": ["IP address vs MAC address", "networking for beginners", "postal mail analogy", "layer 2 vs layer 3"],
+      "analogy": "Your MAC address is your Social Security Number (burned in permanently); your IP address is your current postal street address (changes when you move)."
+    },
+    {
+      "id": 2,
+      "status": "pending",
+      "slug": "default-gateway-explained-simply",
+      "title": "What is a Default Gateway? The Exit Door of Your Local Network",
+      "category": "concepts",
+      "categoryLabel": "Architecture & RFCs",
+      "targetKeywords": ["what is a default gateway", "default gateway explained", "router gateway for beginners"],
+      "analogy": "The exit turnstile of an office building: if a letter is for someone inside the room you hand it directly; if it's for anyone outside, you must hand it to the turnstile guard."
+    },
+    {
+      "id": 3,
+      "status": "pending",
+      "slug": "dns-explained-the-internet-phonebook",
+      "title": "How DNS Works: The Internet's Giant Contact List",
+      "category": "concepts",
+      "categoryLabel": "Architecture & RFCs",
+      "targetKeywords": ["how DNS works", "DNS explained for students", "domain name system basics"],
+      "analogy": "A phonebook or smartphone contacts list: humans remember names like 'google.com', but routers only dial numbers like '142.250.190.46'."
+    },
+    {
+      "id": 4,
+      "status": "pending",
+      "slug": "tcp-vs-udp-certified-mail-vs-postcard",
+      "title": "TCP vs UDP: The Certified Letter vs the Postcard",
+      "category": "science",
+      "categoryLabel": "Computer Science & Math",
+      "targetKeywords": ["TCP vs UDP", "transmission control protocol beginner", "user datagram protocol explained"],
+      "analogy": "TCP is certified mail requiring a physical signature and re-sending if lost; UDP is a live sports broadcast or radio postcard where speed matters more than catching every frame."
+    },
+    {
+      "id": 5,
+      "status": "pending",
+      "slug": "ports-and-sockets-hotel-room-analogy",
+      "title": "What Are Port Numbers? The Hotel Room Analogy",
+      "category": "concepts",
+      "categoryLabel": "Architecture & RFCs",
+      "targetKeywords": ["what are port numbers", "network ports explained", "port 80 port 443 basics"],
+      "analogy": "The IP address is the hotel's street address; the Port number is the specific room number inside the hotel."
+    },
+    {
+      "id": 6,
+      "status": "pending",
+      "slug": "why-hexadecimal-in-ipv6-made-easy",
+      "title": "Why Does IPv6 Have Letters? Hexadecimal Numbers Made Simple",
+      "category": "science",
+      "categoryLabel": "Computer Science & Math",
+      "targetKeywords": ["why ipv6 has letters", "hexadecimal networking explained", "base 16 for beginners"],
+      "analogy": "Counting on 10 fingers vs using a 16-color crayon box. Why computer scientists use A-F as shorthand for 4 binary bits."
+    },
+    {
+      "id": 7,
+      "status": "pending",
+      "slug": "slicing-networks-like-a-pizza-subnetting-basics",
+      "title": "Subnetting Explained Like Slicing a Pizza",
+      "category": "science",
+      "categoryLabel": "Computer Science & Math",
+      "targetKeywords": ["subnetting explained simply", "subnetting pizza analogy", "how to learn subnetting fast"],
+      "analogy": "Cutting a large whole pizza in half, then quarters, then eighths: each cut doubles the number of slices while halving the size of each slice."
+    },
+    {
+      "id": 8,
+      "status": "pending",
+      "slug": "what-is-a-broadcast-storm",
+      "title": "What is a Broadcast Storm? The Megaphone Echo Chamber",
+      "category": "concepts",
+      "categoryLabel": "Architecture & RFCs",
+      "targetKeywords": ["broadcast storm explained", "network broadcast domain", "switching loops"],
+      "analogy": "What happens if someone shouts through a megaphone in a crowded stadium and 10 other people immediately repeat it into their own megaphones."
+    },
+    {
+      "id": 9,
+      "status": "pending",
+      "slug": "the-story-of-the-first-ping",
+      "title": "The Story of the 'Ping': How Mike Muuss Named It After Sonar",
+      "category": "history",
+      "categoryLabel": "History & Evolution",
+      "targetKeywords": ["history of ping", "who invented ping", "ICMP echo history", "Mike Muuss ping"],
+      "analogy": "Submarine sonar sending out an acoustic sound pulse and listening for the underwater echo ping."
+    },
+    {
+      "id": 10,
+      "status": "pending",
+      "slug": "the-invention-of-ethernet-and-aloha-net",
+      "title": "From ALOHAnet to Ethernet: The Hawaiian Origins of Wi-Fi and LANs",
+      "category": "history",
+      "categoryLabel": "History & Evolution",
+      "targetKeywords": ["history of ethernet", "ALOHAnet history", "Robert Metcalfe ethernet", "how ethernet was invented"],
+      "analogy": "How researchers in Hawaii connecting islands via radio transmitters solved the problem of two people trying to talk at the exact same moment."
+    }
+  ]
+}

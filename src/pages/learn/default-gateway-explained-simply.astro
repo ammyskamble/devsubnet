@@ -1,0 +1,367 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleHeader from '../../components/learn/ArticleHeader.astro';
+import RelatedToolsCard from '../../components/learn/RelatedToolsCard.astro';
+import { type SupportedLanguage } from '../../utils/i18n';
+
+const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+
+const articleKeywords = ["what is a default gateway","default gateway explained","router gateway for beginners"];
+---
+
+<Layout
+  lang={lang}
+  title="What is a Default Gateway? The Exit Door of Your Local Network | DevSubnet Learn"
+  description="Understand default gateways with the office turnstile analogy. Learn why your computer can talk locally without a gateway, but needs one the millisecond it visits google.com."
+>
+  <div class="app-shell">
+    <NavBar lang={lang} path="learn" />
+
+    <main class="page-main">
+      <article class="content-container article-layout">
+        <ArticleHeader
+          category="concepts"
+          title="What is a Default Gateway? The Exit Door of Your Local Network"
+          description="Understand default gateways with the office turnstile analogy. Learn why your computer can talk locally without a gateway, but needs one the millisecond it visits google.com."
+          publishDate="September 2026"
+          readingTime="6 min read"
+          keywords={articleKeywords}
+        />
+
+        <div class="article-content">
+          <!-- Section 1: Real-World Anchor -->
+          <section class="content-section">
+            <h2>The Real-World Anchor: Building the Mental Model</h2>
+            <div class="analogy-banner">
+              <div class="analogy-icon">🚪</div>
+              <div class="analogy-text">
+                <h3>The Office Turnstile & Security Guard Analogy</h3>
+                
+      Imagine working in a secure office building:
+      <ul>
+        <li><strong>Inside the Room (Local Network):</strong> When talking to coworkers at adjacent desks, you hand documents directly to them. No security guards or passports required.</li>
+        <li><strong>Leaving the Building (The Internet):</strong> To send a parcel to another city or branch office, you CANNOT throw it across the street. You must walk to the <strong>lobby turnstile (The Default Gateway)</strong> and hand it to the courier guard, who routes it out into the public world.</li>
+      </ul>
+    
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Side-by-Side Comparison -->
+          <section class="content-section">
+            <h2>Think of It Like This: Side-by-Side Comparison</h2>
+            <div class="table-responsive">
+              <table class="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Real-World Mental Model</th>
+                    <th>Networking Implementation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr>
+                    <td><strong>Analogy</strong></td>
+                    <td>Direct Desk-to-Desk Hand-off</td>
+                    <td>Lobby Security Turnstile / Exit Guard</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Network Target</strong></td>
+                    <td>Same Subnet (e.g. 192.168.1.50 -> 192.168.1.75)</td>
+                    <td>Remote Subnet / Internet (e.g. 192.168.1.50 -> 8.8.8.8)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Gateway Involved?</strong></td>
+                    <td>No. ARP resolves destination MAC directly on switch</td>
+                    <td>Yes! Packet destination MAC is set to Gateway router</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Routing Table Flag</strong></td>
+                    <td>Local On-link / Directly Connected</td>
+                    <td>Default Route (0.0.0.0/0) pointing to Gateway IP</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section 3: Numerical & Technical Breakdown -->
+          <section class="content-section">
+            <h2>Under the Hood: How Your Device Decides: The Bitwise AND Test</h2>
+            <div class="math-card">
+              <div class="math-body">
+                
+                <div class="calc-row">
+                  <span class="calc-label">Source IP & Mask:</span>
+                  <code>192.168.1.50 & 255.255.255.0 = 192.168.1.0</code>
+                </div>
+                <div class="calc-row">
+                  <span class="calc-label">Target A (Local):</span>
+                  <code>192.168.1.90 & 255.255.255.0 = 192.168.1.0 (MATCH! Send directly)</code>
+                </div>
+                <div class="calc-row">
+                  <span class="calc-label">Target B (Google):</span>
+                  <code>142.250.190.46 & 255.255.255.0 = 142.250.190.0 (NO MATCH! Forward to Gateway 192.168.1.1)</code>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4: Quick Knowledge Check -->
+          <section class="content-section">
+            <h2>Quick Knowledge Check (Test Your Understanding)</h2>
+            <p>Click each question to test if you've mastered this concept:</p>
+            <div class="quiz-container">
+              
+              <details class="quiz-item">
+                <summary class="quiz-question">
+                  <span class="quiz-q-num">Q1</span>
+                  <span>What happens if your default gateway is configured with the wrong IP address?</span>
+                </summary>
+                <div class="quiz-answer">
+                  <p><strong>Answer:</strong> You can still talk to other computers and printers on your local Wi-Fi/switch, but you will completely lose internet access (no Google, no external servers) because outbound packets cannot leave the subnet.</p>
+                </div>
+              </details>
+              <details class="quiz-item">
+                <summary class="quiz-question">
+                  <span class="quiz-q-num">Q2</span>
+                  <span>What is the default route CIDR notation representing "all internet traffic"?</span>
+                </summary>
+                <div class="quiz-answer">
+                  <p><strong>Answer:</strong> 0.0.0.0/0 with a subnet mask of 0.0.0.0. It acts as the catch-all wildcard for any packet whose destination does not match a more specific local subnet route.</p>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <!-- Section 5: Key Takeaways -->
+          <section class="content-section">
+            <div class="takeaways-card">
+              <div class="takeaways-header">
+                <span class="takeaways-icon">🎯</span>
+                <h3>3 Key Takeaways to Remember</h3>
+              </div>
+              <ul class="takeaways-list">
+                <li>The Default Gateway is your local network's exit door—typically your home Wi-Fi router (like 192.168.1.1).</li><li>Local communication never touches the gateway; only traffic destined for external networks gets handed to it.</li><li>Routers evaluate every destination IP with a bitwise AND mask to decide whether to deliver locally or forward to the gateway.</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Section 6: Related Tools Bridge -->
+          <RelatedToolsCard
+            tools={[
+              {
+                title: 'IPv4 Subnet Calculator',
+                description: 'Explore subnet boundaries, host counts, and network masks with live bitwise calculations.',
+                href: '/',
+                icon: '⚡',
+                tag: 'Popular'
+              },
+              {
+                title: 'Subnet Cheat Sheet',
+                description: 'Fast lookup guide for /1 through /32 prefix sizes and netmasks.',
+                href: '/subnet-cheat-sheet',
+                icon: '📋',
+                tag: 'Reference'
+              },
+              {
+                title: 'What is a Subnet Guide',
+                description: 'Foundational guide explaining prefix lengths, network IDs, and broadcast addresses.',
+                href: '/what-is-a-subnet',
+                icon: '💡',
+                tag: 'Concepts'
+              }
+            ]}
+          />
+        </div>
+      </article>
+    </main>
+
+    <Footer lang={lang} />
+  </div>
+</Layout>
+
+<style>
+  .article-layout {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 5rem 1.25rem;
+  }
+
+  .article-content {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .content-section {
+    margin-bottom: 3rem;
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2.25rem 0 1rem 0;
+    letter-spacing: -0.015em;
+  }
+
+  .analogy-banner {
+    display: flex;
+    gap: 1.25rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin: 1.75rem 0;
+  }
+
+  .analogy-icon {
+    font-size: 2.25rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .analogy-text h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface);
+    font-size: 0.92rem;
+    text-align: left;
+  }
+
+  .comparison-table th, .comparison-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .comparison-table th {
+    background: rgba(0, 0, 0, 0.25);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+  }
+
+  .math-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+
+  .calc-row:last-child {
+    border-bottom: none;
+  }
+
+  .calc-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .calc-row code {
+    font-family: var(--font-mono);
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .quiz-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .quiz-item {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .quiz-question {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .quiz-q-num {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .quiz-answer {
+    padding: 1rem 1.25rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+  }
+
+  .takeaways-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    margin: 2rem 0;
+  }
+
+  .takeaways-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .takeaways-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #34d399;
+  }
+
+  .takeaways-list {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .takeaways-list li {
+    margin-bottom: 0.75rem;
+    font-size: 0.98rem;
+    color: var(--text-primary);
+  }
+</style>

@@ -1,26 +1,28 @@
----import Footer from '../components/Footer.astro';
-import { type SupportedLanguage } from '../utils/i18n';
+---
+import Footer from '../components/Footer.astro';
+import { type SupportedLanguage, translations } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
 import OverlapChecker from '../components/OverlapChecker.astro';
 import NavBar from '../components/NavBar.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 <Layout lang={lang}
-  title="Subnet Overlap Checker – CIDR Conflict Detector | DevSubnet"
-  description="Subnet overlap checker detecting identical, overlapping, and contained CIDR ranges. Essential before VPC peering, VPN routing, firewall changes, and infrastructure deployments to prevent ambiguous routing and traffic loss."
+  title={`${t.nav.overlap} – CIDR Conflict Detector | DevSubnet`}
+  description="Subnet overlap checker detecting identical, overlapping, and contained CIDR ranges. Essential before VPC peering, VPN routing, firewall changes, and infrastructure deployments."
 >
   <div class="app-shell">
     <NavBar lang={lang} path="overlap" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">CONFLICT DETECTION / CIDR OVERLAP CHECKER</div>
-        <h1 id="page-title">Subnet Overlap Checker</h1>
+        <h1 id="page-title">{t.nav.overlap}</h1>
         <p class="lede">Compare multiple CIDR blocks to identify identical, overlapping, contained, and separate relationships — essential before VPC peering, VPN, firewall, and routing changes.</p>
       </section>
       <section aria-label="Overlap checker workspace">
-        <OverlapChecker />
+        <OverlapChecker lang={lang} />
       </section>
     </main>
     <Footer lang={lang} />

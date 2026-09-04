@@ -21,6 +21,154 @@ const whatIsSubnetTranslations: Record<SupportedLanguage, string> = {
 };
 
 const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslations.en;
+
+const footerTranslations: Record<SupportedLanguage, {
+  coreTools: string;
+  cloudVpc: string;
+  knowledge: string;
+  platform: string;
+  tagline: string;
+  desc: string;
+  fastLanes: string;
+  knowledgeHub: string;
+  studentGuide: string;
+  cheatSheet: string;
+  offlineMode: string;
+  clientSide: string;
+  offlineReady: string;
+  copyright: string;
+}> = {
+  en: {
+    coreTools: "Core Tools",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Knowledge",
+    platform: "Platform",
+    tagline: "100% Client-Side CIDR Tools",
+    desc: "Precision network & cloud VPC calculators with zero server logging. Built for speed and mathematical accuracy.",
+    fastLanes: "Fast Lanes:",
+    knowledgeHub: "Knowledge Hub",
+    studentGuide: "Student Exam Guide",
+    cheatSheet: "Subnet Cheat Sheet",
+    offlineMode: "Offline Mode",
+    clientSide: "100% Client-Side",
+    offlineReady: "Offline Ready",
+    copyright: "© 2026 DevSubnet.com. Built for clear, privacy-focused network engineering."
+  },
+  de: {
+    coreTools: "Kern-Tools",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Wissen",
+    platform: "Plattform",
+    tagline: "100% Client-Side CIDR-Tools",
+    desc: "Präzise Netzwerk- und Cloud-VPC-Rechner ohne Server-Logging. Entwickelt für Geschwindigkeit und mathematische Genauigkeit.",
+    fastLanes: "Direktzugriff:",
+    knowledgeHub: "Wissenszentrum",
+    studentGuide: "Prüfungsleitfaden für Studenten",
+    cheatSheet: "Subnetz-Spickzettel",
+    offlineMode: "Offline-Modus",
+    clientSide: "100% Client-Seitig",
+    offlineReady: "Offline-fähig",
+    copyright: "© 2026 DevSubnet.com. Entwickelt für klares, datenschutzorientiertes Netzwerk-Engineering."
+  },
+  es: {
+    coreTools: "Herramientas Principales",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Conocimiento",
+    platform: "Plataforma",
+    tagline: "Herramientas CIDR 100% en el Navegador",
+    desc: "Calculadoras precisas de redes y VPC en la nube sin registros en el servidor. Diseñadas para máxima velocidad.",
+    fastLanes: "Accesos Rápidos:",
+    knowledgeHub: "Centro de Conocimiento",
+    studentGuide: "Guía de Examen para Estudiantes",
+    cheatSheet: "Hoja de Referencia de Subredes",
+    offlineMode: "Modo Desconectado",
+    clientSide: "100% en el Navegador",
+    offlineReady: "Listo sin Conexión",
+    copyright: "© 2026 DevSubnet.com. Diseñado para ingeniería de redes clara y privada."
+  },
+  ja: {
+    coreTools: "基本ツール",
+    cloudVpc: "クラウドVPC",
+    knowledge: "ナレッジ",
+    platform: "プラットフォーム",
+    tagline: "完全ブラウザ内完結 CIDRツール",
+    desc: "サーバー通信不要の高精度ネットワーク・クラウドVPC計算機。スピードと安全性を重視。",
+    fastLanes: "クイックアクセス:",
+    knowledgeHub: "ナレッジハブ",
+    studentGuide: "学生向け試験対策ガイド",
+    cheatSheet: "サブネット早見表",
+    offlineMode: "オフラインモード",
+    clientSide: "完全クライアントサイド",
+    offlineReady: "オフライン対応",
+    copyright: "© 2026 DevSubnet.com. プライバシーを重視したネットワーク設計のために。"
+  },
+  fr: {
+    coreTools: "Outils Principaux",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Connaissances",
+    platform: "Plateforme",
+    tagline: "Outils CIDR 100% Côté Client",
+    desc: "Calculateurs précis de réseaux et cloud VPC sans enregistrement serveur. Conçus pour la vitesse et la sécurité.",
+    fastLanes: "Accès Rapide:",
+    knowledgeHub: "Centre de Connaissances",
+    studentGuide: "Guide d'Examen Étudiant",
+    cheatSheet: "Aide-mémoire Sous-réseau",
+    offlineMode: "Mode Hors-ligne",
+    clientSide: "100% Côté Client",
+    offlineReady: "Prêt Hors-ligne",
+    copyright: "© 2026 DevSubnet.com. Conçu pour une ingénierie réseau claire et sécurisée."
+  },
+  pt: {
+    coreTools: "Ferramentas Principais",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Conhecimento",
+    platform: "Plataforma",
+    tagline: "Ferramentas CIDR 100% no Navegador",
+    desc: "Calculadoras precisas de rede e VPC em nuvem sem logs no servidor. Desenvolvidas para velocidade e precisão.",
+    fastLanes: "Acesso Rápido:",
+    knowledgeHub: "Central de Conhecimento",
+    studentGuide: "Guia de Estudos para Alunos",
+    cheatSheet: "Tabela de Sub-redes",
+    offlineMode: "Modo Offline",
+    clientSide: "100% no Navegador",
+    offlineReady: "Pronto Offline",
+    copyright: "© 2026 DevSubnet.com. Desenvolvido para engenharia de redes clara e com privacidade."
+  },
+  ko: {
+    coreTools: "핵심 도구",
+    cloudVpc: "클라우드 VPC",
+    knowledge: "지식 센터",
+    platform: "플랫폼",
+    tagline: "100% 브라우저 로컬 CIDR 도구",
+    desc: "서버 로깅 없는 정밀 네트워크 및 클라우드 VPC 계산기. 속도와 수학적 정확성을 위해 설계되었습니다.",
+    fastLanes: "빠른 이동:",
+    knowledgeHub: "지식 허브",
+    studentGuide: "학생 시험 대비 가이드",
+    cheatSheet: "서브넷 치트시트",
+    offlineMode: "오프라인 모드",
+    clientSide: "100% 브라우저 연산",
+    offlineReady: "오프라인 지원",
+    copyright: "© 2026 DevSubnet.com. 명확하고 프라이버시를 보호하는 네트워크 엔지니어링을 위해 구축되었습니다."
+  },
+  it: {
+    coreTools: "Strumenti Principali",
+    cloudVpc: "Cloud VPC",
+    knowledge: "Conoscenza",
+    platform: "Piattaforma",
+    tagline: "Strumenti CIDR 100% Client-Side",
+    desc: "Calcolatori di rete e cloud VPC di precisione senza registrazione sul server. Progettati per la massima velocità.",
+    fastLanes: "Accesso Rapido:",
+    knowledgeHub: "Centro di Conoscenza",
+    studentGuide: "Guida per Esami Studenti",
+    cheatSheet: "Scheda di Riferimento Subnet",
+    offlineMode: "Modalità Offline",
+    clientSide: "100% Client-Side",
+    offlineReady: "Pronto Offline",
+    copyright: "© 2026 DevSubnet.com. Creato per un'ingegneria di rete chiara e orientata alla privacy."
+  }
+};
+
+const foot = footerTranslations[lang] || footerTranslations.en;
 ---
 
 <footer class="site-footer option-2" role="contentinfo">
@@ -41,17 +189,17 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
           </span>
           <span class="brand-text">Subnet.com</span>
         </a>
-        <div class="footer-tagline">100% Client-Side CIDR Tools</div>
+        <div class="footer-tagline">{foot.tagline}</div>
         <p class="footer-desc">
-          Precision network & cloud VPC calculators with zero server logging. Built for speed and mathematical accuracy.
+          {foot.desc}
         </p>
         <div class="brand-fast-lanes">
-          <span class="fast-lanes-title">Fast Lanes:</span>
+          <span class="fast-lanes-title">{foot.fastLanes}</span>
           <div class="fast-lanes-row">
-            <a href="/aws-vpc-subnet-calculator" class="fast-pill devops-pill" title="Cloud VPC & DevOps Tools">
+            <a href={`${langPrefix}/aws-vpc-subnet-calculator`} class="fast-pill devops-pill" title="Cloud VPC & DevOps Tools">
               <span>🛠️ DevOps</span>
             </a>
-            <a href="/learn" class="fast-pill student-pill" title="Student Knowledge Hub">
+            <a href={`${langPrefix}/learn`} class="fast-pill student-pill" title="Student Knowledge Hub">
               <span>🎓 Students</span>
             </a>
           </div>
@@ -62,7 +210,7 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
       <div class="footer-col">
         <div class="col-heading" style="--accent-bar: #38bdf8;">
           <span class="col-icon">🧮</span>
-          <h4>Core Tools</h4>
+          <h4>{foot.coreTools}</h4>
         </div>
         <ul class="col-links">
           <li>
@@ -78,7 +226,7 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
             </a>
           </li>
           <li>
-            <a href="/vlsm-calculator" class="col-link">
+            <a href={`${langPrefix}/vlsm-calculator`} class="col-link">
               <span>VLSM Calculator</span>
               <span class="col-tag tag-vlsm">VLSM</span>
             </a>
@@ -90,13 +238,13 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
             </a>
           </li>
           <li>
-            <a href="/cidr-supernet-calculator" class="col-link">
+            <a href={`${langPrefix}/cidr-supernet-calculator`} class="col-link">
               <span>CIDR Supernet</span>
               <span class="col-tag tag-cidr">CIDR</span>
             </a>
           </li>
           <li>
-            <a href="/subnet-overlap-checker" class="col-link">
+            <a href={`${langPrefix}/subnet-overlap-checker`} class="col-link">
               <span>Overlap Checker</span>
               <span class="col-tag tag-audit">Audit</span>
             </a>
@@ -108,23 +256,23 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
       <div class="footer-col">
         <div class="col-heading" style="--accent-bar: #a855f7;">
           <span class="col-icon">☁️</span>
-          <h4>Cloud VPC</h4>
+          <h4>{foot.cloudVpc}</h4>
         </div>
         <ul class="col-links">
           <li>
-            <a href="/aws-vpc-subnet-calculator" class="col-link">
+            <a href={`${langPrefix}/aws-vpc-subnet-calculator`} class="col-link">
               <span>AWS VPC Calc</span>
               <span class="col-tag tag-aws">AWS</span>
             </a>
           </li>
           <li>
-            <a href="/azure-vnet-subnet-calculator" class="col-link">
+            <a href={`${langPrefix}/azure-vnet-subnet-calculator`} class="col-link">
               <span>Azure VNet Calc</span>
               <span class="col-tag tag-azure">Azure</span>
             </a>
           </li>
           <li>
-            <a href="/gcp-vpc-subnet-calculator" class="col-link">
+            <a href={`${langPrefix}/gcp-vpc-subnet-calculator`} class="col-link">
               <span>GCP VPC Calc</span>
               <span class="col-tag tag-gcp">GCP</span>
             </a>
@@ -136,13 +284,13 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
             </a>
           </li>
           <li>
-            <a href="/terraform-subnet-planner" class="col-link">
+            <a href={`${langPrefix}/terraform-subnet-planner`} class="col-link">
               <span>Terraform IaC</span>
               <span class="col-tag tag-iac">IaC</span>
             </a>
           </li>
           <li>
-            <a href="/k8s-cidr-calculator" class="col-link">
+            <a href={`${langPrefix}/k8s-cidr-calculator`} class="col-link">
               <span>K8s CNI Tool</span>
               <span class="col-tag tag-cni">CNI</span>
             </a>
@@ -154,12 +302,12 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
       <div class="footer-col">
         <div class="col-heading" style="--accent-bar: #10b981;">
           <span class="col-icon">📚</span>
-          <h4>Knowledge</h4>
+          <h4>{foot.knowledge}</h4>
         </div>
         <ul class="col-links">
           <li>
-            <a href="/learn" class="col-link highlight">
-              <span>Knowledge Hub</span>
+            <a href={`${langPrefix}/learn`} class="col-link highlight">
+              <span>{foot.knowledgeHub}</span>
               <span class="col-tag tag-daily">Daily</span>
             </a>
           </li>
@@ -171,24 +319,24 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
           </li>
           <li>
             <a href={`${langPrefix}/subnet-cheat-sheet`} class="col-link">
-              <span>Subnet Cheat Sheet</span>
+              <span>{foot.cheatSheet}</span>
               <span class="col-tag tag-quick-ref">Ref</span>
             </a>
           </li>
           <li>
-            <a href="/student-guide" class="col-link">
-              <span>Student Exam Guide</span>
+            <a href={`${langPrefix}/student-guide`} class="col-link">
+              <span>{foot.studentGuide}</span>
               <span class="col-tag tag-ccna">CCNA</span>
             </a>
           </li>
           <li>
-            <a href="/website-analyzer" class="col-link">
+            <a href={`${langPrefix}/website-analyzer`} class="col-link">
               <span>Website Analyzer</span>
               <span class="col-tag tag-dns">DNS</span>
             </a>
           </li>
           <li>
-            <a href="/learn/rfc-1918-private-addresses-explained" class="col-link">
+            <a href={`${langPrefix}/learn/rfc-1918-private-addresses-explained`} class="col-link">
               <span>RFC 1918 Private IPs</span>
               <span class="col-tag tag-rfc">RFC</span>
             </a>
@@ -200,42 +348,42 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
       <div class="footer-col">
         <div class="col-heading" style="--accent-bar: #6366f1;">
           <span class="col-icon">🛡️</span>
-          <h4>Platform</h4>
+          <h4>{foot.platform}</h4>
         </div>
         <ul class="col-links">
           <li>
             <a href={`${langPrefix}/about`} class="col-link">
-              <span>About DevSubnet</span>
+              <span>{t.footer.about}</span>
             </a>
           </li>
           <li>
             <a href={`${langPrefix}/contact`} class="col-link">
-              <span>Contact & Support</span>
+              <span>{t.footer.contact}</span>
             </a>
           </li>
           <li>
             <a href={`${langPrefix}/faq`} class="col-link">
-              <span>FAQ & Help</span>
+              <span>{t.footer.faq}</span>
             </a>
           </li>
           <li>
             <a href={`${langPrefix}/privacy`} class="col-link">
-              <span>Privacy Policy</span>
+              <span>{t.footer.privacy}</span>
             </a>
           </li>
           <li>
             <a href={`${langPrefix}/terms`} class="col-link">
-              <span>Terms of Service</span>
+              <span>{t.footer.terms}</span>
             </a>
           </li>
           <li>
             <a href={`${langPrefix}/cookie-policy`} class="col-link">
-              <span>Cookie Policy</span>
+              <span>{t.footer.cookiePolicy}</span>
             </a>
           </li>
           <li>
-            <a href="/offline" class="col-link">
-              <span>Offline Mode</span>
+            <a href={`${langPrefix}/offline`} class="col-link">
+              <span>{foot.offlineMode}</span>
               <span class="col-tag tag-pwa">PWA</span>
             </a>
           </li>
@@ -246,7 +394,7 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
     <!-- Bottom Bar -->
     <div class="footer-bottom">
       <div class="footer-copy">
-        © 2026 DevSubnet.com. Built for clear, privacy-focused network engineering.
+        {foot.copyright}
       </div>
       <div class="footer-trust">
         <div class="trust-pill">
@@ -255,11 +403,11 @@ const whatIsSubnetText = whatIsSubnetTranslations[lang] || whatIsSubnetTranslati
         </div>
         <div class="trust-pill">
           <span class="icon">⚡</span>
-          <span>100% Client-Side</span>
+          <span>{foot.clientSide}</span>
         </div>
-        <a href="/offline" class="trust-pill link-pill" title="Works offline via PWA cache">
+        <a href={`${langPrefix}/offline`} class="trust-pill link-pill" title="Works offline via PWA cache">
           <span class="icon">📶</span>
-          <span>Offline Ready</span>
+          <span>{foot.offlineReady}</span>
         </a>
         <button type="button" class="top-btn" id="footer-back-to-top" aria-label="Back to top">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

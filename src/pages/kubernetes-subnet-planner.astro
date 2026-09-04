@@ -1,16 +1,17 @@
----import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import { type SupportedLanguage, translations } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 
 <Layout lang={lang} 
-  title="Kubernetes Subnet Planner – Pod & Node IPs | DevSubnet"
-  description="Kubernetes CIDR calculator for Pod, Service, and Node subnet sizing. Calculate non-overlapping CIDR blocks for Cilium, Calico, AWS VPC CNI, and Azure CNI. Detect IP exhaustion risks and generate Kubernetes manifests instantly."
+  title={`${t.intro.k8s.title} | DevSubnet`}
+  description={t.intro.k8s.lede}
 >
-  <MainShell lang={lang} activeTab="k8s">
+  <MainShell lang={lang} activeTab="k8s" navPath="kubernetes-subnet-planner">
   </MainShell>
 
   <!-- FAQ Schema for SEO -->

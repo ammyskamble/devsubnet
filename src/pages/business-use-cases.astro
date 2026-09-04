@@ -1,12 +1,13 @@
----import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import { type SupportedLanguage, translations } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
-import { translations } from '../utils/i18n';
-
-const t = translations.en;
+import { pageCommonI18n } from '../utils/pages-i18n';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
+const common = pageCommonI18n[lang] || pageCommonI18n.en;
+const homeUrl = lang === 'en' ? '/' : `/${lang}/`;
 ---
 
 <Layout lang={lang}
@@ -39,7 +40,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     </section>
 
     <div class="page-cta" style="margin-top: 3rem;">
-      <a href="/" class="btn-return">← Start Subnet Calculation</a>
+      <a href={homeUrl} class="btn-return">← {common.backToCalc}</a>
     </div>
   </MainShell>
 </Layout>

@@ -1,34 +1,41 @@
 ---
+import { toolsI18n } from '../utils/tools-i18n';
+import type { SupportedLanguage } from '../utils/i18n';
+
 interface Props {
   defaultPodCidr?: string;
   defaultPodCidrPrefix?: number;
   defaultNodes?: number;
   defaultPodsPerNode?: number;
+  lang?: SupportedLanguage;
 }
 
 const {
   defaultPodCidr = "10.244.0.0",
   defaultPodCidrPrefix = 16,
   defaultNodes = 100,
-  defaultPodsPerNode = 110
+  defaultPodsPerNode = 110,
+  lang = "en"
 } = Astro.props;
+
+const kp = (toolsI18n[lang] || toolsI18n.en).k8s;
 ---
 
-<div class="calculator-layout">
+<div class="calculator-layout" data-k8s-i18n={JSON.stringify(kp)}>
   <!-- Left Column: Inputs and Stats -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>Kubernetes Cluster Parameters</h2>
+        <span class="step">{kp.step1}</span>
+        <h2>{kp.title}</h2>
       </div>
-      <span class="live-label" style="background-color:rgba(145, 80, 245, 0.12); color:var(--accent-host);">K8s PRE-FLIGHT</span>
+      <span class="live-label" style="background-color:rgba(145, 80, 245, 0.12); color:var(--accent-host);">{kp.badge}</span>
     </div>
 
     <!-- Pod network range inputs -->
     <div class="input-grid-2-1">
       <div class="input-row">
-        <label for="k8s-pod-cidr">Pod Network CIDR Block</label>
+        <label for="k8s-pod-cidr">{kp.podCidrLabel}</label>
         <div class="ip-input">
           <input 
             type="text" 
@@ -49,13 +56,13 @@ const {
       </div>
 
       <div class="input-row">
-        <label for="k8s-pods-per-node">Max Pods / Node</label>
+        <label for="k8s-pods-per-node">{kp.podsPerNodeLabel}</label>
         <div class="select-wrapper">
           <select id="k8s-pods-per-node">
-            <option value="110" selected={defaultPodsPerNode === 110}>110 (Standard Default)</option>
-            <option value="64" selected={defaultPodsPerNode === 64}>64 (Azure Default)</option>
-            <option value="30" selected={defaultPodsPerNode === 30}>30 (GCP Default / Small VMs)</option>
-            <option value="250" selected={defaultPodsPerNode === 250}>250 (High Density Cluster)</option>
+            <option value="110" selected={defaultPodsPerNode === 110}>{kp.podsOption110}</option>
+            <option value="64" selected={defaultPodsPerNode === 64}>{kp.podsOption64}</option>
+            <option value="30" selected={defaultPodsPerNode === 30}>{kp.podsOption30}</option>
+            <option value="250" selected={defaultPodsPerNode === 250}>{kp.podsOption250}</option>
           </select>
         </div>
       </div>
@@ -64,8 +71,8 @@ const {
     <!-- Expected Node Scale -->
     <div class="input-row">
       <div style="display:flex; justify-content:space-between;">
-        <label for="k8s-nodes-count">Target Node Capacity Scale</label>
-        <span id="k8s-nodes-label" style="font-family:var(--font-mono); font-weight:600; color:var(--accent-network);">{defaultNodes} Nodes</span>
+        <label for="k8s-nodes-count">{kp.nodeScaleLabel}</label>
+        <span id="k8s-nodes-label" style="font-family:var(--font-mono); font-weight:600; color:var(--accent-network);">{defaultNodes} {kp.nodeSuffix}</span>
       </div>
       <div class="slider-container">
         <input 
@@ -82,7 +89,7 @@ const {
 
     <!-- Service CIDR range check -->
     <div class="input-row">
-      <label for="k8s-service-cidr">Service CIDR Range (ClusterIPs)</label>
+      <label for="k8s-service-cidr">{kp.serviceCidrLabel}</label>
       <div class="ip-input">
         <input 
           type="text" 
@@ -110,29 +117,29 @@ const {
     <!-- Results Display -->
     <div class="result-heading">
       <div>
-        <span class="step">02</span>
-        <h2>Cluster Allocation Capacity</h2>
+        <span class="step">{kp.step2}</span>
+        <h2>{kp.allocationTitle}</h2>
       </div>
-      <button class="copy-button" type="button" id="copy-k8s-json">Copy JSON</button>
+      <button class="copy-button" type="button" id="copy-k8s-json">{kp.copyJson}</button>
     </div>
 
     <div class="k8s-metrics-row">
       <div class="metric-card">
-        <span>Node IP Allocation</span>
+        <span>{kp.nodeAllocLabel}</span>
         <strong id="k8s-res-node-block">/24</strong>
-        <small style="color:var(--text-muted);" id="k8s-res-node-ips">256 IPs per Node</small>
+        <small style="color:var(--text-muted);" id="k8s-res-node-ips">256 {kp.nodeAllocSuffix}</small>
       </div>
 
       <div class="metric-card">
-        <span>Max Node Capacity</span>
+        <span>{kp.maxNodesLabel}</span>
         <strong id="k8s-res-max-nodes">256</strong>
-        <span class="status-indicator safe" id="k8s-res-nodes-status">Supported</span>
+        <span class="status-indicator safe" id="k8s-res-nodes-status">{kp.statusSupported}</span>
       </div>
 
       <div class="metric-card">
-        <span>Max Pod Scale</span>
+        <span>{kp.maxPodScaleLabel}</span>
         <strong id="k8s-res-max-pods">11,000</strong>
-        <small style="color:var(--text-muted);">Total usable pod IPs</small>
+        <small style="color:var(--text-muted);">{kp.usablePodsNote}</small>
       </div>
     </div>
   </div>
@@ -141,27 +148,27 @@ const {
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">KUBERNETES ANALYSIS</span>
-        <h2>IP Allocation Grid</h2>
+        <span class="aside-kicker">{kp.asideKicker}</span>
+        <h2>{kp.asideTitle}</h2>
       </div>
       <p class="aside-copy">
-        Visualization of the cluster Pod CIDR range usage. A higher utilisation block indicates potential scaling problems.
+        {kp.asideDesc}
       </p>
 
       <div class="capacity">
         <div>
-          <span>TOTAL CIDR IP CAPACITY</span>
+          <span>{kp.totalCapacityLabel}</span>
           <strong id="k8s-total-ips">65,536</strong>
         </div>
-        <span class="capacity-unit">Addresses total</span>
+        <span class="capacity-unit">{kp.addressesTotal}</span>
       </div>
 
       <div class="capacity" style="background-color:rgba(145, 80, 245, 0.03); border-color:rgba(145, 80, 245, 0.1);">
         <div>
-          <span>CLUSTER IP UTILISATION</span>
+          <span>{kp.utilLabel}</span>
           <strong id="k8s-util-pct" style="color:var(--accent-host);">16.7%</strong>
         </div>
-        <span class="capacity-unit" id="k8s-util-status">Safe</span>
+        <span class="capacity-unit" id="k8s-util-status">{kp.statusSafe}</span>
       </div>
 
       <div class="scale-visualizer">
@@ -203,6 +210,23 @@ const {
     const scaleLabel = document.getElementById('k8s-scale-label');
     const copyBtn = document.getElementById('copy-k8s-json');
 
+    const layoutContainer = document.querySelector('.calculator-layout[data-k8s-i18n]') as HTMLElement;
+    let i18n = {
+      nodeSuffix: 'Nodes',
+      nodeAllocSuffix: 'IPs per Node',
+      statusSupported: 'Supported',
+      statusSafe: 'Safe',
+      statusTight: 'Tight Capacity',
+      statusCritical: 'IP Exhaustion',
+      copyJson: 'Copy JSON',
+      copied: 'Copied!'
+    };
+    if (layoutContainer && layoutContainer.dataset.k8sI18n) {
+      try {
+        i18n = { ...i18n, ...JSON.parse(layoutContainer.dataset.k8sI18n) };
+      } catch (e) {}
+    }
+
     function checkCidrOverlap(ip1: string, prefix1: number, ip2: string, prefix2: number): boolean {
       if (!validateIPv4(ip1) || !validateIPv4(ip2)) return false;
       
@@ -225,7 +249,7 @@ const {
       const svcPrefix = parseInt(svcPrefixInput.value, 10);
 
       // Dynamic slider label update
-      if (nodesLabel) nodesLabel.innerText = `${expectedNodes} Nodes`;
+      if (nodesLabel) nodesLabel.innerText = `${expectedNodes} ${i18n.nodeSuffix}`;
 
       // Validate inputs
       if (!validateIPv4(podIp) || isNaN(podPrefix)) {
@@ -254,7 +278,7 @@ const {
       
       // Update simple outputs
       if (nodeBlockDisplay) nodeBlockDisplay.innerText = `/${nodeSubnetPrefix}`;
-      if (nodeIpsDisplay) nodeIpsDisplay.innerText = `${ipsPerNode} IPs per Node`;
+      if (nodeIpsDisplay) nodeIpsDisplay.innerText = `${ipsPerNode} ${i18n.nodeAllocSuffix}`;
       if (maxNodesDisplay) maxNodesDisplay.innerText = maxNodesSupported.toLocaleString();
       if (maxPodsDisplay) maxPodsDisplay.innerText = maxPodsSupported.toLocaleString();
       if (totalIpsDisplay) totalIpsDisplay.innerText = totalPodIps.toLocaleString();
@@ -271,15 +295,15 @@ const {
 
       let warningHtml = '';
       let statusClass = 'safe';
-      let statusText = 'Supported';
+      let statusText = i18n.statusSupported;
 
       if (expectedNodes > maxNodesSupported) {
         statusClass = 'danger';
-        statusText = 'IP Exhaustion';
+        statusText = i18n.statusCritical;
         warningHtml += `<p style="margin-bottom: 0.5rem;">🚨 <strong>IP Exhaustion Warning:</strong> Your expected cluster node scale (${expectedNodes} nodes) exceeds the maximum nodes supported (${maxNodesSupported}) by a <code>/${podPrefix}</code> pod network block. Expand the CIDR block or reduce max pods per node.</p>`;
       } else if (utilizationRate > 80) {
         statusClass = 'warn';
-        statusText = 'Tight Capacity';
+        statusText = i18n.statusTight;
         warningHtml += `<p style="margin-bottom: 0.5rem;">⚠️ <strong>High Utilization:</strong> Cluster is utilizing ${utilizationRate.toFixed(1)}% of available IP space. Minimal headroom left for auto-scaling.</p>`;
       }
 
@@ -341,10 +365,10 @@ const {
         };
 
         await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-        copyBtn.innerText = 'Copied!';
+        copyBtn.innerText = i18n.copied;
         copyBtn.classList.add('copied');
         setTimeout(() => {
-          copyBtn.innerText = 'Copy JSON';
+          copyBtn.innerText = i18n.copyJson;
           copyBtn.classList.remove('copied');
         }, 2000);
       };

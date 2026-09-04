@@ -17,84 +17,128 @@ const t = translations[lang] || translations.en;
 const currentLangInfo = languages[lang] || languages.en;
 const langPrefix = lang === "en" ? "" : `/${lang}`;
 
+const catNames: Record<SupportedLanguage, { core: string; cloud: string; knowledge: string; devops: string; student: string; exploreHub: string }> = {
+  en: { core: "Core Calculators", cloud: "Cloud VPC & DevOps", knowledge: "Knowledge & Guides", devops: "DevOps", student: "Student", exploreHub: "Explore Knowledge Hub" },
+  de: { core: "Kern-Rechner", cloud: "Cloud VPC & DevOps", knowledge: "Wissen & Anleitungen", devops: "DevOps", student: "Studenten", exploreHub: "Wissens-Hub erkunden" },
+  es: { core: "Calculadoras Principales", cloud: "Cloud VPC y DevOps", knowledge: "Conocimiento y Guías", devops: "DevOps", student: "Estudiantes", exploreHub: "Explorar Centro de Conocimiento" },
+  ja: { core: "基本計算ツール", cloud: "クラウドVPC & DevOps", knowledge: "知識 & ガイド", devops: "DevOps", student: "学習者", exploreHub: "ナレッジハブを見る" },
+  fr: { core: "Calculateurs Principaux", cloud: "Cloud VPC & DevOps", knowledge: "Connaissances & Guides", devops: "DevOps", student: "Étudiants", exploreHub: "Explorer le Centre de Savoir" },
+  pt: { core: "Calculadoras Principais", cloud: "Cloud VPC e DevOps", knowledge: "Conhecimento e Guias", devops: "DevOps", student: "Estudantes", exploreHub: "Explorar Central de Conhecimento" },
+  ko: { core: "핵심 계산기", cloud: "클라우드 VPC 및 DevOps", knowledge: "지식 및 가이드", devops: "DevOps", student: "학생", exploreHub: "지식 허브 탐색" },
+  it: { core: "Calcolatori Principali", cloud: "Cloud VPC e DevOps", knowledge: "Conoscenza e Guide", devops: "DevOps", student: "Studenti", exploreHub: "Esplora Centro di Conoscenza" },
+};
+
+const whatIsSubnetTranslations: Record<SupportedLanguage, string> = {
+  en: "What is a Subnet?",
+  de: "Was ist ein Subnetz?",
+  es: "¿Qué es una subred?",
+  ja: "サブネットとは？",
+  fr: "Qu'est-ce qu'un sous-réseau ?",
+  pt: "O que é uma sub-rede?",
+  ko: "서브넷이란?",
+  it: "Cos'è una subnet?"
+};
+
+const knowledgeHubTranslations: Record<SupportedLanguage, string> = {
+  en: "Knowledge Hub",
+  de: "Wissens-Hub",
+  es: "Centro de Conocimiento",
+  ja: "ナレッジハブ",
+  fr: "Centre de Savoir",
+  pt: "Central de Conhecimento",
+  ko: "지식 허브",
+  it: "Centro di Conoscenza"
+};
+
+const studentGuideTranslations: Record<SupportedLanguage, string> = {
+  en: "Student Exam Guide",
+  de: "Prüfungsleitfaden",
+  es: "Guía de Examen",
+  ja: "試験対策ガイド",
+  fr: "Guide d'examen",
+  pt: "Guia de Exame",
+  ko: "시험 대비 가이드",
+  it: "Guida all'esame"
+};
+
 const devopsLinks = [
-  { href: `${langPrefix}/` || "/", label: "⚡ IPv4 Calculator", key: "ipv4" },
+  { href: `${langPrefix}/` || "/", label: `⚡ ${t.nav.ipv4}`, key: "ipv4" },
   {
     href: `${langPrefix}/kubernetes-subnet-planner`,
-    label: "☸️ Kubernetes",
+    label: `☸️ ${t.nav.k8s}`,
     key: "k8s",
   },
   {
-    href: `/terraform-subnet-planner`,
-    label: "📜 Terraform",
+    href: `${langPrefix}/terraform-subnet-planner`,
+    label: `📜 ${t.nav.terraform}`,
     key: "terraform",
   },
-  { href: `/aws-vpc-subnet-calculator`, label: "☁️ Cloud VPCs", key: "aws" },
+  { href: `${langPrefix}/aws-vpc-subnet-calculator`, label: `☁️ ${t.nav.aws}`, key: "aws" },
 ];
 
 const studentLinks = [
-  { href: `/learn`, label: "📚 Knowledge Hub", key: "learn", badge: "Daily" },
+  { href: `${langPrefix}/learn`, label: `📚 ${knowledgeHubTranslations[lang] || "Knowledge Hub"}`, key: "learn", badge: "Daily" },
   {
     href: `${langPrefix}/visual-subnet-splitter`,
-    label: "🔀 Visual Splitter",
+    label: `🔀 ${t.nav.splitter}`,
     key: "splitter",
   },
   {
-    href: `/what-is-a-subnet`,
-    label: "💡 What is a Subnet?",
+    href: `${langPrefix}/what-is-a-subnet`,
+    label: `💡 ${whatIsSubnetTranslations[lang] || "What is a Subnet?"}`,
     key: "what-is-a-subnet",
   },
   {
-    href: `/subnet-cheat-sheet`,
-    label: "📋 Cheat Sheet",
+    href: `${langPrefix}/cidr-cheat-sheet`,
+    label: `📋 ${t.nav.cheatsheet}`,
     key: "subnet-cheat-sheet",
   },
 ];
 
 const toolCategories = [
   {
-    name: "Core Calculators",
+    name: catNames[lang]?.core || "Core Calculators",
     icon: "🧮",
     color: "#38bdf8",
     tools: [
       {
         href: `${langPrefix}/` || "/",
-        label: "IPv4 Subnet Calculator",
+        label: t.nav.ipv4 || "IPv4 Subnet Calculator",
         desc: "Instant bitwise network & host solver",
         tag: "Core",
         key: "ipv4",
       },
       {
         href: `${langPrefix}/visual-subnet-splitter`,
-        label: "Visual Subnet Splitter",
+        label: t.nav.splitter || "Visual Subnet Splitter",
         desc: "Interactive drag & split tree",
         tag: "Visual",
         key: "splitter",
       },
       {
-        href: `/vlsm-calculator`,
-        label: "VLSM Calculator",
+        href: `${langPrefix}/vlsm-calculator`,
+        label: t.nav.vlsm || "VLSM Calculator",
         desc: "Variable length subnet mask planning",
         tag: "VLSM",
         key: "vlsm",
       },
       {
         href: `${langPrefix}/ipv6-subnet-calculator`,
-        label: "IPv6 Calculator",
+        label: t.nav.ipv6 || "IPv6 Calculator",
         desc: "128-bit hex & prefix explorer",
         tag: "IPv6",
         key: "ipv6",
       },
       {
-        href: `/subnet-overlap-checker`,
-        label: "Overlap Checker",
+        href: `${langPrefix}/subnet-overlap-checker`,
+        label: t.nav.overlap || "Overlap Checker",
         desc: "Audit colliding network blocks",
         tag: "Audit",
         key: "overlap",
       },
       {
-        href: `/cidr-supernet-calculator`,
-        label: "CIDR Supernetting",
+        href: `${langPrefix}/cidr-supernet-calculator`,
+        label: t.nav.supernet || "CIDR Supernetting",
         desc: "Route summarization solver",
         tag: "CIDR",
         key: "supernet",
@@ -102,41 +146,41 @@ const toolCategories = [
     ],
   },
   {
-    name: "Cloud VPC & DevOps",
+    name: catNames[lang]?.cloud || "Cloud VPC & DevOps",
     icon: "☁️",
     color: "#a855f7",
     tools: [
       {
         href: `${langPrefix}/kubernetes-subnet-planner`,
-        label: "Kubernetes Planner",
+        label: t.nav.k8s || "Kubernetes Planner",
         desc: "Node, Pod & Service CIDR sizing",
         tag: "K8s",
         key: "k8s",
       },
       {
-        href: `/terraform-subnet-planner`,
-        label: "Terraform Planner",
+        href: `${langPrefix}/terraform-subnet-planner`,
+        label: t.nav.terraform || "Terraform Planner",
         desc: "Auto cidrsubnet() HCL generator",
         tag: "IaC",
         key: "terraform",
       },
       {
-        href: `/aws-vpc-subnet-calculator`,
-        label: "AWS VPC Calculator",
+        href: `${langPrefix}/aws-vpc-subnet-calculator`,
+        label: t.nav.aws || "AWS VPC Calculator",
         desc: "Multi-AZ with 5 reserved IPs",
         tag: "AWS",
         key: "aws",
       },
       {
-        href: `/azure-vnet-subnet-calculator`,
-        label: "Azure VNet Calculator",
+        href: `${langPrefix}/azure-vnet-subnet-calculator`,
+        label: t.nav.azure || "Azure VNet Calculator",
         desc: "GatewaySubnet & 5 reserved IPs",
         tag: "Azure",
         key: "azure",
       },
       {
-        href: `/gcp-vpc-subnet-calculator`,
-        label: "GCP VPC Calculator",
+        href: `${langPrefix}/gcp-vpc-subnet-calculator`,
+        label: t.nav.gcp || "GCP VPC Calculator",
         desc: "Regional CIDRs with 4 reserved IPs",
         tag: "GCP",
         key: "gcp",
@@ -144,41 +188,41 @@ const toolCategories = [
     ],
   },
   {
-    name: "Knowledge & Guides",
+    name: catNames[lang]?.knowledge || "Knowledge & Guides",
     icon: "📚",
     color: "#10b981",
     tools: [
       {
-        href: `/learn`,
-        label: "Knowledge Hub",
+        href: `${langPrefix}/learn`,
+        label: knowledgeHubTranslations[lang] || "Knowledge Hub",
         desc: "Daily student networking articles",
         tag: "Daily New",
         key: "learn",
         highlight: true,
       },
       {
-        href: `/what-is-a-subnet`,
-        label: "What is a Subnet?",
+        href: `${langPrefix}/what-is-a-subnet`,
+        label: whatIsSubnetTranslations[lang] || "What is a Subnet?",
         desc: "Beginner network & mask primer",
         tag: "Primer",
         key: "what-is-a-subnet",
       },
       {
-        href: `/subnet-cheat-sheet`,
-        label: "Subnet Cheat Sheet",
+        href: `${langPrefix}/cidr-cheat-sheet`,
+        label: t.nav.cheatsheet || "Subnet Cheat Sheet",
         desc: "/1 to /32 quick lookup table",
         tag: "Quick Ref",
         key: "subnet-cheat-sheet",
       },
       {
-        href: `/student-guide`,
-        label: "Student Exam Guide",
+        href: `${langPrefix}/student-guide`,
+        label: studentGuideTranslations[lang] || "Student Exam Guide",
         desc: "CCNA formulas & exam shortcuts",
         tag: "Guide",
         key: "student-guide",
       },
       {
-        href: `/website-analyzer`,
+        href: `${langPrefix}/website-analyzer`,
         label: "Website Analyzer",
         desc: "DNS, TLS & network diagnostics",
         tag: "Diagnostic",
@@ -252,7 +296,7 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
           title="Switch to DevOps & Cloud Architecture tabs"
         >
           <span class="persona-icon">🛠️</span>
-          <span class="persona-text">DevOps</span>
+          <span class="persona-text">{catNames[lang]?.devops || "DevOps"}</span>
         </button>
         <button
           type="button"
@@ -264,7 +308,7 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
           title="Switch to Student & Learning Curriculum tabs"
         >
           <span class="persona-icon">🎓</span>
-          <span class="persona-text">Student</span>
+          <span class="persona-text">{catNames[lang]?.student || "Student"}</span>
         </button>
       </div>
 
@@ -375,8 +419,8 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
                 > anywhere to quickly close navigation menus.</span
               >
             </div>
-            <a href="/learn" class="mega-footer-link">
-              Explore Knowledge Hub <span class="arrow">→</span>
+            <a href={`${langPrefix}/learn`} class="mega-footer-link">
+              {catNames[lang]?.exploreHub || "Explore Knowledge Hub"} <span class="arrow">→</span>
             </a>
           </div>
         </div>

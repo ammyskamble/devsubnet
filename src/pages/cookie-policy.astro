@@ -19,7 +19,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
       <div class="content-container">
         <!-- Breadcrumb -->
         <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Home</a> <span class="sep">/</span> <strong>Cookie Policy</strong>
+          <a href={lang === 'en' ? '/' : `/${lang}/`}>Home</a> <span class="sep">/</span> <strong>Cookie Policy</strong>
         </nav>
 
         <section class="page-header">

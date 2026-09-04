@@ -1,32 +1,37 @@
 ---
 import { calculateSubnet, getBinaryBits } from '../utils/subnetMath';
+import { type SupportedLanguage } from '../utils/i18n';
+import { calcTranslations } from '../utils/calc-i18n';
 
 interface Props {
   defaultIp?: string;
   defaultCidr?: number;
   defaultCloud?: 'standard' | 'aws' | 'azure' | 'gcp';
+  lang?: SupportedLanguage;
 }
 
 const { 
   defaultIp = "192.168.1.0", 
   defaultCidr = 24, 
-  defaultCloud = "standard" 
+  defaultCloud = "standard",
+  lang = "en"
 } = Astro.props;
 
 // Calculate initial values for Server-Side Rendering (SEO & Instant first load)
 const initialResult = calculateSubnet(defaultIp, defaultCidr, defaultCloud);
 const initialBits = getBinaryBits(defaultIp, defaultCidr);
+const calc = calcTranslations[lang] || calcTranslations.en;
 ---
 
-<div class="calculator-layout">
+<div class="calculator-layout" id="ipv4-calc-container" data-lang={lang} data-calc={JSON.stringify(calc)}>
   <!-- Left Column: Input and Details -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>Network Parameters</h2>
+        <span class="step">{calc.step1}</span>
+        <h2>{calc.networkParamsTitle}</h2>
       </div>
-      <span class="live-label">LIVE CALCULATION</span>
+      <span class="live-label">{calc.liveLabel}</span>
     </div>
 
     <!-- Grouped Inputs Card -->
@@ -34,13 +39,13 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
       <!-- Inputs Row -->
       <div class="input-grid-2-1">
         <div class="input-row">
-          <label for="ip-address" class="tooltip-trigger" data-tooltip="IPv4 address: Enter four octets (0-255) separated by dots.">IP address</label>
+          <label for="ip-address" class="tooltip-trigger" data-tooltip={calc.ipAddressTooltip}>{calc.ipAddressLabel}</label>
           <div class="ip-input">
             <input 
               type="text" 
               id="ip-address" 
               value={defaultIp} 
-              placeholder="e.g., 10.0.0.0" 
+              placeholder={calc.ipPlaceholder} 
               inputmode="decimal" 
               autocomplete="off" 
               maxlength="15"
@@ -49,7 +54,7 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         </div>
 
         <div class="input-row">
-          <label for="cidr" class="tooltip-trigger" data-tooltip="CIDR Prefix: The number of bits allocated to the network prefix (0 to 32).">CIDR</label>
+          <label for="cidr" class="tooltip-trigger" data-tooltip={calc.cidrTooltip}>{calc.cidrLabel}</label>
           <div class="ip-input">
             <span class="slash">/</span>
             <input 
@@ -77,13 +82,13 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
 
       <!-- Cloud Selector -->
       <div class="input-row">
-        <label for="cloud-provider" class="tooltip-trigger" data-tooltip="Cloud provider rules: Select the architecture to apply vendor-specific reserved IP offsets (AWS/Azure reserve 5 IPs, GCP reserves 4).">Cloud Architecture Rules</label>
+        <label for="cloud-provider" class="tooltip-trigger" data-tooltip={calc.cloudTooltip}>{calc.cloudLabel}</label>
         <div class="select-wrapper">
           <select id="cloud-provider">
-            <option value="standard" selected={defaultCloud === 'standard'}>Standard (Default Gateway + Broadcast Reserved)</option>
-            <option value="aws" selected={defaultCloud === 'aws'}>AWS VPC (5 Reserved IPs)</option>
-            <option value="azure" selected={defaultCloud === 'azure'}>Microsoft Azure VNet (5 Reserved IPs)</option>
-            <option value="gcp" selected={defaultCloud === 'gcp'}>Google Cloud VPC (4 Reserved IPs)</option>
+            <option value="standard" selected={defaultCloud === 'standard'}>{calc.cloudStandard}</option>
+            <option value="aws" selected={defaultCloud === 'aws'}>{calc.cloudAws}</option>
+            <option value="azure" selected={defaultCloud === 'azure'}>{calc.cloudAzure}</option>
+            <option value="gcp" selected={defaultCloud === 'gcp'}>{calc.cloudGcp}</option>
           </select>
         </div>
       </div>
@@ -91,7 +96,7 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
 
     <!-- Presets -->
     <div class="quick-row">
-      <span>Common blocks:</span>
+      <span>{calc.commonBlocks}</span>
       <button type="button" data-fill="10.0.0.0/8">10.0.0.0/8</button>
       <button type="button" data-fill="172.16.0.0/12">172.16.0.0/12</button>
       <button type="button" data-fill="192.168.0.0/16">192.168.0.0/16</button>
@@ -100,16 +105,16 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
 
     <div class="error-banner" id="ip-error" role="alert">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      <span>Invalid IPv4 address format. Please enter four octets (0-255) separated by dots.</span>
+      <span>{calc.invalidIp}</span>
     </div>
 
     <!-- Binary visualization -->
     <div class="binary-section">
       <div class="binary-heading">
-        <span class="tooltip-trigger" data-tooltip="Bitwise visual representation of the network (blue) and host (purple) portions of the IP.">Binary Address Layout</span>
+        <span class="tooltip-trigger" data-tooltip={calc.binaryTooltip}>{calc.binaryTitle}</span>
         <div class="binary-legend">
-          <div class="legend-item"><span class="legend-color net"></span> Network</div>
-          <div class="legend-item"><span class="legend-color host"></span> Host</div>
+          <div class="legend-item"><span class="legend-color net"></span> {calc.networkBit}</div>
+          <div class="legend-item"><span class="legend-color host"></span> {calc.hostBit}</div>
         </div>
       </div>
       <div class="binary-grid-wrapper" id="binary-grid">
@@ -131,50 +136,50 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
     <!-- Result List -->
     <div class="result-heading">
       <div>
-        <span class="step">02</span>
-        <h2>Subnet Metrics</h2>
+        <span class="step">{calc.step2}</span>
+        <h2>{calc.subnetMetricsTitle}</h2>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button class="copy-button" type="button" id="copy-ipv4-json">Copy JSON</button>
-        <button class="copy-button" type="button" id="copy-ipv4-csv">Copy CSV</button>
-        <button class="copy-button" type="button" id="copy-ipv4-markdown">Copy MD Table</button>
+        <button class="copy-button" type="button" id="copy-ipv4-json">{calc.copyJson}</button>
+        <button class="copy-button" type="button" id="copy-ipv4-csv">{calc.copyCsv}</button>
+        <button class="copy-button" type="button" id="copy-ipv4-markdown">{calc.copyMd}</button>
         <button class="copy-button" type="button" id="share-link-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight); display: inline-flex; align-items: center; gap: 0.25rem;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-          <span>Share Link</span>
+          <span>{calc.shareLink}</span>
         </button>
       </div>
     </div>
 
     <div class="summary-grid">
       <div class="summary-item primary">
-        <span class="tooltip-trigger" data-tooltip="Network range: The base IP representing the subnet prefix boundaries.">Network Range / Address</span>
+        <span class="tooltip-trigger" data-tooltip={calc.networkRangeTooltip}>{calc.networkRange}</span>
         <strong id="res-network">{initialResult.network}/{defaultCidr}</strong>
       </div>
       <div class="summary-item highlight-usable">
-        <span class="tooltip-trigger" data-tooltip="Usable range: The IP addresses available for allocation to servers or host interfaces.">Usable Host IPs</span>
+        <span class="tooltip-trigger" data-tooltip={calc.usableHostsTooltip}>{calc.usableHosts}</span>
         <strong id="res-host-range">{initialResult.firstUsable} - {initialResult.lastUsable}</strong>
       </div>
       <div class="summary-item">
-        <span class="tooltip-trigger" data-tooltip="Subnet mask: A 32-bit mask where 1s define the network prefix and 0s define hosts (e.g., 255.255.255.0).">Subnet Mask</span>
+        <span class="tooltip-trigger" data-tooltip={calc.subnetMaskTooltip}>{calc.subnetMask}</span>
         <strong id="res-mask">{initialResult.netmask}</strong>
       </div>
       <div class="summary-item">
-        <span class="tooltip-trigger" data-tooltip="Wildcard mask: The bitwise inverse of the subnet mask, commonly used in Cisco ACLs (e.g., 0.0.0.255).">Wildcard Mask</span>
+        <span class="tooltip-trigger" data-tooltip={calc.wildcardMaskTooltip}>{calc.wildcardMask}</span>
         <strong id="res-wildcard">{initialResult.wildcard}</strong>
       </div>
       <div class="summary-item">
-        <span class="tooltip-trigger" data-tooltip="Broadcast address: The last address in the subnet, used to send packets to all hosts on the segment.">Broadcast Address</span>
+        <span class="tooltip-trigger" data-tooltip={calc.broadcastTooltip}>{calc.broadcast}</span>
         <strong id="res-broadcast">{initialResult.broadcast}</strong>
       </div>
       <div class="summary-item">
-        <span class="tooltip-trigger" data-tooltip="Total capacity: The total number of IP addresses in the subnet including reserved/utility IPs (2^(32 - CIDR)).">Total IP Capacity</span>
+        <span class="tooltip-trigger" data-tooltip={calc.totalCapacityTooltip}>{calc.totalCapacity}</span>
         <strong id="res-total-hosts">{initialResult.totalHosts.toLocaleString()}</strong>
       </div>
     </div>
 
     <!-- Reserved IPs Detail list -->
     <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-color);">
-      <h3 style="font-size: 0.9rem; text-transform: uppercase; font-family: var(--font-display); color: var(--text-secondary); margin-bottom: 0.75rem;">Address Reservations Detail</h3>
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; font-family: var(--font-display); color: var(--text-secondary); margin-bottom: 0.75rem;">{calc.addressReservations}</h3>
       <ul id="res-details" style="font-family: var(--font-mono); font-size: 0.8rem; list-style-type: none; display: flex; flex-direction: column; gap: 0.35rem;">
         {initialResult.reservedDetails.map(detail => (
           <li style="color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
@@ -188,22 +193,22 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
     <details class="reserved-info-details" style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: rgba(255,255,255,0.01);">
       <summary style="font-size: 0.8rem; font-weight: 600; padding: 0.75rem; cursor: pointer; color: var(--accent-highlight); outline: none; user-select: none; display: flex; align-items: center; gap: 0.25rem;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        Compare Cloud Provider Reservation Rules
+        {calc.compareCloudTitle}
       </summary>
       <div style="padding: 0.75rem; font-size: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-        <p>Different cloud and RFC architectures reserve IP addresses for routing, DNS, and system services:</p>
+        <p>{calc.compareCloudIntro}</p>
         <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
           <div style="border-left: 3px solid var(--text-muted); padding-left: 0.5rem;">
-            <strong>Standard RFC 1918:</strong> Reserves <strong>2 IPs</strong>. The network address (first IP) and broadcast address (last IP).
+            {calc.stdRfcRule}
           </div>
           <div style="border-left: 3px solid var(--accent-network); padding-left: 0.5rem;">
-            <strong>AWS VPC:</strong> Reserves <strong>5 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Router), <code>.2</code> (DNS), <code>.3</code> (Future use), and <code>.255</code> (Broadcast).
+            {calc.awsRule}
           </div>
           <div style="border-left: 3px solid var(--accent-host); padding-left: 0.5rem;">
-            <strong>Microsoft Azure:</strong> Reserves <strong>5 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Gateway), <code>.2</code> (DNS), <code>.3</code> (DHCP mapping), and <code>.255</code> (Broadcast).
+            {calc.azureRule}
           </div>
           <div style="border-left: 3px solid var(--accent-highlight); padding-left: 0.5rem;">
-            <strong>Google Cloud (GCP):</strong> Reserves <strong>4 IPs</strong>. <code>.0</code> (Network), <code>.1</code> (Gateway), <code>.254</code> (Future use), and <code>.255</code> (Broadcast).
+            {calc.gcpRule}
           </div>
         </div>
       </div>
@@ -213,14 +218,14 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
     <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
       <div class="panel-heading" style="padding-bottom: 0.5rem; border-bottom: none;">
         <div>
-          <span class="step" style="background: rgba(var(--hsl-host), 0.15); color: var(--accent-host);">03</span>
-          <h2 class="tooltip-trigger" data-tooltip="Interactive Subnet Splitter: Split your current CIDR block in half recursively to plan smaller segments.">Interactive Subnet Splitter</h2>
+          <span class="step" style="background: rgba(var(--hsl-host), 0.15); color: var(--accent-host);">{calc.step3Splitter}</span>
+          <h2 class="tooltip-trigger" data-tooltip={calc.splitterTooltip}>{calc.splitterTitle}</h2>
         </div>
-        <span class="live-label" style="background: rgba(var(--hsl-network), 0.12); color: var(--accent-network);">ALLOCATIONS</span>
+        <span class="live-label" style="background: rgba(var(--hsl-network), 0.12); color: var(--accent-network);">{calc.allocationsLabel}</span>
       </div>
 
       <p class="aside-copy" style="font-size: 0.9rem; margin-bottom: 0.5rem;">
-        Divide the calculated network block <strong><span id="inline-splitter-base-display" style="color: var(--accent-network); font-family: var(--font-mono);">192.168.1.0/24</span></strong> into custom segments. Click <strong>Split</strong> to partition a block, or <strong>Merge</strong> to combine adjacent siblings.
+        {calc.splitterDescPre} <strong><span id="inline-splitter-base-display" style="color: var(--accent-network); font-family: var(--font-mono);">{defaultIp}/{defaultCidr}</span></strong> {calc.splitterDescPost}
       </p>
 
       <div class="splitter-visual-root" style="margin-top: 0.25rem;">
@@ -233,11 +238,11 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         <table class="guide-table" style="font-size: 0.85rem;">
           <thead>
             <tr>
-              <th>Label</th>
-              <th>CIDR Range</th>
-              <th>Usable IP Range</th>
-              <th>Hosts</th>
-              <th>Action</th>
+              <th>{calc.thLabel}</th>
+              <th>{calc.thCidr}</th>
+              <th>{calc.thUsable}</th>
+              <th>{calc.thHosts}</th>
+              <th>{calc.thAction}</th>
             </tr>
           </thead>
           <tbody id="inline-splitter-table-body">
@@ -252,25 +257,25 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">INFRASTRUCTURE PLANNING</span>
-        <h2 id="res-aside-title">Your /{defaultCidr} Subnet</h2>
+        <span class="aside-kicker">{calc.infraPlanning}</span>
+        <h2 id="res-aside-title">{calc.yourSubnetTitle.replace('{cidr}', String(defaultCidr))}</h2>
       </div>
       <p class="aside-copy" id="res-aside-desc">
-        A subnet with a mask of {initialResult.netmask} provides {initialResult.usableHosts.toLocaleString()} usable IP addresses for devices.
+        {calc.asideDescPre} {initialResult.netmask} {calc.asideDescMid} {initialResult.usableHosts.toLocaleString()} {calc.asideDescPost}
       </p>
 
       <div class="capacity highlighted">
         <div>
-          <span>USABLE HOST CAPACITY</span>
+          <span>{calc.usableCapacityLabel}</span>
           <strong id="res-usable-hosts">{initialResult.usableHosts.toLocaleString()}</strong>
         </div>
-        <span class="capacity-unit">IPs available</span>
+        <span class="capacity-unit">{calc.ipsAvailable}</span>
       </div>
 
 
       <div class="scale-visualizer">
         <div class="scale-fill" id="res-scale-fill" style={`width: ${Math.max(0, Math.min(100, (defaultCidr / 32) * 100))}%`}></div>
-        <span class="scale-label" id="res-scale-label">Prefix Sizing: /{defaultCidr}</span>
+        <span class="scale-label" id="res-scale-label">{calc.prefixSizing.replace('{cidr}', String(defaultCidr))}</span>
       </div>
       
       <!-- IaC Exporter Section -->
@@ -290,7 +295,7 @@ const initialBits = getBinaryBits(defaultIp, defaultCidr);
         </div>
         <div class="code-wrapper">
           <div class="code-copy-overlay">
-            <button class="copy-button" type="button" id="copy-iac-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+            <button class="copy-button" type="button" id="copy-iac-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">{calc.copyCode}</button>
           </div>
           <pre><code id="iac-code-output"># Terraform VPC Subnet Definition
 resource "aws_subnet" "subnet_1" &#123;
@@ -308,14 +313,14 @@ resource "aws_subnet" "subnet_1" &#123;
       <div class="extended-tools-panel" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
         <div class="panel-heading" style="margin-bottom: 1rem;">
           <div>
-            <span class="step" style="background: rgba(145, 80, 245, 0.15); color: var(--accent-host);">03</span>
-            <h2>Extended Developer & Network Tools</h2>
+            <span class="step" style="background: rgba(145, 80, 245, 0.15); color: var(--accent-host);">{calc.step3Tools}</span>
+            <h2>{calc.extendedToolsTitle}</h2>
           </div>
-          <span class="live-label" style="background: rgba(145, 80, 245, 0.12); color: var(--accent-host);">DNS & WHOIS UTILITIES</span>
+          <span class="live-label" style="background: rgba(145, 80, 245, 0.12); color: var(--accent-host);">{calc.dnsWhoisLabel}</span>
         </div>
 
         <p class="aside-copy" style="margin-bottom: 1rem; font-size: 0.9rem;">
-          Perform domain resolution, IP ownership lookups, and reverse DNS records directly via authoritative queries:
+          {calc.extendedToolsDesc}
         </p>
 
         <div class="tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.875rem;">
@@ -328,7 +333,7 @@ resource "aws_subnet" "subnet_1" &#123;
           >
             <span style="display: flex; align-items: center; gap: 0.5rem;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-network);"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-              Google DNS Lookup
+              {calc.googleDns}
             </span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">dns.google ↗</span>
           </a>
@@ -342,7 +347,7 @@ resource "aws_subnet" "subnet_1" &#123;
           >
             <span style="display: flex; align-items: center; gap: 0.5rem;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-host);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              ARIN WHOIS Registry
+              {calc.arinWhois}
             </span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">arin.net ↗</span>
           </a>
@@ -356,7 +361,7 @@ resource "aws_subnet" "subnet_1" &#123;
           >
             <span style="display: flex; align-items: center; gap: 0.5rem;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-highlight);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              Cloudflare 1.1.1.1 DNS
+              {calc.cloudflareDns}
             </span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">1.1.1.1 ↗</span>
           </a>
@@ -370,7 +375,7 @@ resource "aws_subnet" "subnet_1" &#123;
           >
             <span style="display: flex; align-items: center; gap: 0.5rem;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-warning);"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-              BGP Route Inspector
+              {calc.bgpInspector}
             </span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">he.net ↗</span>
           </a>
@@ -382,8 +387,14 @@ resource "aws_subnet" "subnet_1" &#123;
 
 <script>
   import { calculateSubnet, getBinaryBits, validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+  import type { CalcTranslation } from '../utils/calc-i18n';
 
   function initIPv4Calculator() {
+    const container = document.getElementById('ipv4-calc-container');
+    const calcData: Partial<CalcTranslation> = container && container.dataset.calc
+      ? JSON.parse(container.dataset.calc)
+      : {};
+
     // DOM Elements
     const ipInput = document.getElementById('ip-address') as HTMLInputElement;
     const cidrInput = document.getElementById('cidr') as HTMLInputElement;
@@ -547,8 +558,8 @@ resource "aws_subnet" "subnet_1" &#123;
               </div>
             </div>
             <div class="subnet-actions" style="display: flex; gap: 0.25rem;">
-              ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">Split</button>` : ''}
-              ${canMergeNode ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">Merge</button>` : ''}
+              ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">${calcData.btnSplit || 'Split'}</button>` : ''}
+              ${canMergeNode ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 22px;">${calcData.btnMerge || 'Merge'}</button>` : ''}
             </div>
           </div>
         `;
@@ -566,7 +577,7 @@ resource "aws_subnet" "subnet_1" &#123;
                 type="text" 
                 class="inline-subnet-table-label-input" 
                 value="${node.label}" 
-                data-idx="${idx}"
+                data-idx="${idx}" 
                 aria-label="Subnet Label ${idx + 1}"
                 style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.8rem; outline:none; max-width: 100px;"
               />
@@ -576,8 +587,8 @@ resource "aws_subnet" "subnet_1" &#123;
             <td>${calculated.usableHosts.toLocaleString()}</td>
             <td>
               <div style="display:flex; gap:0.25rem;">
-                ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">Split</button>` : ''}
-                ${canMergeInline(idx) ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">Merge</button>` : ''}
+                ${node.cidr < 32 ? `<button class="subnet-btn inline-split-btn" data-split="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">${calcData.btnSplit || 'Split'}</button>` : ''}
+                ${canMergeInline(idx) ? `<button class="subnet-btn inline-merge-btn" data-merge="${idx}" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; min-height: unset; height: 24px;">${calcData.btnMerge || 'Merge'}</button>` : ''}
               </div>
             </td>
           </tr>
@@ -663,15 +674,20 @@ resource "aws_subnet" "subnet_1" &#123;
       if (resUsableHosts) resUsableHosts.innerText = result.usableHosts.toLocaleString();
       
       // Update aside elements
-      if (resAsideTitle) resAsideTitle.innerText = `Your /${cidr} Subnet`;
+      if (resAsideTitle) {
+        resAsideTitle.innerText = (calcData.yourSubnetTitle || 'Your /{cidr} Subnet').replace('{cidr}', cidr.toString());
+      }
       if (resAsideDesc) {
-        resAsideDesc.innerText = `A subnet with a mask of ${result.netmask} provides ${result.usableHosts.toLocaleString()} usable IP addresses for devices.`;
+        const pre = calcData.asideDescPre || 'A subnet with a mask of';
+        const mid = calcData.asideDescMid || 'provides';
+        const post = calcData.asideDescPost || 'usable IP addresses for devices.';
+        resAsideDesc.innerText = `${pre} ${result.netmask} ${mid} ${result.usableHosts.toLocaleString()} ${post}`;
       }
       if (resScaleFill) {
         resScaleFill.style.width = `${(cidr / 32) * 100}%`;
       }
       if (resScaleLabel) {
-        resScaleLabel.innerText = `Prefix Sizing: /${cidr}`;
+        resScaleLabel.innerText = (calcData.prefixSizing || 'Prefix Sizing: /{cidr}').replace('{cidr}', cidr.toString());
       }
 
       // Re-render Details List
@@ -861,10 +877,10 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
         const res = calculateSubnet(ip, cidr, cloud);
         
         await navigator.clipboard.writeText(JSON.stringify(res, null, 2));
-        copyJsonBtn.innerText = 'Copied!';
+        copyJsonBtn.innerText = calcData.copied || 'Copied!';
         copyJsonBtn.classList.add('copied');
         setTimeout(() => {
-          copyJsonBtn.innerText = 'Copy JSON';
+          copyJsonBtn.innerText = calcData.copyJson || 'Copy JSON';
           copyJsonBtn.classList.remove('copied');
         }, 2000);
       };
@@ -880,20 +896,20 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
 
         const csvContent = [
           ['Metric', 'Value'],
-          ['Network Range / Address', `${res.network}/${cidr}`],
-          ['Usable Host IPs', `${res.firstUsable} - ${res.lastUsable}`],
-          ['Subnet Mask', res.netmask],
-          ['Wildcard Mask', res.wildcard],
-          ['Broadcast Address', res.broadcast],
-          ['Total IP Capacity', res.totalHosts],
-          ['Usable Host Capacity', res.usableHosts]
+          [calcData.networkRange || 'Network Range / Address', `${res.network}/${cidr}`],
+          [calcData.usableHosts || 'Usable Host IPs', `${res.firstUsable} - ${res.lastUsable}`],
+          [calcData.subnetMask || 'Subnet Mask', res.netmask],
+          [calcData.wildcardMask || 'Wildcard Mask', res.wildcard],
+          [calcData.broadcast || 'Broadcast Address', res.broadcast],
+          [calcData.totalCapacity || 'Total IP Capacity', res.totalHosts],
+          [calcData.usableCapacityLabel || 'Usable Host Capacity', res.usableHosts]
         ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
         await navigator.clipboard.writeText(csvContent);
-        copyCsvBtn.innerText = 'Copied!';
+        copyCsvBtn.innerText = calcData.copied || 'Copied!';
         copyCsvBtn.classList.add('copied');
         setTimeout(() => {
-          copyCsvBtn.innerText = 'Copy CSV';
+          copyCsvBtn.innerText = calcData.copyCsv || 'Copy CSV';
           copyCsvBtn.classList.remove('copied');
         }, 2000);
       };
@@ -910,20 +926,20 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
         const mdContent = [
           '| Metric | Value |',
           '| --- | --- |',
-          `| **Network Range / Address** | ${res.network}/${cidr} |`,
-          `| **Usable Host IPs** | ${res.firstUsable} - ${res.lastUsable} |`,
-          `| **Subnet Mask** | ${res.netmask} |`,
-          `| **Wildcard Mask** | ${res.wildcard} |`,
-          `| **Broadcast Address** | ${res.broadcast} |`,
-          `| **Total IP Capacity** | ${res.totalHosts.toLocaleString()} |`,
-          `| **Usable Host Capacity** | ${res.usableHosts.toLocaleString()} |`
+          `| **${calcData.networkRange || 'Network Range / Address'}** | ${res.network}/${cidr} |`,
+          `| **${calcData.usableHosts || 'Usable Host IPs'}** | ${res.firstUsable} - ${res.lastUsable} |`,
+          `| **${calcData.subnetMask || 'Subnet Mask'}** | ${res.netmask} |`,
+          `| **${calcData.wildcardMask || 'Wildcard Mask'}** | ${res.wildcard} |`,
+          `| **${calcData.broadcast || 'Broadcast Address'}** | ${res.broadcast} |`,
+          `| **${calcData.totalCapacity || 'Total IP Capacity'}** | ${res.totalHosts.toLocaleString()} |`,
+          `| **${calcData.usableCapacityLabel || 'Usable Host Capacity'}** | ${res.usableHosts.toLocaleString()} |`
         ].join('\n');
 
         await navigator.clipboard.writeText(mdContent);
-        copyMarkdownBtn.innerText = 'Copied!';
+        copyMarkdownBtn.innerText = calcData.copied || 'Copied!';
         copyMarkdownBtn.classList.add('copied');
         setTimeout(() => {
-          copyMarkdownBtn.innerText = 'Copy MD Table';
+          copyMarkdownBtn.innerText = calcData.copyMd || 'Copy MD Table';
           copyMarkdownBtn.classList.remove('copied');
         }, 2000);
       };
@@ -942,10 +958,10 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
 
         await navigator.clipboard.writeText(url.toString());
         const btnTextSpan = shareLinkBtn.querySelector('span');
-        if (btnTextSpan) btnTextSpan.innerText = 'Link Copied!';
+        if (btnTextSpan) btnTextSpan.innerText = calcData.copied || 'Copied!';
         shareLinkBtn.classList.add('copied');
         setTimeout(() => {
-          if (btnTextSpan) btnTextSpan.innerText = 'Share Link';
+          if (btnTextSpan) btnTextSpan.innerText = calcData.shareLink || 'Share Link';
           shareLinkBtn.classList.remove('copied');
         }, 2000);
       };
@@ -955,10 +971,10 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
       copyIacBtn.onclick = async () => {
         if (!iacOutput) return;
         await navigator.clipboard.writeText(iacOutput.innerText);
-        copyIacBtn.innerText = 'Copied!';
+        copyIacBtn.innerText = calcData.copied || 'Copied!';
         copyIacBtn.classList.add('copied');
         setTimeout(() => {
-          copyIacBtn.innerText = 'Copy Code';
+          copyIacBtn.innerText = calcData.copyCode || 'Copy Code';
           copyIacBtn.classList.remove('copied');
         }, 2000);
       };

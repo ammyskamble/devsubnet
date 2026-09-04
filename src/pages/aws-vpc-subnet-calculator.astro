@@ -1,14 +1,16 @@
----import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import { type SupportedLanguage } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
+import { toolsI18n } from '../utils/tools-i18n';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const tCloud = (toolsI18n[lang] || toolsI18n.en).cloudIntros.aws;
 ---
 
 <Layout lang={lang} 
-  title="AWS VPC Subnet Calculator – CIDR Planner | DevSubnet"
-  description="AWS VPC subnet calculator with all 5 reserved IPs accounted for. Plan CIDR blocks across Availability Zones, generate Terraform and Ansible configurations, and calculate usable host ranges with cloud-aware reservations for production VPCs."
+  title={`${tCloud.title} | DevSubnet`}
+  description={tCloud.lede}
 >
   <MainShell lang={lang} activeTab="ipv4" defaultCloud="aws" navPath="aws">
   </MainShell>

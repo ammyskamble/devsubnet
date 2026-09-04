@@ -1,15 +1,19 @@
----import Footer from '../components/Footer.astro';
-import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import Footer from '../components/Footer.astro';
+import { translations, type SupportedLanguage } from '../utils/i18n';
+import { terraformTranslations } from '../utils/terraform-i18n';
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const tfT = terraformTranslations[lang] || terraformTranslations.en;
+const t = translations[lang] || translations.en;
+const intro = t.intro.terraform;
 ---
 
 <Layout lang={lang}
-  title="Terraform Subnet Planner – cidrsubnet() VPC Calculator | DevSubnet"
-  description="Terraform subnet planner and cidrsubnet() calculator for AWS, Azure, and GCP VPCs. Generate HCL code, visualize AZ distributions, and calculate subnet offsets to prevent CIDR overlaps and state drift in infrastructure as code."
+  title={`${intro.title} | DevSubnet`}
+  description={intro.lede}
 >
   <div class="app-shell">
     <NavBar lang={lang} path="terraform" />
@@ -17,66 +21,73 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     <main>
       <!-- Hero Intro -->
       <section class="intro" aria-labelledby="page-title">
-        <div class="eyebrow">INFRASTRUCTURE AS CODE / TERRAFORM</div>
-        <h1 id="page-title">Terraform Subnet Planner & cidrsubnet() Calculator</h1>
+        <div class="eyebrow">{intro.eyebrow}</div>
+        <h1 id="page-title">{intro.title}</h1>
         <p class="lede">
-          Plan multi-tier VPC subnets using Terraform's native <code>cidrsubnet()</code> function. Calculate offsets, visualize availability zone distributions, and export production-ready HCL code instantly.
+          {intro.lede}
         </p>
       </section>
 
       <!-- Interactive Calculator Panel -->
-      <section class="calculator-panel" style="margin-bottom: 2.5rem;">
+      <section class="calculator-panel" style="margin-bottom: 2.5rem;" data-tf-i18n={JSON.stringify({
+        copyBtnCopy: tfT.copyBtnCopy,
+        copyBtnCopied: tfT.copyBtnCopied,
+        tierPublic: tfT.tierPublicName,
+        tierPrivate: tfT.tierPrivateName,
+        tierData: tfT.tierDataName,
+        tierMgmt: tfT.tierMgmtName
+      })}>
         <div class="panel-heading">
-          <div><span class="step">01</span><h2>Terraform VPC & Subnet Configuration</h2></div>
-          <span class="live-label">HCL GENERATOR</span>
+          <div><span class="step">01</span><h2>{tfT.panelHeading}</h2></div>
+          <span class="live-label">{tfT.liveLabel}</span>
         </div>
 
         <div class="tf-planner-grid">
           <!-- Inputs Column -->
           <div class="tf-inputs-col">
             <div class="field-group">
-              <label for="tf-base-cidr">Base VPC CIDR Block</label>
-              <input type="text" id="tf-base-cidr" value="10.0.0.0/16" placeholder="e.g. 10.0.0.0/16" class="ip-input" />
-              <span class="field-hint">Root VPC CIDR block to subdivide</span>
+              <label for="tf-base-cidr">{tfT.baseCidrLabel}</label>
+              <input type="text" id="tf-base-cidr" value="10.0.0.0/16" placeholder={tfT.baseCidrPlaceholder} class="ip-input" />
+              <span class="field-hint">{tfT.baseCidrHint}</span>
             </div>
 
             <div class="field-group">
-              <label for="tf-az-count">Availability Zones (AZs)</label>
+              <label for="tf-az-count">{tfT.azLabel}</label>
               <select id="tf-az-count" class="cloud-select">
-                <option value="2">2 AZs (Standard HA)</option>
-                <option value="3" selected>3 AZs (Production HA)</option>
-                <option value="4">4 AZs (Maximum Redundancy)</option>
+                <option value="2">{tfT.azOption2}</option>
+                <option value="3" selected>{tfT.azOption3}</option>
+                <option value="4">{tfT.azOption4}</option>
               </select>
             </div>
 
             <div class="field-group">
-              <label for="tf-newbits">Subnet Sizing (newbits addition)</label>
+              <label for="tf-newbits">{tfT.newbitsLabel}</label>
               <select id="tf-newbits" class="cloud-select">
-                <option value="4">newbits = 4 (/20 subnets – 4,094 usable IPs/AZ)</option>
-                <option value="8" selected>newbits = 8 (/24 subnets – 254 usable IPs/AZ)</option>
-                <option value="9">newbits = 9 (/25 subnets – 126 usable IPs/AZ)</option>
-                <option value="10">newbits = 10 (/26 subnets – 62 usable IPs/AZ)</option>
-                <option value="12">newbits = 12 (/28 subnets – 14 usable IPs/AZ)</option>
+                <option value="4">{tfT.newbitsOption4}</option>
+                <option value="8" selected>{tfT.newbitsOption8}</option>
+                <option value="9">{tfT.newbitsOption9}</option>
+                <option value="10">{tfT.newbitsOption10}</option>
+                <option value="12">{tfT.newbitsOption12}</option>
               </select>
-              <span class="field-hint">Formula: <code>cidrsubnet(vpc_cidr, newbits, netnum)</code></span>
+              <span class="field-hint">{tfT.newbitsHint} <code>cidrsubnet(vpc_cidr, newbits, netnum)</code></span>
             </div>
 
             <div class="field-group">
-              <label>Subnet Tiers</label>
+              <label>{tfT.tiersLabel}</label>
               <div class="tier-checkboxes">
-                <label class="tier-item"><input type="checkbox" id="tier-public" checked /> <span>Public (Ingress / ALBs / NAT)</span></label>
-                <label class="tier-item"><input type="checkbox" id="tier-private" checked /> <span>Private (App / ECS / EKS Workloads)</span></label>
-                <label class="tier-item"><input type="checkbox" id="tier-data" checked /> <span>Database (RDS / Aurora / Cache)</span></label>
-                <label class="tier-item"><input type="checkbox" id="tier-mgmt" /> <span>Management (Bastion / VPN)</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-public" checked /> <span>{tfT.tierPublic}</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-private" checked /> <span>{tfT.tierPrivate}</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-data" checked /> <span>{tfT.tierData}</span></label>
+                <label class="tier-item"><input type="checkbox" id="tier-mgmt" /> <span>{tfT.tierMgmt}</span></label>
               </div>
             </div>
 
             <div class="field-group">
-              <label for="tf-cloud-provider">Target Cloud Provider</label>
+              <label for="tf-cloud-provider">{tfT.providerLabel}</label>
               <select id="tf-cloud-provider" class="cloud-select">
-                <option value="aws" selected>AWS (aws_subnet & VPC module)</option>
-                <option value="azure">Azure (azurerm_subnet & VNet)</option>
-                <option value="gcp">GCP (google_compute_subnetwork)</option>
+                <option value="aws" selected>{tfT.providerOptionAws}</option>
+                <option value="azure">{tfT.providerOptionAzure}</option>
+                <option value="gcp">{tfT.providerOptionGcp}</option>
               </select>
             </div>
           </div>
@@ -84,26 +95,26 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
           <!-- Live HCL Output Column -->
           <div class="tf-output-col">
             <div class="output-header">
-              <span class="output-title">Generated Terraform HCL</span>
-              <button id="copy-tf-btn" class="btn-copy" type="button">Copy HCL Code</button>
+              <span class="output-title">{tfT.outputTitle}</span>
+              <button id="copy-tf-btn" class="btn-copy" type="button">{tfT.copyBtnCopy}</button>
             </div>
-            <pre class="code-box"><code id="tf-code-output"># Calculating Terraform HCL...</code></pre>
+            <pre class="code-box"><code id="tf-code-output"># {tfT.calcFallback}</code></pre>
           </div>
         </div>
 
         <!-- Calculated Subnets Breakdown Table -->
         <div style="margin-top: 2rem;">
-          <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--text-primary);">Subnet Index Mapping & Offsets</h3>
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--text-primary);">{tfT.tableTitle}</h3>
           <div class="guide-table-wrapper">
             <table class="guide-table" id="tf-subnets-table">
               <thead>
                 <tr>
-                  <th>Tier</th>
-                  <th>AZ Index</th>
-                  <th>Calculated CIDR</th>
-                  <th>Terraform Expression</th>
-                  <th>Netnum</th>
-                  <th>Usable IPs</th>
+                  <th>{tfT.tableHeaderTier}</th>
+                  <th>{tfT.tableHeaderAz}</th>
+                  <th>{tfT.tableHeaderCidr}</th>
+                  <th>{tfT.tableHeaderExpr}</th>
+                  <th>{tfT.tableHeaderNetnum}</th>
+                  <th>{tfT.tableHeaderHosts}</th>
                 </tr>
               </thead>
               <tbody id="tf-table-body">
@@ -117,36 +128,30 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
       <!-- Deep Technical Architectural Guide -->
       <section class="guide-section">
         <div class="guide-sticky">
-          <h2>Mastering <em>Terraform</em> Subnetting</h2>
+          <h2>{tfT.guideTitle}</h2>
         </div>
         <div class="guide-content">
           <div class="guide-block">
-            <h3>How the <code>cidrsubnet()</code> Function Works</h3>
-            <p>
-              In Terraform HCL, <code>cidrsubnet(prefix, newbits, netnum)</code> calculates a subnet address within a given IP network prefix:
-            </p>
+            <h3>{tfT.guideFuncTitle}</h3>
+            <p>{tfT.guideFuncP1}</p>
             <ul>
-              <li><strong><code>prefix</code></strong>: The base CIDR string (e.g. <code>"10.0.0.0/16"</code>).</li>
-              <li><strong><code>newbits</code></strong>: Number of additional bits to extend the prefix by. Adding <code>8</code> to a <code>/16</code> creates <code>/24</code> subnets.</li>
-              <li><strong><code>netnum</code></strong>: The zero-based integer index of the specific subnet to create.</li>
+              <li><strong><code>prefix</code></strong>: {tfT.guideFuncL1}</li>
+              <li><strong><code>newbits</code></strong>: {tfT.guideFuncL2}</li>
+              <li><strong><code>netnum</code></strong>: {tfT.guideFuncL3}</li>
             </ul>
           </div>
 
           <div class="guide-block">
-            <h3><code>cidrsubnet()</code> vs <code>cidrsubnets()</code></h3>
-            <p>
-              While <code>cidrsubnet()</code> calculates individual subnets with uniform bit shifts, <code>cidrsubnets(prefix, newbits...)</code> calculates multiple contiguous subnets of varying prefix lengths simultaneously:
-            </p>
+            <h3>{tfT.guideVsTitle}</h3>
+            <p>{tfT.guideVsP1}</p>
             <pre class="mini-code"><code># Creates 1x /20 and 2x /24 subnets from 10.0.0.0/16:
 cidrsubnets("10.0.0.0/16", 4, 8, 8)
 # Result: ["10.0.0.0/20", "10.0.16.0/24", "10.0.17.0/24"]</code></pre>
           </div>
 
           <div class="guide-block">
-            <h3>Preventing Destructive Subnet State Drift</h3>
-            <p>
-              When architecting VPCs in Terraform, always fix your <code>netnum</code> ranges with reserved headroom. If you insert a new subnet index between existing subnets, Terraform will attempt to destroy and recreate all downstream subnets, causing critical downtime for databases and running instances!
-            </p>
+            <h3>{tfT.guideDriftTitle}</h3>
+            <p>{tfT.guideDriftP1}</p>
           </div>
         </div>
       </section>
@@ -154,18 +159,18 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
       <!-- FAQs -->
       <section class="seo-netsudoku-section" style="margin-top: 3rem;">
         <div class="seo-netsudoku-container">
-          <h2 style="font-size: 1.75rem;">Terraform Networking FAQ</h2>
+          <h2 style="font-size: 1.75rem;">{tfT.faqTitle}</h2>
           <div class="seo-netsudoku-grid">
             <div class="seo-netsudoku-card">
               <div>
-                <h4>Can I resize a VPC CIDR block in Terraform without downtime?</h4>
-                <p>You can add secondary CIDR blocks to an existing AWS VPC via <code>aws_vpc_ipv4_cidr_block_association</code> without recreating the VPC or destroying existing subnets.</p>
+                <h4>{tfT.faqQ1}</h4>
+                <p>{tfT.faqA1}</p>
               </div>
             </div>
             <div class="seo-netsudoku-card">
               <div>
-                <h4>How many subnets can a /16 VPC accommodate with /24 subnets?</h4>
-                <p>With <code>newbits = 8</code> (expanding /16 to /24), you can generate exactly 2<sup>8</sup> = 256 unique /24 subnets (indexes 0 through 255), each with 251-254 usable hosts.</p>
+                <h4>{tfT.faqQ2}</h4>
+                <p>{tfT.faqA2}</p>
               </div>
             </div>
           </div>
@@ -359,6 +364,9 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
     }
 
     function renderTerraformPlan() {
+      const panel = document.querySelector('.calculator-panel');
+      const i18n = panel ? JSON.parse(panel.getAttribute('data-tf-i18n') || '{}') : {};
+
       const baseCidrInput = (document.getElementById('tf-base-cidr') as HTMLInputElement)?.value || '10.0.0.0/16';
       const azCount = parseInt((document.getElementById('tf-az-count') as HTMLSelectElement)?.value || '3', 10);
       const newbits = parseInt((document.getElementById('tf-newbits') as HTMLSelectElement)?.value || '8', 10);
@@ -370,10 +378,10 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
       const hasMgmt = (document.getElementById('tier-mgmt') as HTMLInputElement)?.checked;
 
       const tiers: { name: string; key: string }[] = [];
-      if (hasPublic) tiers.push({ name: 'Public', key: 'public' });
-      if (hasPrivate) tiers.push({ name: 'Private App', key: 'private' });
-      if (hasData) tiers.push({ name: 'Database', key: 'database' });
-      if (hasMgmt) tiers.push({ name: 'Management', key: 'mgmt' });
+      if (hasPublic) tiers.push({ name: i18n.tierPublic || 'Public', key: 'public' });
+      if (hasPrivate) tiers.push({ name: i18n.tierPrivate || 'Private App', key: 'private' });
+      if (hasData) tiers.push({ name: i18n.tierData || 'Database', key: 'database' });
+      if (hasMgmt) tiers.push({ name: i18n.tierMgmt || 'Management', key: 'mgmt' });
 
       let netnumIndex = 0;
       const rows: Array<{ tier: string; az: number; cidr: string; expr: string; netnum: number; hosts: number }> = [];
@@ -475,11 +483,16 @@ cidrsubnets("10.0.0.0/16", 4, 8, 8)
 
     const copyBtn = document.getElementById('copy-tf-btn');
     if (copyBtn) {
+      const panel = document.querySelector('.calculator-panel');
+      const i18n = panel ? JSON.parse(panel.getAttribute('data-tf-i18n') || '{}') : {};
+      const originalText = i18n.copyBtnCopy || 'Copy HCL Code';
+      const copiedText = i18n.copyBtnCopied || 'Copied!';
+
       copyBtn.onclick = () => {
         const code = document.getElementById('tf-code-output')?.textContent || '';
         navigator.clipboard.writeText(code).then(() => {
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => { copyBtn.textContent = 'Copy HCL Code'; }, 2000);
+          copyBtn.textContent = copiedText;
+          setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
         });
       };
     }

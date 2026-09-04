@@ -1,26 +1,28 @@
----import Footer from '../components/Footer.astro';
-import { type SupportedLanguage } from '../utils/i18n';
+---
+import Footer from '../components/Footer.astro';
+import { type SupportedLanguage, translations } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
 import Supernetter from '../components/Supernetter.astro';
 import NavBar from '../components/NavBar.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 <Layout lang={lang}
-  title="CIDR Supernetting Calculator – Route Summarization Tool | DevSubnet"
-  description="CIDR supernetting / route summarization calculator combining contiguous networks into single summary routes. Reduce routing table size, lower router memory use, and accelerate convergence for enterprise network designs."
+  title={`${t.nav.supernet} – Route Summarization | DevSubnet`}
+  description="CIDR supernetting / route summarization calculator combining contiguous networks into single summary routes. Reduce routing table size, lower router memory use, and accelerate convergence."
 >
   <div class="app-shell">
     <NavBar lang={lang} path="supernet" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">SUPERNETTING / ROUTE SUMMARIZATION</div>
-        <h1 id="page-title">CIDR Supernetting Calculator</h1>
+        <h1 id="page-title">{t.nav.supernet}</h1>
         <p class="lede">Combine multiple contiguous networks into a single summary route — reducing routing table size, lowering router memory use, and accelerating route convergence.</p>
       </section>
       <section aria-label="Supernetting workspace">
-        <Supernetter />
+        <Supernetter lang={lang} />
       </section>
     </main>
     <Footer lang={lang} />

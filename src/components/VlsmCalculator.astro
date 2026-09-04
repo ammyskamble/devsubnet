@@ -1,20 +1,28 @@
 ---
-import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+import { toolsI18n } from '../utils/tools-i18n';
+import type { SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const { lang = 'en' } = Astro.props;
+const vl = (toolsI18n[lang] || toolsI18n.en).vlsm;
 ---
-<div class="calculator-layout">
+<div class="calculator-layout" data-vlsm-i18n={JSON.stringify(vl)}>
   <!-- Left Column: Input -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>VLSM Planner Parameters</h2>
+        <span class="step">{vl.step1}</span>
+        <h2>{vl.title}</h2>
       </div>
-      <span class="live-label">VARIABLE-LENGTH SUBNET MASKING</span>
+      <span class="live-label">{vl.badge}</span>
     </div>
 
     <!-- Base network input -->
     <div class="input-row">
-      <label for="vlsm-base-ip">Base CIDR Block</label>
+      <label for="vlsm-base-ip">{vl.baseIpLabel}</label>
       <div class="ip-input">
         <input type="text" id="vlsm-base-ip" value="192.168.0.0" placeholder="e.g., 192.168.0.0" inputmode="decimal" autocomplete="off" maxlength="15" />
         <span class="slash">/</span>
@@ -28,8 +36,8 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
 
     <div class="panel-heading">
       <div>
-        <span class="step">02</span>
-        <h2>Segment Requirements</h2>
+        <span class="step">{vl.step2}</span>
+        <h2>{vl.requirementsTitle}</h2>
       </div>
     </div>
 
@@ -37,14 +45,14 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
       <table class="guide-table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Hosts Needed</th>
-            <th>Actions</th>
+            <th>{vl.thName}</th>
+            <th>{vl.thHosts}</th>
+            <th>{vl.thActions}</th>
           </tr>
         </thead>
         <tbody id="vlsm-segments-body">
           <tr>
-            <td><input class="vlsm-name-input" type="text" value="Servers" data-idx="0" placeholder="Segment name" /></td>
+            <td><input class="vlsm-name-input" type="text" value="Servers" data-idx="0" placeholder={vl.placeholderName} /></td>
             <td><input class="vlsm-hosts-input" type="number" value="50" data-idx="0" min="1" max="2097152" /></td>
             <td><button class="vlsm-remove-btn subtool-btn" type="button" data-idx="0">✕</button></td>
           </tr>
@@ -53,12 +61,12 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
     </div>
 
     <div class="quick-row">
-      <button type="button" id="btn-add-segment" class="subtool-btn" style="border-color: rgba(var(--hsl-network),0.3); color: var(--accent-network);">+ Add Segment</button>
-      <button type="button" id="btn-run-vlsm" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">Calculate VLSM</button>
+      <button type="button" id="btn-add-segment" class="subtool-btn" style="border-color: rgba(var(--hsl-network),0.3); color: var(--accent-network);">{vl.btnAddSegment}</button>
+      <button type="button" id="btn-run-vlsm" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">{vl.btnCalculate}</button>
     </div>
 
     <div class="error-banner" id="vlsm-error" role="alert">
-      <span>Not enough address space to satisfy all segment requirements. Reduce host counts or use a larger base block.</span>
+      <span>{vl.errorNotEnough}</span>
     </div>
   </div>
 
@@ -66,24 +74,24 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">VLSM ALLOCATION</span>
-        <h2>Allocated Subnets</h2>
+        <span class="aside-kicker">{vl.asideKicker}</span>
+        <h2>{vl.asideTitle}</h2>
       </div>
       <p class="aside-copy">
-        Subnets are allocated from largest to smallest, each with the smallest prefix that satisfies its host requirement — minimizing wasted addresses.
+        {vl.asideDesc}
       </p>
       <div class="guide-table-wrapper">
         <table class="guide-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>CIDR</th>
-              <th>Usable</th>
-              <th>Wasted</th>
+              <th>{vl.thName}</th>
+              <th>{vl.thCidr}</th>
+              <th>{vl.thUsable}</th>
+              <th>{vl.thWasted}</th>
             </tr>
           </thead>
           <tbody id="vlsm-results-body">
-            <tr><td colspan="4" style="text-align:center; color:var(--text-muted); font-family:var(--font-sans);">Enter segment requirements and click Calculate VLSM.</td></tr>
+            <tr><td colspan="4" style="text-align:center; color:var(--text-muted); font-family:var(--font-sans);">{vl.initialPrompt}</td></tr>
           </tbody>
         </table>
       </div>
@@ -95,9 +103,9 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
         </div>
         <div class="code-wrapper">
           <div class="code-copy-overlay">
-            <button class="copy-button" type="button" id="copy-vlsm-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+            <button class="copy-button" type="button" id="copy-vlsm-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">{vl.copyCode}</button>
           </div>
-          <pre><code id="vlsm-code-output"># VLSM allocation will appear here</code></pre>
+          <pre><code id="vlsm-code-output"># {vl.initialPrompt}</code></pre>
         </div>
       </div>
     </div>
@@ -120,6 +128,19 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
     const errorBanner = document.getElementById('vlsm-error');
     
     if (!baseIpInput || !baseCidrInput || !segmentsBody || !resultsBody) return;
+
+    const layoutContainer = document.querySelector('.calculator-layout[data-vlsm-i18n]') as HTMLElement;
+    let i18n = {
+      placeholderName: 'Segment name',
+      initialPrompt: 'Enter segment requirements and click Calculate VLSM.',
+      copyCode: 'Copy Code',
+      copied: 'Copied!'
+    };
+    if (layoutContainer && layoutContainer.dataset.vlsmI18n) {
+      try {
+        i18n = { ...i18n, ...JSON.parse(layoutContainer.dataset.vlsmI18n) };
+      } catch (e) {}
+    }
 
     let activeTab = 'tf';
     let segmentCounter = 1;
@@ -152,7 +173,7 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
       addSegmentBtn.onclick = () => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td><input class="vlsm-name-input" type="text" value="Segment ${segmentCounter}" data-idx="${segmentCounter}" placeholder="Segment name" /></td>
+          <td><input class="vlsm-name-input" type="text" value="Segment ${segmentCounter}" data-idx="${segmentCounter}" placeholder="${i18n.placeholderName}" /></td>
           <td><input class="vlsm-hosts-input" type="number" value="10" data-idx="${segmentCounter}" min="1" max="2097152" /></td>
           <td><button class="vlsm-remove-btn subtool-btn" type="button" data-idx="${segmentCounter}">✕</button></td>`;
         segmentsBody.appendChild(row);
@@ -293,9 +314,9 @@ import { calculateSubnet, validateIPv4, ip2Long, long2Ip } from '../utils/subnet
       copyCodeBtn.onclick = async () => {
         if (!codeOutput) return;
         await navigator.clipboard.writeText(codeOutput.innerText);
-        copyCodeBtn.innerText = 'Copied!';
+        copyCodeBtn.innerText = i18n.copied;
         copyCodeBtn.classList.add('copied');
-        setTimeout(() => { copyCodeBtn.innerText = 'Copy Code'; copyCodeBtn.classList.remove('copied'); }, 2000);
+        setTimeout(() => { copyCodeBtn.innerText = i18n.copyCode; copyCodeBtn.classList.remove('copied'); }, 2000);
       };
     }
 

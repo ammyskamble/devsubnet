@@ -1,15 +1,17 @@
----import Footer from '../components/Footer.astro';
-import { type SupportedLanguage } from '../utils/i18n';
+---
+import Footer from '../components/Footer.astro';
+import { type SupportedLanguage, translations } from '../utils/i18n';
 
 import Layout from '../layouts/Layout.astro';
 import NavBar from '../components/NavBar.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 
 <Layout lang={lang}
-  title="K8s CIDR Calculator – Kubernetes Pod & Service Subnet Sizer | DevSubnet"
-  description="Kubernetes CIDR calculator for Pod, Service, and Node subnet sizing with IP exhaustion diagnostics. Size CIDR blocks for Cilium eBPF, Calico BGP, AWS VPC CNI, and Azure CNI. Export Kubernetes manifests and detect capacity risks."
+  title={`${t.intro.k8sCidr.title} | DevSubnet`}
+  description={t.intro.k8sCidr.lede}
 >
   <div class="app-shell">
     <NavBar lang={lang} path="k8s-cidr" />
@@ -17,10 +19,10 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     <main>
       <!-- Hero Intro -->
       <section class="intro" aria-labelledby="page-title">
-        <div class="eyebrow">KUBERNETES NETWORKING / CNI SIZING</div>
-        <h1 id="page-title">Kubernetes CIDR Calculator & CNI Subnet Sizer</h1>
+        <div class="eyebrow">{t.intro.k8sCidr.eyebrow}</div>
+        <h1 id="page-title">{t.intro.k8sCidr.title}</h1>
         <p class="lede">
-          Calculate non-overlapping Pod, Service, and Node CIDR allocations for your Kubernetes clusters. Supports Cilium eBPF, Calico BGP, AWS VPC CNI, and Azure CNI with live IP exhaustion diagnostics.
+          {t.intro.k8sCidr.lede}
         </p>
       </section>
 

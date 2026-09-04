@@ -1,19 +1,27 @@
 ---
-import { validateIPv4, ip2Long } from '../utils/subnetMath';
+import { toolsI18n } from '../utils/tools-i18n';
+import type { SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const { lang = 'en' } = Astro.props;
+const su = (toolsI18n[lang] || toolsI18n.en).supernet;
 ---
-<div class="calculator-layout">
+<div class="calculator-layout" data-supernet-i18n={JSON.stringify(su)}>
   <!-- Left Column: Input -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>Networks to Aggregate</h2>
+        <span class="step">{su.step1}</span>
+        <h2>{su.title}</h2>
       </div>
-      <span class="live-label">SUPERNETTING / ROUTE SUMMARIZATION</span>
+      <span class="live-label">{su.badge}</span>
     </div>
 
     <div class="input-row">
-      <label for="supernet-input">Contiguous CIDR blocks (one per line)</label>
+      <label for="supernet-input">{su.inputLabel}</label>
       <textarea id="supernet-input" rows="6" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical;">192.168.0.0/24
 192.168.1.0/24
 192.168.2.0/24
@@ -21,12 +29,12 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     </div>
 
     <div class="quick-row">
-      <button type="button" id="btn-run-supernet" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">Aggregate</button>
-      <button type="button" id="btn-clear-supernet" class="subtool-btn">Clear</button>
+      <button type="button" id="btn-run-supernet" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight);">{su.btnAggregate}</button>
+      <button type="button" id="btn-clear-supernet" class="subtool-btn">{su.btnClear}</button>
     </div>
 
     <div class="error-banner" id="supernet-error" role="alert">
-      <span>Enter valid CIDR blocks — one per line. Only redundant routes that can collapse safely are aggregated.</span>
+      <span>{su.errorInvalid}</span>
     </div>
   </div>
 
@@ -34,27 +42,27 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">SUMMARY ROUTES</span>
-        <h2>Aggregated Result</h2>
+        <span class="aside-kicker">{su.asideKicker}</span>
+        <h2>{su.asideTitle}</h2>
       </div>
       <p class="aside-copy">
-        A single summary route that covers all listed networks reduces routing table size and accelerates convergence. Some networks may remain separate if they are not aggregatable.
+        {su.asideDesc}
       </p>
 
       <!-- BGP Bounding Supernet Result -->
       <div id="bgp-supernet-card" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 0.5rem; display: none;">
-        <h3 style="font-size: 0.85rem; text-transform: uppercase; font-family: var(--font-display); color: var(--accent-network, #38bdf8); margin-bottom: 0.75rem; font-weight: bold; letter-spacing: 0.05em;">Smallest Bounding Supernet (BGP Summary)</h3>
+        <h3 style="font-size: 0.85rem; text-transform: uppercase; font-family: var(--font-display); color: var(--accent-network, #38bdf8); margin-bottom: 0.75rem; font-weight: bold; letter-spacing: 0.05em;">{su.bgpCardTitle}</h3>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <span style="font-size: 0.82rem; color: var(--text-secondary);">Supernet CIDR:</span>
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">{su.supernetCidrLabel}</span>
             <strong id="bgp-supernet-cidr" style="font-family: var(--font-mono); font-size: 1.15rem; color: var(--text-primary);">192.168.0.0/22</strong>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <span style="font-size: 0.82rem; color: var(--text-secondary);">IP Range:</span>
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">{su.ipRangeLabel}</span>
             <span id="bgp-supernet-range" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-primary);">192.168.0.0 - 192.168.3.255</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <span style="font-size: 0.82rem; color: var(--text-secondary);">Space Efficiency:</span>
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">{su.efficiencyLabel}</span>
             <span id="bgp-supernet-efficiency" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-primary);">50.0% (512 / 1024 IPs)</span>
           </div>
         </div>
@@ -64,19 +72,19 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
         <table class="guide-table">
           <thead>
             <tr>
-              <th>CIDR</th>
-              <th>Range</th>
+              <th>{su.thCidr}</th>
+              <th>{su.thRange}</th>
             </tr>
           </thead>
           <tbody id="supernet-table-body">
-            <tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Aggregate.</td></tr>
+            <tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">{su.initialPrompt}</td></tr>
           </tbody>
         </table>
       </div>
       <div class="export-panel">
         <div class="code-wrapper">
           <div class="code-copy-overlay">
-            <button class="copy-button" type="button" id="copy-supernet-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy</button>
+            <button class="copy-button" type="button" id="copy-supernet-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">{su.copyCode}</button>
           </div>
           <pre><code id="supernet-code-output"># Summary route export</code></pre>
         </div>
@@ -98,6 +106,18 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     const errorBanner = document.getElementById('supernet-error');
 
     if (!input || !runBtn || !tableBody) return;
+
+    const layoutContainer = document.querySelector('.calculator-layout[data-supernet-i18n]') as HTMLElement;
+    let i18n = {
+      initialPrompt: 'Enter CIDR blocks and click Aggregate.',
+      copyCode: 'Copy',
+      copied: 'Copied!'
+    };
+    if (layoutContainer && layoutContainer.dataset.supernetI18n) {
+      try {
+        i18n = { ...i18n, ...JSON.parse(layoutContainer.dataset.supernetI18n) };
+      } catch (e) {}
+    }
 
     function parseBlock(line: string): { network: number; cidr: number } | null {
       const t = line.trim();
@@ -218,7 +238,7 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     if (clearBtn) {
       clearBtn.onclick = () => {
         input.value = '';
-        tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDR blocks and click Aggregate.</td></tr>';
+        tableBody.innerHTML = `<tr><td colspan="2" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">${i18n.initialPrompt}</td></tr>`;
         if (codeOutput) codeOutput.innerText = '# Summary route export';
         const bgpCard = document.getElementById('bgp-supernet-card');
         if (bgpCard) bgpCard.style.display = 'none';
@@ -228,9 +248,9 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
       copyBtn.onclick = async () => {
         if (!codeOutput) return;
         await navigator.clipboard.writeText(codeOutput.innerText);
-        copyBtn.innerText = 'Copied!';
+        copyBtn.innerText = i18n.copied;
         copyBtn.classList.add('copied');
-        setTimeout(() => { copyBtn.innerText = 'Copy'; copyBtn.classList.remove('copied'); }, 2000);
+        setTimeout(() => { copyBtn.innerText = i18n.copyCode; copyBtn.classList.remove('copied'); }, 2000);
       };
     }
   }

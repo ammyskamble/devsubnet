@@ -1,26 +1,27 @@
----import Footer from '../components/Footer.astro';
-import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import Footer from '../components/Footer.astro';
+import { type SupportedLanguage, translations } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import VlsmCalculator from '../components/VlsmCalculator.astro';
 import NavBar from '../components/NavBar.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 <Layout lang={lang}
-  title="VLSM Calculator – Variable-Length Subnet Masking Tool | DevSubnet"
-  description="VLSM calculator for variable-length subnet masking that minimizes IP waste. Divide CIDR blocks into subnets sized to exact host requirements for real network designs, supporting VLSM segmentation and IP address optimization."
+  title={`${t.nav.vlsm} – Variable-Length Subnet Masking | DevSubnet`}
+  description="VLSM calculator for variable-length subnet masking that minimizes IP waste. Divide CIDR blocks into subnets sized to exact host requirements."
 >
   <div class="app-shell">
     <NavBar lang={lang} path="vlsm" />
     <main>
       <section class="intro" aria-labelledby="page-title">
         <div class="eyebrow">VLSM PLANNER / VARIABLE-LENGTH SUBNET MASKING</div>
-        <h1 id="page-title">VLSM Calculator &amp; Subnet Planner</h1>
+        <h1 id="page-title">{t.nav.vlsm}</h1>
         <p class="lede">Divide a base CIDR block into subnets of varying sizes based on exact host requirements — minimizing address waste in real network designs.</p>
       </section>
       <section aria-label="VLSM calculator workspace">
-        <VlsmCalculator />
+        <VlsmCalculator lang={lang} />
       </section>
       <section class="guide-section">
         <div class="guide-sticky"><h2>What is <em>VLSM</em>?</h2></div>

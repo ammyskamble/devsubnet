@@ -1,26 +1,34 @@
 ---
-import { validateIPv4, ip2Long } from '../utils/subnetMath';
+import { toolsI18n } from '../utils/tools-i18n';
+import type { SupportedLanguage } from '../utils/i18n';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const { lang = 'en' } = Astro.props;
+const ov = (toolsI18n[lang] || toolsI18n.en).overlap;
 ---
-<div class="calculator-layout">
+<div class="calculator-layout" data-overlap-i18n={JSON.stringify(ov)}>
   <!-- Left Column: Input and Mode Selection -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>Overlap Mode & Subnets</h2>
+        <span class="step">{ov.step1}</span>
+        <h2>{ov.title}</h2>
       </div>
-      <span class="live-label">OVERLAP DETECTOR</span>
+      <span class="live-label">{ov.badge}</span>
     </div>
 
     <!-- Mode Selector Tabs -->
     <div class="subtool-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
-      <button type="button" id="tab-mode-list" class="export-tab-btn active" style="flex: 1;">Single List Check</button>
-      <button type="button" id="tab-mode-groups" class="export-tab-btn" style="flex: 1;">VPC Peering (Two Groups)</button>
+      <button type="button" id="tab-mode-list" class="export-tab-btn active" style="flex: 1;">{ov.tabSingle}</button>
+      <button type="button" id="tab-mode-groups" class="export-tab-btn" style="flex: 1;">{ov.tabGroups}</button>
     </div>
 
     <!-- Mode 1: Single List Input -->
     <div id="container-mode-list" class="input-row">
-      <label for="overlap-input">CIDR Blocks (one per line, e.g. 10.0.0.0/24 or 2001:db8::/48)</label>
+      <label for="overlap-input">{ov.inputLabel}</label>
       <textarea id="overlap-input" rows="7" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.0/24
 10.0.0.128/25
 172.16.0.0/16
@@ -32,13 +40,13 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     <!-- Mode 2: Two Groups Input -->
     <div id="container-mode-groups" class="input-row" style="display: none; flex-direction: column; gap: 1rem;">
       <div>
-        <label for="overlap-group-a" style="margin-bottom: 0.35rem; display: block;">Group A: On-Premises or VPC 1 CIDRs</label>
+        <label for="overlap-group-a" style="margin-bottom: 0.35rem; display: block;">{ov.groupALabel}</label>
         <textarea id="overlap-group-a" rows="4" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.0/24
 172.16.0.0/16
 2001:db8:fefe::/48</textarea>
       </div>
       <div>
-        <label for="overlap-group-b" style="margin-bottom: 0.35rem; display: block;">Group B: AWS Transit Gateway or VPC 2 CIDRs</label>
+        <label for="overlap-group-b" style="margin-bottom: 0.35rem; display: block;">{ov.groupBLabel}</label>
         <textarea id="overlap-group-b" rows="4" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); outline: none; resize: vertical; width: 100%;">10.0.0.128/25
 192.168.1.0/24
 2001:db8:fefe:1::/64</textarea>
@@ -46,12 +54,12 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     </div>
 
     <div class="quick-row" style="margin-top: 1rem;">
-      <button type="button" id="btn-run-overlap" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight); font-weight: bold;">Check Conflicts</button>
-      <button type="button" id="btn-clear-overlap" class="subtool-btn">Clear</button>
+      <button type="button" id="btn-run-overlap" class="subtool-btn" style="border-color: var(--accent-highlight); color: var(--accent-highlight); font-weight: bold;">{ov.btnCheck}</button>
+      <button type="button" id="btn-clear-overlap" class="subtool-btn">{ov.btnClear}</button>
     </div>
 
     <div class="error-banner" id="overlap-error" role="alert">
-      <span>One or more entries are not valid CIDR blocks. Format: IP/prefix (e.g. 10.0.0.0/24 or 2001:db8::/32).</span>
+      <span>{ov.errorInvalid}</span>
     </div>
   </div>
 
@@ -59,11 +67,11 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">CONFLICT ANALYSIS</span>
-        <h2>Relationships Detected</h2>
+        <span class="aside-kicker">{ov.asideKicker}</span>
+        <h2>{ov.asideTitle}</h2>
       </div>
       <p class="aside-copy">
-        Compiling address bounds to identify overlapping, duplicate, or nested routing boundaries.
+        {ov.asideDesc}
       </p>
       <div id="overlap-summary" class="overlap-summary"></div>
       
@@ -71,13 +79,13 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
         <table class="guide-table">
           <thead>
             <tr>
-              <th>Subnet A</th>
-              <th>Subnet B</th>
-              <th>Relationship</th>
+              <th>{ov.thSubnetA}</th>
+              <th>{ov.thSubnetB}</th>
+              <th>{ov.thRelationship}</th>
             </tr>
           </thead>
           <tbody id="overlap-table-body">
-            <tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">Enter CIDRs and click Check Conflicts.</td></tr>
+            <tr><td colspan="3" style="text-align:center;color:var(--text-muted); font-family:var(--font-sans);">{ov.initialPrompt}</td></tr>
           </tbody>
         </table>
       </div>
@@ -114,6 +122,20 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
     const errorBanner = document.getElementById('overlap-error');
 
     if (!runBtn || !tableBody || !inputList) return;
+
+    const layoutContainer = document.querySelector('.calculator-layout[data-overlap-i18n]') as HTMLElement;
+    let i18n = {
+      noConflicts: 'No overlapping subnets found. Configuration is safe for routing and peering.',
+      conflictsFound: 'Direct CIDR collisions detected! Overlapping IP address spaces will fail routing.',
+      relIdentical: 'Identical Range',
+      relContains: 'Subnet Contained',
+      relOverlaps: 'Partial Overlap'
+    };
+    if (layoutContainer && layoutContainer.dataset.overlapI18n) {
+      try {
+        i18n = { ...i18n, ...JSON.parse(layoutContainer.dataset.overlapI18n) };
+      } catch (e) {}
+    }
 
     let mode = 'list'; // 'list' or 'groups'
 
@@ -229,11 +251,12 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
             const isConflict = rel === 'Overlapping' || rel === 'Identical';
             if (isConflict) conflictCount++;
             
+            const relText = rel === 'Identical' ? i18n.relIdentical : rel === 'Contained' ? i18n.relContains : rel === 'Overlapping' ? i18n.relOverlaps : 'Separate';
             const color = isConflict ? 'var(--accent-danger, #f43f5e)' : rel === 'Contained' ? 'var(--accent-warning, #f59e0b)' : 'var(--accent-network, #38bdf8)';
             html += `<tr>
               <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocks[i].label}</span></td>
               <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocks[j].label}</span></td>
-              <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
+              <td><span style="color:${color}; font-weight:600;">${relText}</span></td>
             </tr>`;
           }
         }
@@ -253,11 +276,12 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
             const isConflict = rel === 'Overlapping' || rel === 'Identical';
             if (isConflict) conflictCount++;
 
+            const relText = rel === 'Identical' ? i18n.relIdentical : rel === 'Contained' ? i18n.relContains : rel === 'Overlapping' ? i18n.relOverlaps : 'Separate';
             const color = isConflict ? 'var(--accent-danger, #f43f5e)' : rel === 'Contained' ? 'var(--accent-warning, #f59e0b)' : 'var(--accent-network, #38bdf8)';
             html += `<tr>
               <td><span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--accent-host);">${blocksA[i].label} (Group A)</span></td>
               <td><span style="font-family:var(--font-mono); font-size:0.85rem;">${blocksB[j].label} (Group B)</span></td>
-              <td><span style="color:${color}; font-weight:600;">${rel}</span></td>
+              <td><span style="color:${color}; font-weight:600;">${relText}</span></td>
             </tr>`;
           }
         }
@@ -269,8 +293,8 @@ import { validateIPv4, ip2Long } from '../utils/subnetMath';
         const clean = conflictCount === 0;
         summary.innerHTML = `
           <div class="overlap-summary-card ${clean ? 'clean' : 'conflict'}">
-            <strong>${conflictCount} conflict${conflictCount === 1 ? '' : 's'}</strong>
-            <span>across ${comparisonsCount} comparison${comparisonsCount === 1 ? '' : 's'}</span>
+            <strong>${clean ? i18n.noConflicts : i18n.conflictsFound}</strong>
+            <span>(${conflictCount} conflicts across ${comparisonsCount} comparisons)</span>
           </div>`;
       }
     }

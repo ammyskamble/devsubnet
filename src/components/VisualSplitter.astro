@@ -1,34 +1,41 @@
 ---
+import { toolsI18n } from '../utils/tools-i18n';
+import type { SupportedLanguage } from '../utils/i18n';
+
 interface Props {
   defaultIp?: string;
   defaultCidr?: number;
+  lang?: SupportedLanguage;
 }
 
 const { 
   defaultIp = "10.0.0.0", 
-  defaultCidr = 24 
+  defaultCidr = 24,
+  lang = "en"
 } = Astro.props;
+
+const sp = (toolsI18n[lang] || toolsI18n.en).splitter;
 ---
 
-<div class="calculator-layout">
+<div class="calculator-layout" data-splitter-i18n={JSON.stringify(sp)}>
   <!-- Left Column: Visual Tree Layout -->
   <div class="calculator-panel">
     <div class="panel-heading">
       <div>
-        <span class="step">01</span>
-        <h2>Interactive Subnet Splitter</h2>
+        <span class="step">{sp.step1}</span>
+        <h2>{sp.title}</h2>
       </div>
-      <span class="live-label">VISUAL TREE DESIGNER</span>
+      <span class="live-label">{sp.badge}</span>
     </div>
 
     <p class="aside-copy">
-      Divide your address block into custom network segments. Click <strong>Split</strong> to partition a block in half, edit segment names (e.g., "Web", "DB"), or click <strong>Merge</strong> to combine adjacent siblings back.
+      {sp.desc}
     </p>
 
     <!-- Base network input -->
     <div class="input-grid-2-1 input-grid-end">
       <div class="input-row">
-        <label for="split-base-ip">VPC Base CIDR IP Block</label>
+        <label for="split-base-ip">{sp.baseIpLabel}</label>
         <div class="ip-input">
           <input 
             type="text" 
@@ -53,20 +60,20 @@ const {
         id="btn-reset-splitter" 
         style="height: 48px; border-color: var(--accent-network); color: var(--accent-network);"
       >
-        Reset Block
+        {sp.resetBtn}
       </button>
     </div>
 
     <!-- Architecture Presets & Dual-Stack Toggle Group -->
     <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-color); margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
       <div class="input-row" style="margin: 0;">
-        <label for="split-preset-templates" style="margin-bottom: 0.35rem; display: block;">Load Standard Architecture Preset</label>
+        <label for="split-preset-templates" style="margin-bottom: 0.35rem; display: block;">{sp.presetLabel}</label>
         <div class="select-wrapper">
           <select id="split-preset-templates" style="width: 100%; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; color: var(--text-primary); outline: none;">
-            <option value="none" selected>-- Select a Preset Topology --</option>
-            <option value="aws-3tier">3-Tier AWS VPC across 3 Availability Zones</option>
-            <option value="hub-spoke">Hub-and-Spoke VPN Pool</option>
-            <option value="k8s-cluster">Small Kubernetes Cluster</option>
+            <option value="none" selected>{sp.presetDefault}</option>
+            <option value="aws-3tier">{sp.presetAws}</option>
+            <option value="hub-spoke">{sp.presetHub}</option>
+            <option value="k8s-cluster">{sp.presetK8s}</option>
           </select>
         </div>
       </div>
@@ -77,13 +84,13 @@ const {
           <span class="switch-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .3s; border-radius: 22px;"></span>
         </label>
         <div>
-          <label style="margin: 0; font-weight: 600; display: block; font-size: 0.85rem; color: var(--text-primary);">Enable Dual-Stack (IPv4 / IPv6) Planning</label>
-          <span class="field-hint" style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Auto-allocate sequential /64 IPv6 ranges side-by-side with IPv4 subnets.</span>
+          <label style="margin: 0; font-weight: 600; display: block; font-size: 0.85rem; color: var(--text-primary);">{sp.dualStackLabel}</label>
+          <span class="field-hint" style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">{sp.dualStackHint}</span>
         </div>
       </div>
 
       <div id="dual-stack-v6-wrapper" class="input-row" style="display: none; margin: 0;">
-        <label for="dual-stack-v6-base" style="margin-bottom: 0.35rem; display: block;">IPv6 Base CIDR Block</label>
+        <label for="dual-stack-v6-base" style="margin-bottom: 0.35rem; display: block;">{sp.v6BaseLabel}</label>
         <input type="text" id="dual-stack-v6-base" value="2001:db8:1234::/48" class="ip-input" style="width: 100%; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; color: var(--text-primary); font-family: var(--font-mono);" />
       </div>
     </div>
@@ -112,12 +119,12 @@ const {
     <!-- Error Banner -->
     <div class="error-banner" id="splitter-error" role="alert">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      <span>Invalid IPv4 address base network range.</span>
+      <span>{sp.errorInvalid}</span>
     </div>
 
     <!-- Interactive Blocks Rendering Area -->
     <div class="splitter-visual-root">
-      <span style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Allocated Network Space</span>
+      <span style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">{sp.allocatedSpace}</span>
       
       <div class="subnet-block-row" id="splitter-grid-root">
         <!-- Rendered Client-Side dynamically -->
@@ -127,21 +134,21 @@ const {
     <!-- Output List Details -->
     <div class="result-heading">
       <div>
-        <span class="step">02</span>
-        <h2>Allocated Subnets List</h2>
+        <span class="step">{sp.step2}</span>
+        <h2>{sp.subnetsList}</h2>
       </div>
-      <button class="copy-button" type="button" id="copy-splitter-json">Copy JSON</button>
+      <button class="copy-button" type="button" id="copy-splitter-json">{sp.copyJson}</button>
     </div>
 
     <div class="guide-table-wrapper">
       <table class="guide-table">
         <thead>
           <tr>
-            <th>Label</th>
-            <th>CIDR Range</th>
-            <th>Usable IP Range</th>
-            <th>Usable Hosts</th>
-            <th>Split/Merge</th>
+            <th>{sp.thLabel}</th>
+            <th>{sp.thCidr}</th>
+            <th>{sp.thUsable}</th>
+            <th>{sp.thHosts}</th>
+            <th>{sp.thAction}</th>
           </tr>
         </thead>
         <tbody id="splitter-table-body">
@@ -155,11 +162,11 @@ const {
   <div class="insight-panel">
     <div class="calculator-panel" style="gap: 1.5rem;">
       <div>
-        <span class="aside-kicker">INFRASTRUCTURE EXPORTER</span>
-        <h2>IaC Manifest</h2>
+        <span class="aside-kicker">{sp.asideKicker}</span>
+        <h2>{sp.asideTitle}</h2>
       </div>
       <p class="aside-copy">
-        Generate and export structural subnets configs. Ideal for pasting into DevOps automation templates.
+        {sp.asideDesc}
       </p>
 
       <div class="export-panel">
@@ -176,7 +183,7 @@ const {
         </div>
         <div class="code-wrapper">
           <div class="code-copy-overlay">
-            <button class="copy-button" type="button" id="copy-splitter-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Copy Code</button>
+            <button class="copy-button" type="button" id="copy-splitter-code" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">{sp.copyCode}</button>
           </div>
           <pre><code id="splitter-code-output"># Loading configurations...</code></pre>
         </div>
@@ -213,6 +220,20 @@ const {
     const iacSelect = document.getElementById('export-iac-select') as HTMLSelectElement;
 
     if (!baseIpInput || !baseCidrInput || !gridRoot || !tableBody) return;
+
+    const layoutContainer = document.querySelector('.calculator-layout[data-splitter-i18n]') as HTMLElement;
+    let i18n = {
+      btnSplit: 'Split',
+      btnMerge: 'Merge',
+      copyCode: 'Copy Code',
+      copyJson: 'Copy JSON',
+      copied: 'Copied!'
+    };
+    if (layoutContainer && layoutContainer.dataset.splitterI18n) {
+      try {
+        i18n = { ...i18n, ...JSON.parse(layoutContainer.dataset.splitterI18n) };
+      } catch (e) {}
+    }
 
     // Base state
     let subnets: SubnetNode[] = [];
@@ -471,8 +492,8 @@ const {
               </div>
             </div>
             <div class="subnet-actions">
-              ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">Split</button>` : ''}
-              ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">Merge</button>` : ''}
+              ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">${i18n.btnSplit}</button>` : ''}
+              ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">${i18n.btnMerge}</button>` : ''}
             </div>
           </div>
         `;
@@ -495,7 +516,7 @@ const {
                 type="text" 
                 class="subnet-table-label-input" 
                 value="${node.label}" 
-                data-idx="${idx}"
+                data-idx="${idx}" 
                 style="background:none; border:none; border-bottom: 1px dashed var(--border-color); color:var(--text-primary); font-size:0.9rem; outline:none;"
               />
             </td>
@@ -507,8 +528,8 @@ const {
             <td>${usableHosts.toLocaleString()}</td>
             <td>
               <div style="display:flex; gap:0.4rem;">
-                ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">Split</button>` : ''}
-                ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">Merge</button>` : ''}
+                ${node.cidr < 32 ? `<button class="subnet-btn split-btn" data-split="${idx}">${i18n.btnSplit}</button>` : ''}
+                ${canMerge(idx) ? `<button class="subnet-btn join-btn" data-merge="${idx}">${i18n.btnMerge}</button>` : ''}
               </div>
             </td>
           </tr>
@@ -726,10 +747,10 @@ const {
       copyCodeBtn.onclick = async () => {
         if (!codeOutput) return;
         await navigator.clipboard.writeText(codeOutput.innerText);
-        copyCodeBtn.innerText = 'Copied!';
+        copyCodeBtn.innerText = i18n.copied;
         copyCodeBtn.classList.add('copied');
         setTimeout(() => {
-          copyCodeBtn.innerText = 'Copy Code';
+          copyCodeBtn.innerText = i18n.copyCode;
           copyCodeBtn.classList.remove('copied');
         }, 2000);
       };
@@ -747,10 +768,10 @@ const {
           ...(isDualStack ? { ipv6_cidr: getIPv6Subnet(v6Base, idx) } : {})
         }));
         await navigator.clipboard.writeText(JSON.stringify(formatted, null, 2));
-        copyJsonBtn.innerText = 'Copied!';
+        copyJsonBtn.innerText = i18n.copied;
         copyJsonBtn.classList.add('copied');
         setTimeout(() => {
-          copyJsonBtn.innerText = 'Copy JSON';
+          copyJsonBtn.innerText = i18n.copyJson;
           copyJsonBtn.classList.remove('copied');
         }, 2000);
       };

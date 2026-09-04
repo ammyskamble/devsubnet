@@ -148,7 +148,7 @@ export const terraformTranslations: Record<SupportedLanguage, TerraformTranslati
     tiersLabel: "Subnetz-Ebenen (Tiers)",
     tierPublic: "Public (Ingress / ELBs / NAT)",
     tierPrivate: "Private (App / ECS / EKS Workloads)",
-    tierData: "Database (RDS / Aurora / Cache)",
+    tierData: "Datenbank (RDS / Aurora / Cache)",
     tierMgmt: "Management (Bastion / VPN)",
     tierPublicName: "Public",
     tierPrivateName: "Private App",

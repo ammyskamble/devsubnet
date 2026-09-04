@@ -1,16 +1,17 @@
----import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import { type SupportedLanguage, translations } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
+const t = translations[lang] || translations.en;
 ---
 
 <Layout lang={lang} 
-  title="IPv6 Subnet Calculator – CIDR & Prefix Tool | DevSubnet"
-  description="IPv6 subnet calculator for 128-bit address compression, expansion, and prefix delegation. Classify address types, calculate /48 /56 /64 subnet boundaries, and generate IPv6 prefix delegation blocks for cloud VPCs."
+  title={`${t.intro.ipv6.title} | DevSubnet`}
+  description={t.intro.ipv6.lede}
 >
-  <MainShell lang={lang} activeTab="ipv6">
+  <MainShell lang={lang} activeTab="ipv6" navPath="ipv6-subnet-calculator">
   </MainShell>
 
   <!-- FAQ Schema for SEO -->

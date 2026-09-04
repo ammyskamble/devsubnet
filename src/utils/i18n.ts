@@ -86,15 +86,25 @@ export interface HreflangAlternate {
  * US, India, UK, Canada, Australia, Germany, Philippines, Singapore, Netherlands, South Africa, Spain, Japan
  */
 
-// Routes that have localized versions available. Pages outside this set only
-// have an English version, so no /lang/ hreflang alternates are emitted for them.
+// Routes that have localized versions available.
 const LOCALIZED_ROUTES = new Set([
   '/',
   '/faq',
   '/cidr-cheat-sheet',
   '/visual-subnet-splitter',
   '/kubernetes-subnet-planner',
-  '/ipv6-subnet-calculator'
+  '/ipv6-subnet-calculator',
+  '/terraform-subnet-planner',
+  '/vlsm-calculator',
+  '/subnet-overlap-checker',
+  '/cidr-supernet-calculator',
+  '/aws-vpc-subnet-calculator',
+  '/azure-vnet-subnet-calculator',
+  '/gcp-vpc-subnet-calculator',
+  '/k8s-cidr-calculator',
+  '/what-is-a-subnet',
+  '/student-guide',
+  '/business-use-cases'
 ]);
 
 export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https://devsubnet.com'): HreflangAlternate[] {

@@ -148,6 +148,9 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
     { lang: 'en-GB', href: enUrl }, // United Kingdom
     { lang: 'en-CA', href: enUrl }, // Canada
     { lang: 'en-AU', href: enUrl }, // Australia
+    { lang: 'en-NL', href: enUrl }, // Netherlands (English)
+    { lang: 'nl-NL', href: enUrl }, // Netherlands (Dutch)
+    { lang: 'nl', href: enUrl }, // Netherlands Fallback
     { lang: 'en-SG', href: enUrl }, // Singapore
     { lang: 'en-PH', href: enUrl }, // Philippines
     { lang: 'en-ZA', href: enUrl }, // South Africa
@@ -281,9 +284,9 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
     },
     intro: {
       ipv4: {
-        title: "IPv4 Subnet Calculator & CIDR Planner",
-        eyebrow: "FREE NETWORK TOOL / IPv4 & CCNA / CCNP",
-        lede: "Compute host ranges, subnet masks, broadcast addresses, wildcard boundaries, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly."
+        title: "Online IP Subnet Calculator & CIDR Calculator",
+        eyebrow: "FREE ONLINE IP SUBNET CALCULATOR / IPv4 & CIDR",
+        lede: "The fast, free online IP subnet calculator and CIDR calculator online. Calculate host ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly."
       },
       splitter: {
         title: "Visual Subnet Splitter & CIDR Partitioner",
@@ -312,17 +315,17 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       }
     },
     meta: {
-      defaultTitle: "Free IP Subnet Calculator & CIDR Planner | DevSubnet",
-      defaultDesc: "Free online IPv4 and IPv6 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly."
+      defaultTitle: "Online IP Subnet Calculator & CIDR Calculator | DevSubnet",
+      defaultDesc: "Free online IP subnet calculator and CIDR calculator online. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly."
     },
     guide: {
       title: "Play with Networks – Classic Calculations, Cloud VPCs, and Subnetting Strategies",
-      lead: "Welcome to the premium home for network topology planners, CCNA/CCNP candidates, and DevOps engineers worldwide across the United States, India, United Kingdom, Canada, Australia, Singapore, Philippines, and South Africa.",
+      lead: "Welcome to the premier online IP subnet calculator and CIDR calculator for network engineers, CCNA/CCNP candidates, and cloud architects worldwide across Australia, the Netherlands, the United States, the United Kingdom, Canada, and Europe.",
       exploreTitle: "Explore Modern Subnet Planning Topics",
       cards: [
         {
-          title: "Understanding the Core IP Subnet",
-          desc: "An IP subnet is a logical subdivision of an IP network. Essential for CCNA/CCNP exams, security zoning, and enterprise traffic routing.",
+          title: "Online IP Subnet Calculator & Bitwise Logic",
+          desc: "An online IP subnet calculator that performs bitwise splitting on IPv4 networks. Essential for CCNA/CCNP exams, security zoning, and enterprise traffic routing.",
           linkText: "Calculate Standard Subnets →",
           href: "/"
         },
@@ -339,8 +342,8 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
           href: "/"
         },
         {
-          title: "Translating CIDR Notation",
-          desc: "Classless Inter-Domain Routing (CIDR) maps slash notation (/24, /28) into subnet masks and boundaries in real time.",
+          title: "IP CIDR Calculator & Slash Notation",
+          desc: "Our IP CIDR calculator translates slash notation (/24, /28) into subnet masks, wildcard masks, and network boundaries in real time.",
           linkText: "View CIDR cheat sheet →",
           href: "/cidr-cheat-sheet"
         },

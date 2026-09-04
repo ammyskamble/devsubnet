@@ -36,6 +36,32 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 
           <details class="faq-details" role="listitem">
             <summary class="faq-summary">
+              <span>What is a subnet calculator and how does it work?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>A <strong>subnet calculator</strong> is a software tool used by network administrators, IT engineers, and students to simplify the process of dividing an IP network into smaller sub-networks (subnets). By inputting an IP address and a subnet mask or CIDR prefix (such as <code>/24</code>), the calculator automates binary and bitwise arithmetic to instantly determine the <strong>network address</strong>, <strong>broadcast address</strong>, <strong>usable host IP range</strong>, <strong>subnet mask</strong>, and <strong>cloud VPC reserved IP offsets</strong>.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
+              <span>How do I use this online IP subnet calculator and CIDR calculator?</span>
+              <span class="icon" aria-hidden="true">
+                <span class="plus">+</span>
+                <span class="minus">&#8722;</span>
+              </span>
+            </summary>
+            <div class="faq-answer">
+              <p>To use this <strong>online IP subnet calculator</strong>, input your IPv4 or IPv6 network address and choose a prefix length (e.g., /24). Our <strong>ip cidr calculator</strong> and <strong>cidr calculator online</strong> instantly breaks down the network ID, broadcast address, subnet mask, wildcard mask, and usable host count in real time without transmitting any data over the internet.</p>
+            </div>
+          </details>
+
+          <details class="faq-details" role="listitem">
+            <summary class="faq-summary">
               <span>What is a subnet mask and how does it work?</span>
               <span class="icon" aria-hidden="true">
                 <span class="plus">+</span>
@@ -240,6 +266,72 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 
     <Footer lang={lang} />
   </div>
+
+  <!-- FAQ Schema for Rich Search Engine Snippets -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a subnet calculator and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A subnet calculator is a software tool used by network administrators, IT engineers, and students to simplify dividing an IP network into smaller sub-networks. By entering an IP address and CIDR prefix (such as /24), the calculator automates binary and bitwise arithmetic to determine the network address, broadcast address, usable host IP range, subnet mask, and cloud VPC reserved IP offsets."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I use this online IP subnet calculator and CIDR calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To use this online IP subnet calculator, input your IPv4 or IPv6 network address and choose a prefix length (e.g., /24). Our ip cidr calculator and cidr calculator online instantly breaks down the network ID, broadcast address, subnet mask, wildcard mask, and usable host count in real time without transmitting any data over the internet."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a subnet mask and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A subnet mask is a 32-bit number used to divide an IP address into two parts: the network address and the host address. It works by performing a bitwise AND operation on the IP address, where binary '1's represent the network portion and binary '0's represent the host portion."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate subnets from an IP address?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To calculate subnets, convert the CIDR slash notation or subnet mask to binary. Identify the network bits (marked as 1) and host bits (marked as 0). The number of subnets you can create is 2^n, where n is the number of borrowed bits. Usable hosts per subnet is 2^h - 2."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is CIDR notation and how is it used?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CIDR (Classless Inter-Domain Routing) notation is a compact way of representing an IP address and its associated routing prefix. It consists of an IP address, a slash character ('/'), and a decimal number indicating the number of bits allocated to the network prefix."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many usable hosts are in a /24 subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A /24 subnet contains 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What IP addresses does AWS reserve in a VPC subnet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AWS reserves 5 IP addresses in every VPC subnet: x.x.x.0 (network address), x.x.x.1 (VPC router), x.x.x.2 (DNS resolver), x.x.x.3 (reserved for future use), and x.x.x.255 (broadcast address)."
+          }
+        }
+      ]
+    }
+  </script>
 </Layout>
 
 <style>

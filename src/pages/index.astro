@@ -1,5 +1,5 @@
----import { type SupportedLanguage } from '../utils/i18n';
-
+---
+import { type SupportedLanguage } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
 
@@ -7,8 +7,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
 ---
 
 <Layout lang={lang} 
-  title="Free IP Subnet Calculator & CIDR Planner | DevSubnet"
-  description="Free online IPv4 & IPv6 subnet calculator. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, cloud VPC reservations for AWS/Azure/GCP, and Terraform cidrsubnet planning instantly."
+  title="Online IP Subnet Calculator & CIDR Calculator | DevSubnet"
+  description="Free online IP subnet calculator and CIDR calculator online. Calculate IPv4 & IPv6 network ranges, subnet masks, broadcast addresses, usable hosts, cloud VPC reservations for AWS/Azure/GCP, and Terraform cidrsubnet planning instantly."
 >
   <MainShell lang={lang} activeTab="ipv4" defaultCloud="standard">
   </MainShell>
@@ -19,6 +19,22 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
       "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a subnet calculator and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A subnet calculator is a software utility used by network engineers, IT professionals, and students to divide IP networks into smaller subnets. By entering an IP address and CIDR prefix (e.g. /24), the calculator automates binary math to instantly determine the network address, broadcast address, subnet mask, usable host IP range, and cloud-aware VPC reserved IPs without manual calculation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I use this online IP subnet calculator and CIDR calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To use this online IP subnet calculator, enter any IPv4 or IPv6 address and adjust the CIDR prefix length slider. Our online IP CIDR calculator instantly computes the subnet mask, network ID, broadcast address, usable host IP range, wildcard mask, and cloud VPC reserved IPs (for AWS, Azure, and GCP) directly in your browser with zero server latency."
+          }
+        },
         {
           "@type": "Question",
           "name": "What is a subnet mask and how does it work?",

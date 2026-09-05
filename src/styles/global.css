@@ -103,6 +103,10 @@ html {
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 body {
@@ -110,8 +114,39 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
   line-height: 1.6;
   overflow-x: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  max-width: 100%;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
 }
 
 /* Layout Shell */
@@ -252,7 +287,10 @@ pre {
   backdrop-filter: blur(var(--glass-blur));
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .topbar-row {
@@ -262,7 +300,9 @@ pre {
   gap: 1rem;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .brand {
@@ -274,6 +314,7 @@ pre {
   font-size: 1.4rem;
   letter-spacing: -0.03em;
   color: var(--text-primary);
+  flex-shrink: 0;
 }
 
 .brand-badge {
@@ -307,6 +348,9 @@ pre {
   border-radius: var(--radius-full);
   backdrop-filter: blur(24px) saturate(180%);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
 }
 
 :root[data-theme="light"] .nav-links {
@@ -606,6 +650,8 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 1rem;
 }
@@ -1090,11 +1136,13 @@ select:focus {
 .subnet-block-row {
   display: flex;
   width: 100%;
+  max-width: 100%;
   min-height: 70px;
   background-color: var(--bg-secondary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   position: relative;
   transition: all var(--transition-normal);
 }
@@ -1397,6 +1445,8 @@ select:focus {
 
 .guide-table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   margin-top: 0.5rem;
@@ -1567,20 +1617,86 @@ select:focus {
    RESPONSIVE BREAKPOINTS — Mobile & Speed Optimized
    ============================================= */
 
-/* Global Overflow Protection */
-body,
-html {
-  max-width: 100vw;
+/* Global Screen Fit & Overflow Protection */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .app-shell,
 main,
 .calculator-layout,
 .calculator-panel,
-.insight-panel {
+.insight-panel,
+.card-panel,
+.guide-section,
+.summary-grid,
+.core-inputs-card,
+.footer-container {
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+}
+
+/* Tablet & Laptop Topbar Breakpoint: 1240px and below (Ensures Navigation & Language button never clip) */
+@media (max-width: 1240px) {
+  .topbar-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    padding: 0.65rem 1.25rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .brand {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .nav-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    order: 3;
+    flex-basis: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    padding: 0.25rem 0;
+    box-sizing: border-box;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.03);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .nav-tab.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-color: var(--accent-network);
+    color: var(--text-primary);
+  }
 }
 
 /* Tablet: 1024px and below */
@@ -1617,22 +1733,20 @@ main,
 
   /* --- Topbar / Navigation --- */
   .topbar {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
     backdrop-filter: none !important;
     background-color: var(--bg-secondary) !important;
   }
 
   .topbar-row {
-    flex-wrap: wrap;
-    gap: 0.5rem 0.75rem;
     padding: 0;
   }
 
   .brand {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
   }
 
   .nav-actions {
@@ -1642,6 +1756,7 @@ main,
   .nav-links {
     order: 3;
     flex-basis: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1650,7 +1765,7 @@ main,
     scrollbar-width: none;
     max-width: 100%;
     padding: 0.25rem 0;
-    margin: 0 -0.25rem;
+    box-sizing: border-box;
     backdrop-filter: none !important;
   }
 
@@ -1732,9 +1847,24 @@ main,
     overflow-x: hidden;
   }
 
+  .panel-heading,
+  .result-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
   .panel-heading h2,
   .result-heading h2 {
     font-size: 1.1rem;
+    width: 100%;
+  }
+
+  .result-heading > div:last-child {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 
   /* --- Inputs layout --- */
@@ -1919,10 +2049,8 @@ main,
   }
 
   .guide-table {
-    display: block;
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    min-width: 500px;
   }
 
   .guide-table td,
@@ -2095,7 +2223,8 @@ footer,
   text-transform: none;
   letter-spacing: normal;
   white-space: normal;
-  width: 220px;
+  width: max-content;
+  max-width: min(240px, calc(100vw - 2rem));
   opacity: 0;
   pointer-events: none;
   z-index: 50;
@@ -2112,6 +2241,12 @@ footer,
   .tooltip-trigger::after {
     left: 50%;
     transform: translate(-50%, -6px);
-    width: 180px;
+    max-width: min(200px, calc(100vw - 2rem));
+  }
+}
+
+@media (hover: none) {
+  .tooltip-trigger:hover::after {
+    display: none;
   }
 }

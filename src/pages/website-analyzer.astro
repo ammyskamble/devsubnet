@@ -587,6 +587,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     border-top: 1px solid var(--border-color);
     max-height: 250px;
     overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     background: rgba(0,0,0,0.1);
   }
 
@@ -704,6 +706,8 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
     line-height: 1.6;
     max-height: 400px;
     overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     color: var(--text-primary);
   }
 

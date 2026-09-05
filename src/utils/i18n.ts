@@ -785,7 +785,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       }
     },
     meta: {
-      defaultTitle: "Calculateur de sous-réseau IP et planificateur CIDR gratuit | DevSubnet",
+      defaultTitle: "Calculateur de sous-réseau IP et CIDR gratuit | DevSubnet",
       defaultDesc: "Calculateur de sous-réseau IPv4 et IPv6 gratuit en ligne. Calculez instantanément les plages réseau, les masques de sous-réseau, les adresses de diffusion, les hôtes utilisables et les réservations cloud VPC pour AWS, Azure et GCP."
     },
     guide: {

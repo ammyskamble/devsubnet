@@ -382,7 +382,7 @@ const foot = footerTranslations[lang] || footerTranslations.en;
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/offline`} class="col-link">
+            <a href={`${langPrefix}/offline`} rel="nofollow" class="col-link">
               <span>{foot.offlineMode}</span>
               <span class="col-tag tag-pwa">PWA</span>
             </a>
@@ -405,7 +405,7 @@ const foot = footerTranslations[lang] || footerTranslations.en;
           <span class="icon">⚡</span>
           <span>{foot.clientSide}</span>
         </div>
-        <a href={`${langPrefix}/offline`} class="trust-pill link-pill" title="Works offline via PWA cache">
+        <a href={`${langPrefix}/offline`} rel="nofollow" class="trust-pill link-pill" title="Works offline via PWA cache">
           <span class="icon">📶</span>
           <span>{foot.offlineReady}</span>
         </a>

@@ -26,7 +26,7 @@ export default defineConfig({
     defaultStrategy: 'hover'
   },
   server: {
-    host: '127.0.0.1',
+    host: true,
     port: 4321
   }
 });

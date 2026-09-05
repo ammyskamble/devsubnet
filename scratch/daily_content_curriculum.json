@@ -45,7 +45,7 @@
     },
     {
       "id": 3,
-      "status": "pending",
+      "status": "published",
       "slug": "dns-explained-the-internet-phonebook",
       "title": "How DNS Works: The Internet's Giant Contact List",
       "category": "concepts",
@@ -55,7 +55,8 @@
         "DNS explained for students",
         "domain name system basics"
       ],
-      "analogy": "A phonebook or smartphone contacts list: humans remember names like 'google.com', but routers only dial numbers like '142.250.190.46'."
+      "analogy": "A phonebook or smartphone contacts list: humans remember names like 'google.com', but routers only dial numbers like '142.250.190.46'.",
+      "publishedDate": "2026-09-05T03:33:40.433Z"
     },
     {
       "id": 4,

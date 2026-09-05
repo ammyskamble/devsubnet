@@ -296,7 +296,7 @@
           (window as any)['ga-disable-G-F2T4WC5Y9V'] = true;
         } else {
           (window as any)['ga-disable-G-F2T4WC5Y9V'] = false;
-          if (!window.gtag) {
+          if (!(window as any).gtag) {
             window.location.reload();
           }
         }

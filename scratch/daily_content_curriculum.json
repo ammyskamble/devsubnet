@@ -60,7 +60,7 @@
     },
     {
       "id": 4,
-      "status": "pending",
+      "status": "published",
       "slug": "tcp-vs-udp-certified-mail-vs-postcard",
       "title": "TCP vs UDP: The Certified Letter vs the Postcard",
       "category": "science",
@@ -70,7 +70,8 @@
         "transmission control protocol beginner",
         "user datagram protocol explained"
       ],
-      "analogy": "TCP is certified mail requiring a physical signature and re-sending if lost; UDP is a live sports broadcast or radio postcard where speed matters more than catching every frame."
+      "analogy": "TCP is certified mail requiring a physical signature and re-sending if lost; UDP is a live sports broadcast or radio postcard where speed matters more than catching every frame.",
+      "publishedDate": "2026-09-06T03:34:36.332Z"
     },
     {
       "id": 5,

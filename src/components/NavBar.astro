@@ -62,11 +62,11 @@ const studentGuideTranslations: Record<SupportedLanguage, string> = {
 };
 
 const primaryLinks = [
-  { href: `${langPrefix}/` || "/", label: t.nav.ipv4 || "IPv4 Calculator", key: "ipv4" },
-  { href: `${langPrefix}/visual-subnet-splitter`, label: t.nav.splitter || "Visual Splitter", key: "splitter" },
-  { href: `${langPrefix}/ipv6-subnet-calculator`, label: t.nav.ipv6 || "IPv6 Subnetting", key: "ipv6" },
-  { href: `${langPrefix}/kubernetes-subnet-planner`, label: t.nav.k8s || "Kubernetes Planner", key: "k8s" },
-  { href: `${langPrefix}/learn`, label: knowledgeHubTranslations[lang] || "Knowledge Hub", key: "learn" },
+  { href: langPrefix ? `${langPrefix}/` : "/", label: t.nav.ipv4 || "IPv4 Calculator", key: "ipv4" },
+  { href: `${langPrefix}/visual-subnet-splitter/`, label: t.nav.splitter || "Visual Splitter", key: "splitter" },
+  { href: `${langPrefix}/ipv6-subnet-calculator/`, label: t.nav.ipv6 || "IPv6 Subnetting", key: "ipv6" },
+  { href: `${langPrefix}/kubernetes-subnet-planner/`, label: t.nav.k8s || "Kubernetes Planner", key: "k8s" },
+  { href: "/learn/", label: knowledgeHubTranslations[lang] || "Knowledge Hub", key: "learn" },
 ];
 
 const toolCategories = [
@@ -76,42 +76,42 @@ const toolCategories = [
     color: "#38bdf8",
     tools: [
       {
-        href: `${langPrefix}/` || "/",
+        href: langPrefix ? `${langPrefix}/` : "/",
         label: t.nav.ipv4 || "IPv4 Subnet Calculator",
         desc: "Instant bitwise network & host solver",
         tag: "Core",
         key: "ipv4",
       },
       {
-        href: `${langPrefix}/visual-subnet-splitter`,
+        href: `${langPrefix}/visual-subnet-splitter/`,
         label: t.nav.splitter || "Visual Subnet Splitter",
         desc: "Interactive drag & split tree",
         tag: "Visual",
         key: "splitter",
       },
       {
-        href: `${langPrefix}/vlsm-calculator`,
+        href: "/vlsm-calculator/",
         label: t.nav.vlsm || "VLSM Calculator",
         desc: "Variable length subnet mask planning",
         tag: "VLSM",
         key: "vlsm",
       },
       {
-        href: `${langPrefix}/ipv6-subnet-calculator`,
+        href: `${langPrefix}/ipv6-subnet-calculator/`,
         label: t.nav.ipv6 || "IPv6 Calculator",
         desc: "128-bit hex & prefix explorer",
         tag: "IPv6",
         key: "ipv6",
       },
       {
-        href: `${langPrefix}/subnet-overlap-checker`,
+        href: "/subnet-overlap-checker/",
         label: t.nav.overlap || "Overlap Checker",
         desc: "Audit colliding network blocks",
         tag: "Audit",
         key: "overlap",
       },
       {
-        href: `${langPrefix}/cidr-supernet-calculator`,
+        href: "/cidr-supernet-calculator/",
         label: t.nav.supernet || "CIDR Supernetting",
         desc: "Route summarization solver",
         tag: "CIDR",
@@ -125,35 +125,35 @@ const toolCategories = [
     color: "#a855f7",
     tools: [
       {
-        href: `${langPrefix}/kubernetes-subnet-planner`,
+        href: `${langPrefix}/kubernetes-subnet-planner/`,
         label: t.nav.k8s || "Kubernetes Planner",
         desc: "Node, Pod & Service CIDR sizing",
         tag: "K8s",
         key: "k8s",
       },
       {
-        href: `${langPrefix}/terraform-subnet-planner`,
+        href: "/terraform-subnet-planner/",
         label: t.nav.terraform || "Terraform Planner",
         desc: "Auto cidrsubnet() HCL generator",
         tag: "IaC",
         key: "terraform",
       },
       {
-        href: `${langPrefix}/aws-vpc-subnet-calculator`,
+        href: "/aws-vpc-subnet-calculator/",
         label: t.nav.aws || "AWS VPC Calculator",
         desc: "Multi-AZ with 5 reserved IPs",
         tag: "AWS",
         key: "aws",
       },
       {
-        href: `${langPrefix}/azure-vnet-subnet-calculator`,
+        href: "/azure-vnet-subnet-calculator/",
         label: t.nav.azure || "Azure VNet Calculator",
         desc: "GatewaySubnet & 5 reserved IPs",
         tag: "Azure",
         key: "azure",
       },
       {
-        href: `${langPrefix}/gcp-vpc-subnet-calculator`,
+        href: "/gcp-vpc-subnet-calculator/",
         label: t.nav.gcp || "GCP VPC Calculator",
         desc: "Regional CIDRs with 4 reserved IPs",
         tag: "GCP",
@@ -167,7 +167,7 @@ const toolCategories = [
     color: "#10b981",
     tools: [
       {
-        href: `${langPrefix}/learn`,
+        href: "/learn/",
         label: knowledgeHubTranslations[lang] || "Knowledge Hub",
         desc: "Daily student networking articles",
         tag: "Daily New",
@@ -175,28 +175,28 @@ const toolCategories = [
         highlight: true,
       },
       {
-        href: `${langPrefix}/what-is-a-subnet`,
+        href: "/what-is-a-subnet/",
         label: whatIsSubnetTranslations[lang] || "What is a Subnet?",
         desc: "Beginner network & mask primer",
         tag: "Primer",
         key: "what-is-a-subnet",
       },
       {
-        href: `${langPrefix}/cidr-cheat-sheet`,
+        href: `${langPrefix}/cidr-cheat-sheet/`,
         label: t.nav.cheatsheet || "Subnet Cheat Sheet",
         desc: "/1 to /32 quick lookup table",
         tag: "Quick Ref",
         key: "subnet-cheat-sheet",
       },
       {
-        href: `${langPrefix}/student-guide`,
+        href: "/student-guide/",
         label: studentGuideTranslations[lang] || "Student Exam Guide",
         desc: "CCNA formulas & exam shortcuts",
         tag: "Guide",
         key: "student-guide",
       },
       {
-        href: `${langPrefix}/website-analyzer`,
+        href: "/website-analyzer/",
         label: "Website Analyzer",
         desc: "DNS, TLS & network diagnostics",
         tag: "Diagnostic",
@@ -224,7 +224,7 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
 
 <header class="topbar">
   <div class="topbar-row">
-    <a class="brand" href={langPrefix || "/"} aria-label="DevSubnet.com home">
+    <a class="brand" href={langPrefix ? `${langPrefix}/` : "/"} aria-label="DevSubnet.com home">
       <span class="brand-badge">
         <svg
           class="brand-navicon"
@@ -339,7 +339,7 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
                 > anywhere to quickly close navigation menus.</span
               >
             </div>
-            <a href={`${langPrefix}/learn`} class="mega-footer-link">
+            <a href="/learn/" class="mega-footer-link">
               {catNames[lang]?.exploreHub || "Explore Knowledge Hub"} <span class="arrow">→</span>
             </a>
           </div>

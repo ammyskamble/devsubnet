@@ -86,25 +86,14 @@ export interface HreflangAlternate {
  * US, India, UK, Canada, Australia, Germany, Philippines, Singapore, Netherlands, South Africa, Spain, Japan
  */
 
-// Routes that have localized versions available.
-const LOCALIZED_ROUTES = new Set([
+
+export const LOCALIZED_ROUTES = new Set([
   '/',
-  '/faq',
-  '/cidr-cheat-sheet',
-  '/visual-subnet-splitter',
-  '/kubernetes-subnet-planner',
-  '/ipv6-subnet-calculator',
-  '/terraform-subnet-planner',
-  '/vlsm-calculator',
-  '/subnet-overlap-checker',
-  '/cidr-supernet-calculator',
-  '/aws-vpc-subnet-calculator',
-  '/azure-vnet-subnet-calculator',
-  '/gcp-vpc-subnet-calculator',
-  '/k8s-cidr-calculator',
-  '/what-is-a-subnet',
-  '/student-guide',
-  '/business-use-cases'
+  '/visual-subnet-splitter/',
+  '/ipv6-subnet-calculator/',
+  '/kubernetes-subnet-planner/',
+  '/cidr-cheat-sheet/',
+  '/faq/'
 ]);
 
 export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https://devsubnet.com'): HreflangAlternate[] {
@@ -122,16 +111,15 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
   }
 
   const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
-  const localizedPath = normalizedPath === '/' ? '/' : normalizedPath;
-  const hasLocalizedVersion = true;
+  const hasLocalizedVersion = LOCALIZED_ROUTES.has(normalizedPath);
   const enUrl = `${siteUrl}${normalizedPath}`;
-  const deUrl = `${siteUrl}/de${localizedPath}`;
-  const esUrl = `${siteUrl}/es${localizedPath}`;
-  const jaUrl = `${siteUrl}/ja${localizedPath}`;
-  const frUrl = `${siteUrl}/fr${localizedPath}`;
-  const ptUrl = `${siteUrl}/pt${localizedPath}`;
-  const koUrl = `${siteUrl}/ko${localizedPath}`;
-  const itUrl = `${siteUrl}/it${localizedPath}`;
+  const deUrl = `${siteUrl}/de${normalizedPath}`;
+  const esUrl = `${siteUrl}/es${normalizedPath}`;
+  const jaUrl = `${siteUrl}/ja${normalizedPath}`;
+  const frUrl = `${siteUrl}/fr${normalizedPath}`;
+  const ptUrl = `${siteUrl}/pt${normalizedPath}`;
+  const koUrl = `${siteUrl}/ko${normalizedPath}`;
+  const itUrl = `${siteUrl}/it${normalizedPath}`;
 
   const alternates: HreflangAlternate[] = [
     // Global generic languages
@@ -157,9 +145,6 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
     { lang: 'en-GB', href: enUrl }, // United Kingdom
     { lang: 'en-CA', href: enUrl }, // Canada
     { lang: 'en-AU', href: enUrl }, // Australia
-    { lang: 'en-NL', href: enUrl }, // Netherlands (English)
-    { lang: 'nl-NL', href: enUrl }, // Netherlands (Dutch)
-    { lang: 'nl', href: enUrl }, // Netherlands Fallback
     { lang: 'en-SG', href: enUrl }, // Singapore
     { lang: 'en-PH', href: enUrl }, // Philippines
     { lang: 'en-ZA', href: enUrl }, // South Africa
@@ -190,7 +175,8 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
 }
 
 /**
- * Returns localized path given a base route and target language
+ * Returns localized path given a base route and target language.
+ * Ensures consistent trailing slash and prevents linking to fake untranslated pages.
  */
 export function getLocalizedPath(currentPath: string, targetLang: SupportedLanguage): string {
   const nonDefaultLangs = Object.keys(languages).filter(l => l !== 'en');
@@ -206,16 +192,21 @@ export function getLocalizedPath(currentPath: string, targetLang: SupportedLangu
     }
   }
 
-  const normalizedPath = cleanPath === '/' ? '' : (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`);
-  const route = normalizedPath.length > 1 && normalizedPath.endsWith('/') ? normalizedPath.slice(0, -1) : (normalizedPath || '/');
+  const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
 
   if (targetLang === 'en') {
-    return route === '/' ? '/' : route;
+    return normalizedPath;
   }
-  if (route === '/') {
+
+  // If page does NOT have a localized version, keep user on canonical English page
+  if (!LOCALIZED_ROUTES.has(normalizedPath)) {
+    return normalizedPath;
+  }
+
+  if (normalizedPath === '/') {
     return `/${targetLang}/`;
   }
-  return `/${targetLang}${route}`;
+  return `/${targetLang}${normalizedPath}`;
 }
 
 export interface TranslationDictionary {

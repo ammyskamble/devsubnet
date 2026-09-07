@@ -3,6 +3,7 @@ import { ClientRouter } from "astro:transitions";
 import {
   getHrefLangAlternates,
   languages,
+  LOCALIZED_ROUTES,
   type SupportedLanguage,
 } from "../utils/i18n";
 import PrivacySettings from "../components/PrivacySettings.astro";
@@ -42,10 +43,12 @@ for (const l of nonDefaultLangs) {
 const normalizedPath = cleanPath === "/" ? "/" : (cleanPath.endsWith("/") ? cleanPath : `${cleanPath}/`);
 const siteBase = "https://devsubnet.com";
 
-// If page is localized (e.g. /es/learn/ or /ja/), canonical MUST be self-referencing to that locale
+// If page is genuinely localized (e.g. /es/ or /ja/faq/), canonical is self-referencing to that locale.
+// If page is English-only (e.g. /learn/... or /about/), canonical always points to canonical English apex URL.
+const isLocalizedRoute = LOCALIZED_ROUTES.has(normalizedPath);
 const resolvedCanonicalUrl =
   canonicalUrl ||
-  (lang === "en"
+  (lang === "en" || !isLocalizedRoute
     ? `${siteBase}${normalizedPath}`
     : (normalizedPath === "/" ? `${siteBase}/${lang}/` : `${siteBase}/${lang}${normalizedPath}`));
 

@@ -176,7 +176,7 @@ const foot = footerTranslations[lang] || footerTranslations.en;
     <div class="footer-grid-5col">
       <!-- Column 1: Brand & Fast Lanes -->
       <div class="footer-brand-col">
-        <a href={langPrefix || "/"} class="footer-brand" aria-label="DevSubnet.com Home">
+        <a href={langPrefix ? `${langPrefix}/` : "/"} class="footer-brand" aria-label="DevSubnet.com Home">
           <span class="brand-badge">
             <svg class="brand-navicon" viewBox="0 0 512 512" width="16" height="16" aria-hidden="true">
               <circle cx="256" cy="140" r="40" fill="#ffffff"/>
@@ -196,10 +196,10 @@ const foot = footerTranslations[lang] || footerTranslations.en;
         <div class="brand-fast-lanes">
           <span class="fast-lanes-title">{foot.fastLanes}</span>
           <div class="fast-lanes-row">
-            <a href={`${langPrefix}/aws-vpc-subnet-calculator`} class="fast-pill devops-pill" title="Cloud VPC & DevOps Tools">
+            <a href="/aws-vpc-subnet-calculator/" class="fast-pill devops-pill" title="Cloud VPC & DevOps Tools">
               <span>🛠️ DevOps</span>
             </a>
-            <a href={`${langPrefix}/learn`} class="fast-pill student-pill" title="Student Knowledge Hub">
+            <a href="/learn/" class="fast-pill student-pill" title="Student Knowledge Hub">
               <span>🎓 Students</span>
             </a>
           </div>
@@ -214,37 +214,37 @@ const foot = footerTranslations[lang] || footerTranslations.en;
         </div>
         <ul class="col-links">
           <li>
-            <a href={`${langPrefix}/`} class="col-link">
+            <a href={langPrefix ? `${langPrefix}/` : "/"} class="col-link">
               <span>IPv4 Subnet</span>
               <span class="col-tag tag-core">Core</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/visual-subnet-splitter`} class="col-link">
+            <a href={`${langPrefix}/visual-subnet-splitter/`} class="col-link">
               <span>Visual Splitter</span>
               <span class="col-tag tag-visual">Tree</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/vlsm-calculator`} class="col-link">
+            <a href="/vlsm-calculator/" class="col-link">
               <span>VLSM Calculator</span>
               <span class="col-tag tag-vlsm">VLSM</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/ipv6-subnet-calculator`} class="col-link">
+            <a href={`${langPrefix}/ipv6-subnet-calculator/`} class="col-link">
               <span>IPv6 Subnet</span>
               <span class="col-tag tag-ipv6">IPv6</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/cidr-supernet-calculator`} class="col-link">
+            <a href="/cidr-supernet-calculator/" class="col-link">
               <span>CIDR Supernet</span>
               <span class="col-tag tag-cidr">CIDR</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/subnet-overlap-checker`} class="col-link">
+            <a href="/subnet-overlap-checker/" class="col-link">
               <span>Overlap Checker</span>
               <span class="col-tag tag-audit">Audit</span>
             </a>
@@ -260,37 +260,37 @@ const foot = footerTranslations[lang] || footerTranslations.en;
         </div>
         <ul class="col-links">
           <li>
-            <a href={`${langPrefix}/aws-vpc-subnet-calculator`} class="col-link">
+            <a href="/aws-vpc-subnet-calculator/" class="col-link">
               <span>AWS VPC Calc</span>
               <span class="col-tag tag-aws">AWS</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/azure-vnet-subnet-calculator`} class="col-link">
+            <a href="/azure-vnet-subnet-calculator/" class="col-link">
               <span>Azure VNet Calc</span>
               <span class="col-tag tag-azure">Azure</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/gcp-vpc-subnet-calculator`} class="col-link">
+            <a href="/gcp-vpc-subnet-calculator/" class="col-link">
               <span>GCP VPC Calc</span>
               <span class="col-tag tag-gcp">GCP</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/kubernetes-subnet-planner`} class="col-link">
+            <a href={`${langPrefix}/kubernetes-subnet-planner/`} class="col-link">
               <span>K8s Sizing</span>
               <span class="col-tag tag-k8s">K8s</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/terraform-subnet-planner`} class="col-link">
+            <a href="/terraform-subnet-planner/" class="col-link">
               <span>Terraform IaC</span>
               <span class="col-tag tag-iac">IaC</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/k8s-cidr-calculator`} class="col-link">
+            <a href="/k8s-cidr-calculator/" class="col-link">
               <span>K8s CNI Tool</span>
               <span class="col-tag tag-cni">CNI</span>
             </a>
@@ -306,37 +306,37 @@ const foot = footerTranslations[lang] || footerTranslations.en;
         </div>
         <ul class="col-links">
           <li>
-            <a href={`${langPrefix}/learn`} class="col-link highlight">
+            <a href="/learn/" class="col-link highlight">
               <span>{foot.knowledgeHub}</span>
               <span class="col-tag tag-daily">Daily</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/what-is-a-subnet`} class="col-link">
+            <a href="/what-is-a-subnet/" class="col-link">
               <span>{whatIsSubnetText}</span>
               <span class="col-tag tag-primer">Guide</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/subnet-cheat-sheet`} class="col-link">
+            <a href={`${langPrefix}/cidr-cheat-sheet/`} class="col-link">
               <span>{foot.cheatSheet}</span>
               <span class="col-tag tag-quick-ref">Ref</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/student-guide`} class="col-link">
+            <a href="/student-guide/" class="col-link">
               <span>{foot.studentGuide}</span>
               <span class="col-tag tag-ccna">CCNA</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/website-analyzer`} class="col-link">
+            <a href="/website-analyzer/" class="col-link">
               <span>Website Analyzer</span>
               <span class="col-tag tag-dns">DNS</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/learn/rfc-1918-private-addresses-explained`} class="col-link">
+            <a href="/learn/rfc-1918-private-addresses-explained/" class="col-link">
               <span>RFC 1918 Private IPs</span>
               <span class="col-tag tag-rfc">RFC</span>
             </a>
@@ -352,39 +352,33 @@ const foot = footerTranslations[lang] || footerTranslations.en;
         </div>
         <ul class="col-links">
           <li>
-            <a href={`${langPrefix}/about`} class="col-link">
+            <a href="/about/" class="col-link">
               <span>{t.footer.about}</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/contact`} class="col-link">
+            <a href="/contact/" class="col-link">
               <span>{t.footer.contact}</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/faq`} class="col-link">
+            <a href={`${langPrefix}/faq/`} class="col-link">
               <span>{t.footer.faq}</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/privacy`} class="col-link">
+            <a href="/privacy/" class="col-link">
               <span>{t.footer.privacy}</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/terms`} class="col-link">
+            <a href="/terms/" class="col-link">
               <span>{t.footer.terms}</span>
             </a>
           </li>
           <li>
-            <a href={`${langPrefix}/cookie-policy`} class="col-link">
+            <a href="/cookie-policy/" class="col-link">
               <span>{t.footer.cookiePolicy}</span>
-            </a>
-          </li>
-          <li>
-            <a href={`${langPrefix}/offline`} rel="nofollow" class="col-link">
-              <span>{foot.offlineMode}</span>
-              <span class="col-tag tag-pwa">PWA</span>
             </a>
           </li>
         </ul>
@@ -405,10 +399,10 @@ const foot = footerTranslations[lang] || footerTranslations.en;
           <span class="icon">⚡</span>
           <span>{foot.clientSide}</span>
         </div>
-        <a href={`${langPrefix}/offline`} rel="nofollow" class="trust-pill link-pill" title="Works offline via PWA cache">
+        <div class="trust-pill" title="Works offline via PWA cache">
           <span class="icon">📶</span>
           <span>{foot.offlineReady}</span>
-        </a>
+        </div>
         <button type="button" class="top-btn" id="footer-back-to-top" aria-label="Back to top">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="18 15 12 9 6 15"></polyline>

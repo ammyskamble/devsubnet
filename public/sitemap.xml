@@ -13,9 +13,6 @@
     <xhtml:link rel="alternate" hreflang="en-PH" href="https://devsubnet.com/"/>
     <xhtml:link rel="alternate" hreflang="en-ZA" href="https://devsubnet.com/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/"/>
-    <xhtml:link rel="alternate" hreflang="de-DE" href="https://devsubnet.com/de/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/"/>
-    <xhtml:link rel="alternate" hreflang="nl-NL" href="https://devsubnet.com/nl/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/"/>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://devsubnet.com/es/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/"/>
@@ -57,7 +54,6 @@
     <loc>https://devsubnet.com/visual-subnet-splitter/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://devsubnet.com/visual-subnet-splitter/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/visual-subnet-splitter/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/visual-subnet-splitter/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/visual-subnet-splitter/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/visual-subnet-splitter/"/>
     <changefreq>weekly</changefreq>
@@ -67,7 +63,6 @@
     <loc>https://devsubnet.com/kubernetes-subnet-planner/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://devsubnet.com/kubernetes-subnet-planner/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/kubernetes-subnet-planner/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/kubernetes-subnet-planner/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/kubernetes-subnet-planner/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/kubernetes-subnet-planner/"/>
     <changefreq>weekly</changefreq>
@@ -77,7 +72,6 @@
     <loc>https://devsubnet.com/ipv6-subnet-calculator/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://devsubnet.com/ipv6-subnet-calculator/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/ipv6-subnet-calculator/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/ipv6-subnet-calculator/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/ipv6-subnet-calculator/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/ipv6-subnet-calculator/"/>
     <changefreq>weekly</changefreq>
@@ -102,7 +96,6 @@
     <loc>https://devsubnet.com/cidr-cheat-sheet/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://devsubnet.com/cidr-cheat-sheet/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/cidr-cheat-sheet/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/cidr-cheat-sheet/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/cidr-cheat-sheet/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/cidr-cheat-sheet/"/>
     <changefreq>weekly</changefreq>
@@ -112,7 +105,6 @@
     <loc>https://devsubnet.com/faq/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://devsubnet.com/faq/"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://devsubnet.com/de/faq/"/>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://devsubnet.com/nl/faq/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://devsubnet.com/es/faq/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://devsubnet.com/ja/faq/"/>
     <changefreq>weekly</changefreq>
@@ -181,38 +173,6 @@
   </url>
   <url>
     <loc>https://devsubnet.com/de/faq/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Dutch (/nl/) Routes (Netherlands - AMS-IX Hub & Belgium) -->
-  <url>
-    <loc>https://devsubnet.com/nl/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://devsubnet.com/nl/visual-subnet-splitter/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://devsubnet.com/nl/kubernetes-subnet-planner/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://devsubnet.com/nl/ipv6-subnet-calculator/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://devsubnet.com/nl/cidr-cheat-sheet/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://devsubnet.com/nl/faq/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

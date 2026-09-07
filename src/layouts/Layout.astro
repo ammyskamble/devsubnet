@@ -20,11 +20,36 @@ const {
   lang = (Astro.currentLocale as SupportedLanguage) || "en",
   title = "Online IP Subnet Calculator & CIDR Calculator | DevSubnet",
   description = "Free online IP subnet calculator and CIDR calculator online. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly.",
-  canonicalUrl = Astro.url.href,
+  canonicalUrl,
   noindex = false,
 } = Astro.props;
 
-const hreflangLinks = getHrefLangAlternates(Astro.url.pathname);
+// Determine clean pathname stripped of any locale prefix
+const nonDefaultLangs = Object.keys(languages).filter((l) => l !== "en");
+let cleanPath = Astro.url.pathname || "/";
+for (const l of nonDefaultLangs) {
+  if (cleanPath === `/${l}` || cleanPath === `/${l}/`) {
+    cleanPath = "/";
+    break;
+  }
+  if (cleanPath.startsWith(`/${l}/`)) {
+    cleanPath = cleanPath.slice(l.length + 1);
+    break;
+  }
+}
+
+// Normalize path to always have leading slash and trailing slash
+const normalizedPath = cleanPath === "/" ? "/" : (cleanPath.endsWith("/") ? cleanPath : `${cleanPath}/`);
+const siteBase = "https://devsubnet.com";
+
+// If page is localized (e.g. /es/learn/ or /ja/), canonical MUST be self-referencing to that locale
+const resolvedCanonicalUrl =
+  canonicalUrl ||
+  (lang === "en"
+    ? `${siteBase}${normalizedPath}`
+    : (normalizedPath === "/" ? `${siteBase}/${lang}/` : `${siteBase}/${lang}${normalizedPath}`));
+
+const hreflangLinks = getHrefLangAlternates(cleanPath);
 const currentLangInfo = languages[lang] || languages.en;
 ---
 
@@ -134,7 +159,7 @@ const currentLangInfo = languages[lang] || languages.en;
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
-    <link rel="canonical" href={canonicalUrl} />
+    <link rel="canonical" href={resolvedCanonicalUrl} />
     <meta name="theme-color" content="#0d111c" />
     <meta name="generator" content={Astro.generator} />
 
@@ -155,21 +180,21 @@ const currentLangInfo = languages[lang] || languages.en;
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:url" content={resolvedCanonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content="devsubnet.com" />
     <meta property="og:locale" content={currentLangInfo.locale} />
-    <meta property="og:image" content={`${Astro.url.origin}/og-image.png`} />
+    <meta property="og:image" content="https://devsubnet.com/og-image.png" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:url" content={resolvedCanonicalUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta
       property="twitter:image"
-      content={`${Astro.url.origin}/og-image.png`}
+      content="https://devsubnet.com/og-image.png"
     />
 
     <!-- Anti-Flash Theme Script (runs inline & on astro:after-swap) -->

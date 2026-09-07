@@ -122,17 +122,16 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
   }
 
   const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
-  const pathWithoutRootSlash = normalizedPath === '/' ? '' : normalizedPath;
-  const route = pathWithoutRootSlash === '' ? '/' : pathWithoutRootSlash.replace(/\/$/, '');
+  const localizedPath = normalizedPath === '/' ? '/' : normalizedPath;
   const hasLocalizedVersion = true;
-  const enUrl = `${siteUrl}${pathWithoutRootSlash || '/'}`;
-  const deUrl = `${siteUrl}/de${pathWithoutRootSlash}`;
-  const esUrl = `${siteUrl}/es${pathWithoutRootSlash}`;
-  const jaUrl = `${siteUrl}/ja${pathWithoutRootSlash}`;
-  const frUrl = `${siteUrl}/fr${pathWithoutRootSlash}`;
-  const ptUrl = `${siteUrl}/pt${pathWithoutRootSlash}`;
-  const koUrl = `${siteUrl}/ko${pathWithoutRootSlash}`;
-  const itUrl = `${siteUrl}/it${pathWithoutRootSlash}`;
+  const enUrl = `${siteUrl}${normalizedPath}`;
+  const deUrl = `${siteUrl}/de${localizedPath}`;
+  const esUrl = `${siteUrl}/es${localizedPath}`;
+  const jaUrl = `${siteUrl}/ja${localizedPath}`;
+  const frUrl = `${siteUrl}/fr${localizedPath}`;
+  const ptUrl = `${siteUrl}/pt${localizedPath}`;
+  const koUrl = `${siteUrl}/ko${localizedPath}`;
+  const itUrl = `${siteUrl}/it${localizedPath}`;
 
   const alternates: HreflangAlternate[] = [
     // Global generic languages

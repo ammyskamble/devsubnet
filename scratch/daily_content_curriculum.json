@@ -75,7 +75,7 @@
     },
     {
       "id": 5,
-      "status": "pending",
+      "status": "published",
       "slug": "ports-and-sockets-hotel-room-analogy",
       "title": "What Are Port Numbers? The Hotel Room Analogy",
       "category": "concepts",
@@ -85,7 +85,8 @@
         "network ports explained",
         "port 80 port 443 basics"
       ],
-      "analogy": "The IP address is the hotel's street address; the Port number is the specific room number inside the hotel."
+      "analogy": "The IP address is the hotel's street address; the Port number is the specific room number inside the hotel.",
+      "publishedDate": "2026-09-07T03:36:45.593Z"
     },
     {
       "id": 6,

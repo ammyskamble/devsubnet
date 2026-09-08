@@ -90,7 +90,7 @@
     },
     {
       "id": 6,
-      "status": "pending",
+      "status": "published",
       "slug": "why-hexadecimal-in-ipv6-made-easy",
       "title": "Why Does IPv6 Have Letters? Hexadecimal Numbers Made Simple",
       "category": "science",
@@ -100,7 +100,8 @@
         "hexadecimal networking explained",
         "base 16 for beginners"
       ],
-      "analogy": "Counting on 10 fingers vs using a 16-color crayon box. Why computer scientists use A-F as shorthand for 4 binary bits."
+      "analogy": "Counting on 10 fingers vs using a 16-color crayon box. Why computer scientists use A-F as shorthand for 4 binary bits.",
+      "publishedDate": "2026-09-08T03:36:24.629Z"
     },
     {
       "id": 7,

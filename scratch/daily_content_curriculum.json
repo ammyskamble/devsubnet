@@ -105,7 +105,7 @@
     },
     {
       "id": 7,
-      "status": "pending",
+      "status": "published",
       "slug": "slicing-networks-like-a-pizza-subnetting-basics",
       "title": "Subnetting Explained Like Slicing a Pizza",
       "category": "science",
@@ -115,7 +115,8 @@
         "subnetting pizza analogy",
         "how to learn subnetting fast"
       ],
-      "analogy": "Cutting a large whole pizza in half, then quarters, then eighths: each cut doubles the number of slices while halving the size of each slice."
+      "analogy": "Cutting a large whole pizza in half, then quarters, then eighths: each cut doubles the number of slices while halving the size of each slice.",
+      "publishedDate": "2026-09-09T03:36:13.582Z"
     },
     {
       "id": 8,

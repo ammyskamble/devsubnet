@@ -1,17 +1,7 @@
 {
-  "name": "DevSubnet - Free IP Subnet Calculator & CIDR Planner",
-  "short_name": "DevSubnet",
-  "description": "Free online IPv4 subnet calculator, CIDR planner, VLSM, and cloud VPC tools for AWS, Azure, and GCP. All calculations run locally in your browser.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0d111c",
-  "theme_color": "#0d111c",
+  "name": "IP Subnet ",
+  "short_name": "IP Subnet ",
   "icons": [
-    {
-      "src": "/favicon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
@@ -23,11 +13,9 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
     }
-  ]
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
 }

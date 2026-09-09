@@ -1,0 +1,76 @@
+---
+interface Props {
+  width?: number | string;
+  height?: number | string;
+  class?: string;
+}
+
+const { width = 32, height = 32, class: className = "" } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width={width}
+  height={height}
+  class={className}
+  aria-hidden="true"
+>
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="dsBgGrad" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#141E33"/>
+      <stop offset="100%" stop-color="#080C14"/>
+    </radialGradient>
+
+    <!-- Glowing Cyan/Blue Line Gradient -->
+    <linearGradient id="dsCyberCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="100%" stop-color="#0066FF"/>
+    </linearGradient>
+
+    <!-- Violet/Magenta Accent Gradient -->
+    <linearGradient id="dsNeonViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+
+    <!-- Glow Effect -->
+    <filter id="dsSoftGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base / Background -->
+  <rect width="512" height="512" rx="115" fill="url(#dsBgGrad)" stroke="#1E293B" stroke-width="6"/>
+
+  <!-- Subnet Mesh Lines -->
+  <g opacity="0.35" stroke="url(#dsCyberCyan)" stroke-width="2.5" stroke-dasharray="4,6">
+    <line x1="140" y1="140" x2="372" y2="140"/>
+    <line x1="140" y1="372" x2="372" y2="372"/>
+    <line x1="140" y1="140" x2="140" y2="372"/>
+    <line x1="372" y1="140" x2="372" y2="372"/>
+    <line x1="140" y1="140" x2="372" y2="372"/>
+    <line x1="372" y1="140" x2="140" y2="372"/>
+  </g>
+
+  <!-- Corner / Network Router Nodes -->
+  <circle cx="140" cy="140" r="8" fill="#00F0FF"/>
+  <circle cx="372" cy="140" r="8" fill="#A855F7"/>
+  <circle cx="372" cy="372" r="8" fill="#EC4899"/>
+  <circle cx="140" cy="372" r="8" fill="#0066FF"/>
+
+  <!-- Central "DS" Monogram integrated with Code Brackets -->
+  <g filter="url(#dsSoftGlow)">
+    <!-- Letter "D" / Left Bracket Motif -->
+    <path d="M 190 175 L 190 335 M 190 175 H 230 C 275 175, 275 335, 230 335 H 190" fill="none" stroke="url(#dsCyberCyan)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Letter "S" / Routing Pathway -->
+    <path d="M 335 200 C 310 170, 275 185, 275 215 C 275 250, 335 260, 335 295 C 335 335, 290 345, 270 320" fill="none" stroke="url(#dsNeonViolet)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Central Gateway Node -->
+    <circle cx="256" cy="256" r="14" fill="#080C14" stroke="#00F0FF" stroke-width="5"/>
+    <circle cx="256" cy="256" r="5" fill="#00F0FF"/>
+  </g>
+</svg>

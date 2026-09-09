@@ -1,5 +1,6 @@
 ---
 import { translations, type SupportedLanguage } from '../utils/i18n';
+import Logo from './Logo.astro';
 
 interface Props {
   lang?: SupportedLanguage;
@@ -177,16 +178,8 @@ const foot = footerTranslations[lang] || footerTranslations.en;
       <!-- Column 1: Brand & Fast Lanes -->
       <div class="footer-brand-col">
         <a href={langPrefix ? `${langPrefix}/` : "/"} class="footer-brand" aria-label="DevSubnet.com Home">
-          <span class="brand-badge">
-            <svg class="brand-navicon" viewBox="0 0 512 512" width="16" height="16" aria-hidden="true">
-              <circle cx="256" cy="140" r="40" fill="#ffffff"/>
-              <path d="M256 180 v70 M150 290 h212 M150 250 v40 M362 250 v40 M150 290 v60 M362 290 v60" fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round"/>
-              <circle cx="150" cy="370" r="32" fill="#ffffff"/>
-              <circle cx="362" cy="370" r="32" fill="#ffffff"/>
-              <path d="M280 190 l-48 80" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
-            </svg>
-            Dev
-          </span>
+          <Logo width="30" height="30" class="brand-logo" />
+          <span class="brand-badge">Dev</span>
           <span class="brand-text">Subnet.com</span>
         </a>
         <div class="footer-tagline">{foot.tagline}</div>

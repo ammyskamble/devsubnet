@@ -6,5 +6,7 @@ Disallow: /500
 Disallow: /503
 Allow: /
 
-# Sitemap Link
+# Sitemap Links
+Sitemap: https://devsubnet.com/sitemap-index.xml
+Sitemap: https://devsubnet.com/sitemap-0.xml
 Sitemap: https://devsubnet.com/sitemap.xml

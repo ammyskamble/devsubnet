@@ -5,6 +5,7 @@ import {
   getLocalizedPath,
   type SupportedLanguage,
 } from "../utils/i18n";
+import Logo from "./Logo.astro";
 
 interface Props {
   path?: string;
@@ -225,31 +226,8 @@ const availableLangs = Object.keys(languages) as SupportedLanguage[];
 <header class="topbar">
   <div class="topbar-row">
     <a class="brand" href={langPrefix ? `${langPrefix}/` : "/"} aria-label="DevSubnet.com home">
-      <span class="brand-badge">
-        <svg
-          class="brand-navicon"
-          viewBox="0 0 512 512"
-          width="18"
-          height="18"
-          aria-hidden="true"
-        >
-          <circle cx="256" cy="140" r="40" fill="#ffffff"></circle>
-          <path
-            d="M256 180 v70 M150 290 h212 M150 250 v40 M362 250 v40 M150 290 v60 M362 290 v60"
-            fill="none"
-            stroke="#ffffff"
-            stroke-width="32"
-            stroke-linecap="round"></path>
-          <circle cx="150" cy="370" r="32" fill="#ffffff"></circle>
-          <circle cx="362" cy="370" r="32" fill="#ffffff"></circle>
-          <path
-            d="M280 190 l-48 80"
-            stroke="#ffffff"
-            stroke-width="36"
-            stroke-linecap="round"></path>
-        </svg>
-        Dev
-      </span>
+      <Logo width="34" height="34" class="brand-logo" />
+      <span class="brand-badge">Dev</span>
       <span class="brand-text">Subnet.com</span>
     </a>
 

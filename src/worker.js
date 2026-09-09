@@ -22,6 +22,16 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
+    // Sitemap aliases & canonical redirects
+    if (url.pathname === '/sitemap_0.xml') {
+      url.pathname = '/sitemap-0.xml';
+      return Response.redirect(url.toString(), 301);
+    }
+    if (url.pathname === '/sitemap_index.xml') {
+      url.pathname = '/sitemap-index.xml';
+      return Response.redirect(url.toString(), 301);
+    }
+
     // Serve static assets from the assets directory
     return env.ASSETS.fetch(request);
   }

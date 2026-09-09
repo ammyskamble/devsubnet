@@ -27,6 +27,7 @@ const PRECACHE_ASSETS = [
   '/favicon.svg',
   '/favicon.ico',
   '/favicon-96x96.png',
+  '/apple-touch-icon.png',
   '/site.webmanifest'
 ];
 

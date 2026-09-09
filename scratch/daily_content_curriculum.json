@@ -60,7 +60,7 @@
     },
     {
       "id": 4,
-      "status": "pending",
+      "status": "published",
       "slug": "tcp-vs-udp-certified-mail-vs-postcard",
       "title": "TCP vs UDP: The Certified Letter vs the Postcard",
       "category": "science",
@@ -70,11 +70,12 @@
         "transmission control protocol beginner",
         "user datagram protocol explained"
       ],
-      "analogy": "TCP is certified mail requiring a physical signature and re-sending if lost; UDP is a live sports broadcast or radio postcard where speed matters more than catching every frame."
+      "analogy": "TCP is certified mail requiring a physical signature and re-sending if lost; UDP is a live sports broadcast or radio postcard where speed matters more than catching every frame.",
+      "publishedDate": "2026-09-06T03:34:36.332Z"
     },
     {
       "id": 5,
-      "status": "pending",
+      "status": "published",
       "slug": "ports-and-sockets-hotel-room-analogy",
       "title": "What Are Port Numbers? The Hotel Room Analogy",
       "category": "concepts",
@@ -84,11 +85,12 @@
         "network ports explained",
         "port 80 port 443 basics"
       ],
-      "analogy": "The IP address is the hotel's street address; the Port number is the specific room number inside the hotel."
+      "analogy": "The IP address is the hotel's street address; the Port number is the specific room number inside the hotel.",
+      "publishedDate": "2026-09-07T03:36:45.593Z"
     },
     {
       "id": 6,
-      "status": "pending",
+      "status": "published",
       "slug": "why-hexadecimal-in-ipv6-made-easy",
       "title": "Why Does IPv6 Have Letters? Hexadecimal Numbers Made Simple",
       "category": "science",
@@ -98,11 +100,12 @@
         "hexadecimal networking explained",
         "base 16 for beginners"
       ],
-      "analogy": "Counting on 10 fingers vs using a 16-color crayon box. Why computer scientists use A-F as shorthand for 4 binary bits."
+      "analogy": "Counting on 10 fingers vs using a 16-color crayon box. Why computer scientists use A-F as shorthand for 4 binary bits.",
+      "publishedDate": "2026-09-08T03:36:24.629Z"
     },
     {
       "id": 7,
-      "status": "pending",
+      "status": "published",
       "slug": "slicing-networks-like-a-pizza-subnetting-basics",
       "title": "Subnetting Explained Like Slicing a Pizza",
       "category": "science",
@@ -112,7 +115,8 @@
         "subnetting pizza analogy",
         "how to learn subnetting fast"
       ],
-      "analogy": "Cutting a large whole pizza in half, then quarters, then eighths: each cut doubles the number of slices while halving the size of each slice."
+      "analogy": "Cutting a large whole pizza in half, then quarters, then eighths: each cut doubles the number of slices while halving the size of each slice.",
+      "publishedDate": "2026-09-09T03:36:13.582Z"
     },
     {
       "id": 8,

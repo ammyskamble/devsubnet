@@ -120,7 +120,7 @@
     },
     {
       "id": 8,
-      "status": "pending",
+      "status": "published",
       "slug": "what-is-a-broadcast-storm",
       "title": "What is a Broadcast Storm? The Megaphone Echo Chamber",
       "category": "concepts",
@@ -130,7 +130,8 @@
         "network broadcast domain",
         "switching loops"
       ],
-      "analogy": "What happens if someone shouts through a megaphone in a crowded stadium and 10 other people immediately repeat it into their own megaphones."
+      "analogy": "What happens if someone shouts through a megaphone in a crowded stadium and 10 other people immediately repeat it into their own megaphones.",
+      "publishedDate": "2026-09-10T03:36:18.331Z"
     },
     {
       "id": 9,

@@ -135,7 +135,7 @@
     },
     {
       "id": 9,
-      "status": "pending",
+      "status": "published",
       "slug": "the-story-of-the-first-ping",
       "title": "The Story of the 'Ping': How Mike Muuss Named It After Sonar",
       "category": "history",
@@ -146,7 +146,8 @@
         "ICMP echo history",
         "Mike Muuss ping"
       ],
-      "analogy": "Submarine sonar sending out an acoustic sound pulse and listening for the underwater echo ping."
+      "analogy": "Submarine sonar sending out an acoustic sound pulse and listening for the underwater echo ping.",
+      "publishedDate": "2026-09-11T03:35:55.947Z"
     },
     {
       "id": 10,

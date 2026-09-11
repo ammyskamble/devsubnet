@@ -153,9 +153,14 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
 
   if (hasLocalizedVersion) {
     alternates.push(
-      // Priority Regional European & Asian Locales
+      // Priority Regional European, Latin American & Asian Locales
       { lang: 'de-DE', href: deUrl }, // Germany
       { lang: 'es-ES', href: esUrl }, // Spain
+      { lang: 'es-MX', href: esUrl }, // Mexico (Major Subneteo Traffic Target)
+      { lang: 'es-CO', href: esUrl }, // Colombia
+      { lang: 'es-AR', href: esUrl }, // Argentina
+      { lang: 'es-CL', href: esUrl }, // Chile
+      { lang: 'es-PE', href: esUrl }, // Peru
       { lang: 'ja-JP', href: jaUrl }, // Japan
       { lang: 'fr-FR', href: frUrl }, // France
       { lang: 'fr-CA', href: frUrl }, // Canada (French)
@@ -514,9 +519,9 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
     },
     intro: {
       ipv4: {
-        title: "Calculadora de Subredes IPv4 y Planificador CIDR",
-        eyebrow: "HERRAMIENTA DE RED GRATUITA / IPv4",
-        lede: "Calcule rangos de hosts, máscaras de subred, direcciones de broadcast, límites wildcard y reservas VPC en AWS, Azure y GCP al instante."
+        title: "Calculadora de Subredes IPv4 y CIDR Online",
+        eyebrow: "CALCULADORA DE SUBNETEO Y SUBREDES IPv4 / CIDR ONLINE",
+        lede: "Calculadora de subneteo IPv4 gratuita y precisa. Calcule rangos de IPs utilizables, máscara de subred, dirección de difusión (broadcast), dirección de red y reservas para AWS, Azure y GCP sin registro."
       },
       splitter: {
         title: "Divisor Visual de Subredes y Particionador CIDR",
@@ -545,8 +550,8 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       }
     },
     meta: {
-      defaultTitle: "Calculadora de Subredes IP y Planificador CIDR Gratis | DevSubnet",
-      defaultDesc: "Calculadora de subredes IPv4 e IPv6 gratuita en línea. Calcule rangos de red, máscaras, broadcast y reservas VPC de AWS, Azure y GCP."
+      defaultTitle: "Calculadora de Subredes IPv4 y Subneteo CIDR Online | DevSubnet",
+      defaultDesc: "Calculadora de subneteo IPv4 gratuita y rápida. Calcule rangos de IP utilizables, máscaras de subred, broadcast, y subnetting para AWS, Azure y GCP sin registro."
     },
     guide: {
       title: "Planificación de Redes – Cálculos Clásicos, VPCs Cloud y Estrategias CIDR",
@@ -594,7 +599,7 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       prefixTableDesc: "Tabla de correspondencia entre longitud de prefijos, máscara de subred, máscara wildcard y capacidad de hosts.",
       comparisonTitle: "Comparativa de DevSubnet frente a otras calculadoras",
       comparisonDesc: "Las herramientas básicas solo hacen cálculos estándar. DevSubnet añade reservas cloud, exportación IaC y cálculo K8s.",
-      faqTitle: "Preguntas Frecuentes (FAQ)",
+      faqTitle: "Preguntas Frecuentes sobre Subredes y Máscaras de Red",
       faqViewAll: "Ver Todas las Preguntas →",
       ctaPrimary: "Iniciar Cálculo de Subred",
       ctaSecondary: "Probar Partición Visual"

@@ -1,6 +1,7 @@
 ---
 import { translations, type SupportedLanguage } from '../utils/i18n';
 import { guideTranslations } from '../utils/guide-i18n';
+import SubneteoSection from './SubneteoSection.astro';
 
 interface Props {
   lang?: SupportedLanguage;
@@ -124,8 +125,11 @@ const prefixTableRows = [
       ))}
     </div>
 
+    <!-- Dedicated Spanish Subneteo Educational Guide for CCNA / Students -->
+    {lang === 'es' && <SubneteoSection />}
+
     <!-- FAQ Section -->
-    <h3 id="faq-section-title">{guide.faqTitle}</h3>
+    <h2 id="faq-section-title">{guide.faqTitle}</h2>
     <div class="seo-netsudoku-grid" style="margin-bottom: 2rem;">
       {guideData.faqs.map((faq) => (
         <div class="seo-netsudoku-card">
@@ -176,6 +180,11 @@ const prefixTableRows = [
     color: var(--text-primary);
     margin-bottom: 1.5rem;
     line-height: 1.2;
+  }
+
+  .seo-netsudoku-container h2#faq-section-title {
+    font-size: 1.75rem;
+    margin-top: 3.5rem;
   }
   
   .seo-netsudoku-container p.lead {

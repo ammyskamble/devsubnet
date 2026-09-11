@@ -1,0 +1,471 @@
+---
+// Subneteo educational section targeting CCNA students, university courses, and Spanish networking professionals
+---
+
+<section class="subneteo-guide-block" aria-labelledby="subneteo-heading">
+  <div class="subneteo-header">
+    <span class="subneteo-badge">GUÍA EDUCATIVA Y CERTIFICACIONES (CCNA / COMPTIA)</span>
+    <h2 id="subneteo-heading">¿Qué es el subneteo y cómo calcular subredes IPv4?</h2>
+    <p class="subneteo-lead">
+      El <strong>subneteo</strong> (del inglés <em>subnetting</em>) es la técnica fundamental de arquitectura de redes que consiste en dividir una red IP física o lógica en múltiples subredes más pequeñas, jerárquicas e independientes. Esta práctica es indispensable para optimizar el enrutamiento, delimitar los dominios de difusión (<em>broadcast domains</em>), robustecer la seguridad perimetral y maximizar la eficiencia del espacio de direcciones IPv4.
+    </p>
+  </div>
+
+  <!-- Formulas Container -->
+  <div class="subneteo-formulas-grid">
+    <div class="subneteo-formula-card">
+      <div class="formula-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+      </div>
+      <h3>Fórmula de Subredes: 2<sup>n</sup></h3>
+      <p class="formula-math">Cantidad de subredes = 2<sup>n</sup></p>
+      <p class="formula-desc">
+        Donde <strong>n</strong> representa el número de bits que se «toman prestados» o se roban de la porción de host para asignarlos a la porción de red. Cada bit adicional que se toma duplica el número de subredes disponibles:
+      </p>
+      <ul class="formula-examples">
+        <li><strong>n = 1:</strong> 2<sup>1</sup> = 2 subredes</li>
+        <li><strong>n = 2:</strong> 2<sup>2</sup> = 4 subredes</li>
+        <li><strong>n = 3:</strong> 2<sup>3</sup> = 8 subredes</li>
+        <li><strong>n = 4:</strong> 2<sup>4</sup> = 16 subredes</li>
+      </ul>
+    </div>
+
+    <div class="subneteo-formula-card highlight-card">
+      <div class="formula-icon highlight">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+      </div>
+      <h3>Fórmula de Hosts: 2<sup>h</sup> - 2</h3>
+      <p class="formula-math highlight">Hosts utilizables = 2<sup>h</sup> - 2</p>
+      <p class="formula-desc">
+        Donde <strong>h</strong> es la cantidad de bits restantes para hosts (es decir, 32 menos el nuevo prefijo CIDR). Se restan obligatoriamente <strong>2 direcciones</strong> en redes estándar RFC 1918:
+      </p>
+      <ul class="formula-examples">
+        <li><strong>Dirección de red:</strong> La primera IP (todos los bits de host en 0). Identifica la subred.</li>
+        <li><strong>Dirección de difusión (Broadcast):</strong> La última IP (todos los bits de host en 1). Comunica a todos los equipos del segmento.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Step-by-Step Practical Subnetting Example -->
+  <div class="subneteo-step-by-step">
+    <div class="step-header">
+      <span class="step-tag">EJEMPLO PRÁCTICO</span>
+      <h3>Subneteo Paso a Paso: Dividir 192.168.1.0/24 en 4 Subredes</h3>
+      <p>
+        Supongamos que una empresa necesita segmentar su bloque clase C <code>192.168.1.0/24</code> en 4 subredes independientes para los departamentos de <em>Administración</em>, <em>Finanzas</em>, <em>Desarrollo</em> y <em>Visitantes</em>.
+      </p>
+    </div>
+
+    <div class="steps-timeline">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Calcular los bits prestados (n)</h4>
+          <p>Aplicamos 2<sup>n</sup> &ge; 4. Con <strong>n = 2</strong> obtenemos 2<sup>2</sup> = 4 subredes exactas. Necesitamos robar 2 bits a la porción de host.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Calcular el nuevo prefijo CIDR y la Máscara de Subred</h4>
+          <p>
+            Sumamos los bits prestados al prefijo original: <strong>/24 + 2 = /26</strong>.<br/>
+            En notación decimal con puntos, el último octeto pasa de <code>00000000</code> a <code>11000000</code> (128 + 64 = 192).<br/>
+            La nueva <strong>máscara de subred</strong> es <code>255.255.255.192</code> y la <strong>máscara wildcard / inversa</strong> es <code>0.0.0.63</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Calcular el Rango de IPs Utilizables por Subred</h4>
+          <p>
+            Los bits de host restantes son h = 32 - 26 = 6.<br/>
+            Aplicando la fórmula de hosts: 2<sup>6</sup> - 2 = 64 - 2 = <strong>62 direcciones de host utilizables</strong> por cada una de las 4 subredes.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Calcular el Salto de Red (Número Mágico)</h4>
+          <p>
+            Restamos el valor del octeto modificado a 256: <strong>256 - 192 = 64</strong>.<br/>
+            Las subredes avanzarán en incrementos exactos de 64 en el cuarto octeto.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subnets Result Table -->
+    <div class="guide-table-wrapper" style="margin-top: 1.5rem;">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>Subred</th>
+            <th>Dirección de Red</th>
+            <th>Rango de IPs Utilizables</th>
+            <th>Dirección de Difusión (Broadcast)</th>
+            <th>Hosts Útiles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Subred 1</strong></td>
+            <td><code>192.168.1.0/26</code></td>
+            <td><code>192.168.1.1</code> – <code>192.168.1.62</code></td>
+            <td><code>192.168.1.63</code></td>
+            <td>62</td>
+          </tr>
+          <tr>
+            <td><strong>Subred 2</strong></td>
+            <td><code>192.168.1.64/26</code></td>
+            <td><code>192.168.1.65</code> – <code>192.168.1.126</code></td>
+            <td><code>192.168.1.127</code></td>
+            <td>62</td>
+          </tr>
+          <tr>
+            <td><strong>Subred 3</strong></td>
+            <td><code>192.168.1.128/26</code></td>
+            <td><code>192.168.1.129</code> – <code>192.168.1.190</code></td>
+            <td><code>192.168.1.191</code></td>
+            <td>62</td>
+          </tr>
+          <tr>
+            <td><strong>Subred 4</strong></td>
+            <td><code>192.168.1.192/26</code></td>
+            <td><code>192.168.1.193</code> – <code>192.168.1.254</code></td>
+            <td><code>192.168.1.255</code></td>
+            <td>62</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Interactive Visual Subnet Splitter Highlight -->
+  <div class="splitter-feature-box">
+    <div class="splitter-feature-content">
+      <span class="splitter-kicker">HERRAMIENTA VISUAL RECOMENDADA</span>
+      <h3>Subneteo Paso a Paso con el Divisor Visual de Subredes</h3>
+      <p>
+        Calcular subredes a mano en papel o con tablas estáticas es propenso a errores humanos durante exámenes y despliegues en producción. Nuestra <strong>Calculadora de Subneteo y Divisor Visual</strong> automatiza todo el proceso paso a paso:
+      </p>
+      <ul class="feature-bullets">
+        <li><strong>Partición Visual con un Clic:</strong> Divida bloques CIDR a la mitad recursivamente y visualice la segmentación binaria al instante.</li>
+        <li><strong>Soporte VLSM Completo:</strong> Asigne tamaños de subred variables (/26, /28, /30) sin solapamiento de IPs.</li>
+        <li><strong>Cálculo Automático para Cloud:</strong> Aplique con un clic las reglas de reserva de AWS VPC (5 IPs), Azure VNet (5 IPs) o Google Cloud (4 IPs).</li>
+        <li><strong>Exportación IaC Inmediata:</strong> Copie la configuración generada en código HCL para Terraform, Ansible o CloudFormation.</li>
+      </ul>
+      <div class="feature-actions">
+        <a href="#ipv4-calc-container" class="btn-seo-primary">Probar Calculadora de Subneteo Arriba ↑</a>
+        <a href="/es/visual-subnet-splitter" class="btn-seo-secondary">Abrir Divisor Visual de Subredes →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .subneteo-guide-block {
+    margin: 4rem 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .subneteo-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .subneteo-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-network);
+    background: rgba(var(--hsl-network), 0.12);
+    border: 1px solid rgba(var(--hsl-network), 0.25);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full, 9999px);
+    margin-bottom: 1rem;
+  }
+
+  .subneteo-header h2 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    line-height: 1.25;
+  }
+
+  .subneteo-lead {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .subneteo-formulas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .subneteo-formula-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    backdrop-filter: blur(var(--glass-blur));
+    transition: transform var(--transition-normal), border-color var(--transition-normal);
+  }
+
+  .subneteo-formula-card:hover {
+    border-color: var(--accent-network);
+    transform: translateY(-2px);
+  }
+
+  .subneteo-formula-card.highlight-card:hover {
+    border-color: var(--accent-host);
+  }
+
+  .formula-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: rgba(var(--hsl-network), 0.15);
+    color: var(--accent-network);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .formula-icon.highlight {
+    background: rgba(var(--hsl-host), 0.15);
+    color: var(--accent-host);
+  }
+
+  .subneteo-formula-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .formula-math {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-network);
+    background: rgba(var(--hsl-network), 0.08);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  .formula-math.highlight {
+    color: var(--accent-host);
+    background: rgba(var(--hsl-host), 0.08);
+  }
+
+  .formula-desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 1rem 0;
+  }
+
+  .formula-examples {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .formula-examples li {
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .formula-examples li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-network);
+    font-weight: bold;
+  }
+
+  .subneteo-step-by-step {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .step-header h3 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.5rem 0 0.75rem 0;
+  }
+
+  .step-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent-highlight);
+    text-transform: uppercase;
+  }
+
+  .step-header p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 1.75rem 0;
+  }
+
+  .steps-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    background: var(--accent-network);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.2rem;
+  }
+
+  .step-content h4 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem 0;
+  }
+
+  .step-content p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .step-content code {
+    font-family: var(--font-mono);
+    color: var(--accent-highlight);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.15rem 0.35rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .splitter-feature-box {
+    background: linear-gradient(135deg, rgba(var(--hsl-network), 0.1) 0%, rgba(var(--hsl-host), 0.08) 100%);
+    border: 1px solid rgba(var(--hsl-network), 0.3);
+    border-radius: var(--radius-md);
+    padding: 2.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .splitter-kicker {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-network);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .splitter-feature-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .splitter-feature-content p {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem 0;
+  }
+
+  .feature-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.75rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .feature-bullets li {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .feature-bullets li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent-network);
+    font-weight: bold;
+  }
+
+  .feature-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 640px) {
+    .subneteo-header h2 {
+      font-size: 1.6rem;
+    }
+    .subneteo-step-by-step,
+    .splitter-feature-box {
+      padding: 1.5rem;
+    }
+    .step-item {
+      gap: 0.85rem;
+    }
+  }
+</style>

@@ -221,8 +221,10 @@ const currentLangInfo = languages[lang] || languages.en;
         set:html={JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "DevSubnet - Online IP Subnet Calculator & CIDR Calculator",
-          url: "https://devsubnet.com/",
+          name: lang === 'es' 
+            ? "DevSubnet - Calculadora de Subredes IPv4 y Subneteo CIDR Online" 
+            : "DevSubnet - Online IP Subnet Calculator & CIDR Calculator",
+          url: resolvedCanonicalUrl,
           inLanguage: lang,
           applicationCategory: "UtilitiesApplication",
           applicationSubCategory: "Networking & Cloud Infrastructure",
@@ -254,7 +256,17 @@ const currentLangInfo = languages[lang] || languages.en;
             bestRating: "5",
             worstRating: "1",
           },
-          featureList: [
+          featureList: lang === 'es' ? [
+            "Calculadora de subneteo IPv4 y subredes CIDR online",
+            "Cálculo de rango de IPs utilizables, máscara de subred y broadcast",
+            "División de redes y subneteo VLSM interactivo con divisor visual",
+            "Cálculo de IPs reservadas para AWS VPC, Azure VNet y GCP",
+            "Planificador de subredes para Terraform con función cidrsubnet()",
+            "Calculadora de CIDR para Kubernetes (Cilium, Calico, AWS VPC CNI)",
+            "Detector de conflictos y superposición de subredes",
+            "Guía educativa de subneteo paso a paso con fórmulas 2^n y 2^h - 2",
+            "Tabla de prefijos CIDR y máscaras de subred",
+          ] : [
             "Online IP subnet calculator & CIDR calculator online",
             "IPv4 & IPv6 subnet calculation with binary bitwise visualization",
             "IP CIDR calculator with slash notation to subnet mask converter",

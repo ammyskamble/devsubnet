@@ -151,7 +151,7 @@
     },
     {
       "id": 10,
-      "status": "pending",
+      "status": "published",
       "slug": "the-invention-of-ethernet-and-aloha-net",
       "title": "From ALOHAnet to Ethernet: The Hawaiian Origins of Wi-Fi and LANs",
       "category": "history",
@@ -162,7 +162,8 @@
         "Robert Metcalfe ethernet",
         "how ethernet was invented"
       ],
-      "analogy": "How researchers in Hawaii connecting islands via radio transmitters solved the problem of two people trying to talk at the exact same moment."
+      "analogy": "How researchers in Hawaii connecting islands via radio transmitters solved the problem of two people trying to talk at the exact same moment.",
+      "publishedDate": "2026-09-12T03:35:02.167Z"
     }
   ]
 }

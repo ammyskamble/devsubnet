@@ -1,5 +1,5 @@
 ---
-import { calculateSubnet, getBinaryBits } from '../utils/subnetMath';
+import { calculateSubnet, getBinaryBits, calculateExamMath } from '../utils/subnetMath';
 import { type SupportedLanguage } from '../utils/i18n';
 import { calcTranslations } from '../utils/calc-i18n';
 
@@ -20,6 +20,7 @@ const {
 // Calculate initial values for Server-Side Rendering (SEO & Instant first load)
 const initialResult = calculateSubnet(defaultIp, defaultCidr, defaultCloud);
 const initialBits = getBinaryBits(defaultIp, defaultCidr);
+const initialExam = calculateExamMath(defaultIp, defaultCidr);
 const calc = calcTranslations[lang] || calcTranslations.en;
 ---
 
@@ -36,8 +37,8 @@ const calc = calcTranslations[lang] || calcTranslations.en;
 
     <!-- Grouped Inputs Card -->
     <div class="core-inputs-card">
-      <!-- Inputs Row -->
-      <div class="input-grid-2-1">
+      <!-- Inputs Row with Reverse Netmask/Wildcard support -->
+      <div class="input-grid-3">
         <div class="input-row">
           <label for="ip-address" class="tooltip-trigger" data-tooltip={calc.ipAddressTooltip}>{calc.ipAddressLabel}</label>
           <div class="ip-input">
@@ -48,7 +49,7 @@ const calc = calcTranslations[lang] || calcTranslations.en;
               placeholder={calc.ipPlaceholder} 
               inputmode="decimal" 
               autocomplete="off" 
-              maxlength="15"
+              maxlength="35"
             />
           </div>
         </div>
@@ -63,6 +64,21 @@ const calc = calcTranslations[lang] || calcTranslations.en;
               value={defaultCidr} 
               min="0" 
               max="32"
+            />
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label for="netmask-input" class="tooltip-trigger" data-tooltip={calc.maskOrWildcardTooltip || "Enter dotted netmask (e.g. 255.255.255.240) or wildcard (0.0.0.15) for instant reverse lookup"}>{calc.maskOrWildcardLabel || "Mask / Wildcard"}</label>
+          <div class="ip-input">
+            <input 
+              type="text" 
+              id="netmask-input" 
+              value={initialResult.netmask} 
+              placeholder={calc.maskPlaceholder || "255.255.255.0 or 0.0.0.255"} 
+              inputmode="decimal" 
+              autocomplete="off" 
+              maxlength="15"
             />
           </div>
         </div>
@@ -103,33 +119,89 @@ const calc = calcTranslations[lang] || calcTranslations.en;
       <button type="button" data-fill="192.168.1.0/24">192.168.1.0/24</button>
     </div>
 
+    <!-- Next / Previous Subnet Navigation Bar -->
+    <div class="subnet-stepper-bar">
+      <div class="stepper-meta">
+        <span class="stepper-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-network);"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+          {calc.stepperLabel || "Subnet Stepper"}:
+        </span>
+        <span class="stepper-current-badge" id="stepper-current-badge">{initialResult.network}/{defaultCidr}</span>
+        <span class="stepper-delta-badge" id="stepper-delta-badge">Step: ±{initialResult.totalHosts.toLocaleString()} IPs</span>
+      </div>
+      <div class="stepper-controls">
+        <button type="button" class="stepper-btn" id="btn-prev-subnet" title="Step backward by 1 consecutive subnet block">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>{calc.prevSubnetLabel || "< Prev Subnet"}</span>
+        </button>
+        <button type="button" class="stepper-btn" id="btn-next-subnet" title="Step forward to next consecutive subnet block">
+          <span>{calc.nextSubnetLabel || "Next Subnet >"}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    </div>
+
     <div class="error-banner" id="ip-error" role="alert">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
       <span>{calc.invalidIp}</span>
     </div>
 
-    <!-- Binary visualization -->
+    <!-- Binary visualization: cidr.xyz Interactive Grid -->
     <div class="binary-section">
       <div class="binary-heading">
-        <span class="tooltip-trigger" data-tooltip={calc.binaryTooltip}>{calc.binaryTitle}</span>
-        <div class="binary-legend">
-          <div class="legend-item"><span class="legend-color net"></span> {calc.networkBit}</div>
-          <div class="legend-item"><span class="legend-color host"></span> {calc.hostBit}</div>
+        <div class="binary-title-wrap">
+          <span class="tooltip-trigger" data-tooltip={calc.binaryTooltip}>{calc.binaryTitle}</span>
+          <span class="binary-live-tag">Interactive Bit Grid</span>
+        </div>
+        <div class="binary-header-actions">
+          <div class="binary-mode-switch" role="group" aria-label="Binary interactive mode">
+            <button type="button" class="binary-mode-btn active" id="mode-prefix-btn" title="Click any bit to instantly set the CIDR prefix length">
+              <span class="mode-icon">🎯</span> {calc.bitPrefixMode || 'Set Prefix'}
+            </button>
+            <button type="button" class="binary-mode-btn" id="mode-flip-btn" title="Click any bit to flip its value (0 ↔ 1) and recalculate the IP">
+              <span class="mode-icon">🔄</span> {calc.bitFlipMode || 'Flip Bit (0 ↔ 1)'}
+            </button>
+          </div>
+          <div class="binary-legend">
+            <div class="legend-item"><span class="legend-color net"></span> {calc.networkBit}</div>
+            <div class="legend-item"><span class="legend-color host"></span> {calc.hostBit}</div>
+          </div>
         </div>
       </div>
       <div class="binary-grid-wrapper" id="binary-grid">
         {Array.from({ length: 4 }).map((_, octetIdx) => (
-          <div class="binary-octet">
-            {initialBits.slice(octetIdx * 8, (octetIdx + 1) * 8).map((bit) => (
-              <span 
-                class={`binary-bit ${bit.type}`} 
-                title={`Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit`}
-              >
-                {bit.val}
-              </span>
-            ))}
+          <div class="binary-octet-col">
+            <div class="binary-bit-weights">
+              <span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span>
+            </div>
+            <div class="binary-octet" data-octet={octetIdx + 1}>
+              {initialBits.slice(octetIdx * 8, (octetIdx + 1) * 8).map((bit, bitIdx) => {
+                const globalBitIdx = octetIdx * 8 + bitIdx;
+                const isBoundary = globalBitIdx + 1 === defaultCidr;
+                return (
+                  <button 
+                    type="button"
+                    class={`binary-bit ${bit.type} ${isBoundary ? 'boundary-bit' : ''}`} 
+                    data-bit-idx={globalBitIdx}
+                    data-bit-val={bit.val}
+                    data-octet-idx={bit.octetIndex}
+                    title={`Bit ${globalBitIdx + 1} (Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}): Weight ${Math.pow(2, 7 - bit.bitIndex)} - ${bit.type === 'net' ? 'Network' : 'Host'} Bit. Click to adjust.`}
+                    aria-label={`Bit ${globalBitIdx + 1}, value ${bit.val}, ${bit.type === 'net' ? 'network' : 'host'} bit`}
+                  >
+                    {bit.val}
+                  </button>
+                );
+              })}
+            </div>
+            <div class="binary-octet-footer">
+              Octet {octetIdx + 1}: <strong class="octet-dec-val">{defaultIp.split('.')[octetIdx] || '0'}</strong>
+            </div>
           </div>
         ))}
+      </div>
+      <div class="binary-guidance-note">
+        <span class="note-icon">💡</span>
+        <span id="binary-mode-instruction">Click any bit above to set the CIDR prefix boundary directly, or switch to <strong>Flip Bit (0 ↔ 1)</strong> mode to modify the IP address bit-by-bit.</span>
       </div>
     </div>
 
@@ -174,6 +246,127 @@ const calc = calcTranslations[lang] || calcTranslations.en;
       <div class="summary-item">
         <span class="tooltip-trigger" data-tooltip={calc.totalCapacityTooltip}>{calc.totalCapacity}</span>
         <strong id="res-total-hosts">{initialResult.totalHosts.toLocaleString()}</strong>
+      </div>
+    </div>
+
+    <!-- Lab CLI Quick Copy Bar -->
+    <div class="cli-quick-copy-card">
+      <div class="cli-quick-header">
+        <span class="cli-quick-title">⚡ CCNA & Lab CLI Quick Copy</span>
+        <span class="cli-quick-desc">Instant 1-click syntax for Packet Tracer, GNS3, and EVE-NG</span>
+      </div>
+      <div class="cli-buttons-row">
+        <button type="button" class="cli-copy-btn" id="quick-copy-cisco-ip" title="Copy Cisco IOS IP address command">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Cisco IOS IP</span>
+        </button>
+        <button type="button" class="cli-copy-btn" id="quick-copy-cisco-acl" title="Copy Cisco ACL Wildcard syntax">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Cisco ACL Wildcard</span>
+        </button>
+        <button type="button" class="cli-copy-btn" id="quick-copy-linux-ip" title="Copy Linux iproute2 command">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Linux iproute2</span>
+        </button>
+        <button type="button" class="cli-copy-btn" id="quick-copy-cisco-route" title="Copy Cisco Static Route command">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Cisco Route</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Exam Mode: Step-by-Step Math Derivation -->
+    <div class="exam-mode-card" id="exam-mode-section">
+      <div class="exam-mode-header">
+        <div class="exam-mode-badge-wrap">
+          <span class="exam-pill">🎓 {calc.examModeBadge || 'CCNA / CCNP EXAM MODE'}</span>
+          <h3 class="exam-title">{calc.examModeTitle || 'Step-by-Step Subnet Math Derivation'}</h3>
+        </div>
+        <button type="button" class="exam-toggle-switch" id="exam-mode-toggle" aria-expanded="true">
+          <span class="switch-indicator"></span>
+          <span id="exam-toggle-label">{calc.hideMathLabel || 'Hide Step-by-Step Math'}</span>
+        </button>
+      </div>
+
+      <div class="exam-mode-content" id="exam-mode-content">
+        <div class="exam-grid">
+          <!-- Card 1: Subnet & Host Bit Calculations -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 1</div>
+            <h4>Bit Allocation (2<sup>s</sup> & 2<sup>h</sup> &minus; 2)</h4>
+            <div class="formula-box">
+              <div class="formula-line">
+                <span class="f-label">Subnets Created:</span>
+                <code>2<sup>s</sup> = 2<sup>{initialExam.borrowedBits}</sup> = {initialExam.subnetsCreated.toLocaleString()}</code>
+              </div>
+              <div class="formula-line">
+                <span class="f-label">Usable Host IPs:</span>
+                <code>2<sup>h</sup> &minus; 2 = 2<sup>{initialExam.hostBits}</sup> &minus; 2 = {initialExam.usableHosts.toLocaleString()}</code>
+              </div>
+            </div>
+            <p class="exam-step-desc">
+              IP is Class <strong>{initialExam.ipClass}</strong> (default /{initialExam.defaultClassCidr}). Borrowing <strong>{initialExam.borrowedBits}</strong> bits creates <strong>{initialExam.subnetsCreated.toLocaleString()}</strong> subnets with <strong>{initialExam.hostBits}</strong> host bits remaining.
+            </p>
+          </div>
+
+          <!-- Card 2: Magic Number & Block Size -->
+          <div class="exam-step-card highlight">
+            <div class="step-num-badge">STEP 2</div>
+            <h4>Magic Number & Block Size</h4>
+            <div class="formula-box">
+              <div class="formula-line">
+                <span class="f-label">Interesting Octet:</span>
+                <code>{initialExam.interestingOctetName} (Mask: {initialExam.maskOctetValue})</code>
+              </div>
+              <div class="formula-line">
+                <span class="f-label">Magic Number:</span>
+                <code class="highlight-magic">256 &minus; {initialExam.maskOctetValue} = {initialExam.magicNumber}</code>
+              </div>
+            </div>
+            <p class="exam-step-desc">
+              The subnet boundary falls in the <strong>{initialExam.interestingOctetName}</strong>. Subnet blocks increment by multiples of <strong>{initialExam.magicNumber}</strong>.
+            </p>
+          </div>
+
+          <!-- Card 3: Boundary Hops & Range Identification -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 3</div>
+            <h4>Boundary Hops & Range Identification</h4>
+            <div class="hops-ribbon">
+              {initialExam.multiples.slice(0, 8).map(m => {
+                const isActive = m === initialExam.lowerBoundary;
+                return (
+                  <span class={`hop-badge ${isActive ? 'active-hop' : ''}`}>
+                    .{m}
+                  </span>
+                );
+              })}
+              {initialExam.multiples.length > 8 && <span class="hop-badge">...</span>}
+            </div>
+            <p class="exam-step-desc">
+              Octet value is <strong>{initialExam.ipOctetValue}</strong>. It falls between <strong>.{initialExam.lowerBoundary}</strong> and <strong>.{initialExam.broadcastOctet}</strong>.
+            </p>
+            <div class="exam-summary-strip">
+              <span><strong>Net ID:</strong> {initialExam.networkIp}</span>
+              <span><strong>Usable:</strong> {initialExam.firstUsableIp} - {initialExam.lastUsableIp}</span>
+              <span><strong>Broadcast:</strong> {initialExam.broadcastIp}</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Bitwise AND Verification -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 4</div>
+            <h4>Bitwise AND Verification</h4>
+            <div class="and-table">
+              <div class="and-row"><span class="and-lbl">IP ({initialExam.ipOctetValue}):</span><code class="and-bits">{initialExam.andOperation.ipOctetBin}</code></div>
+              <div class="and-row"><span class="and-lbl">Mask ({initialExam.maskOctetValue}):</span><code class="and-bits">{initialExam.andOperation.maskOctetBin}</code></div>
+              <div class="and-row and-result"><span class="and-lbl">AND Result:</span><code class="and-bits">{initialExam.andOperation.andResultBin} (={initialExam.andOperation.resultDec})</code></div>
+            </div>
+            <p class="exam-step-desc">
+              Bitwise AND produces <strong>{initialExam.andOperation.resultDec}</strong>, validating the Network ID.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -285,6 +478,9 @@ const calc = calcTranslations[lang] || calcTranslations.en;
           <label for="export-iac-select" class="sr-only">Export IaC Format</label>
           <select id="export-iac-select" class="cloud-select" aria-label="Export IaC Format" style="width: 100%; height: 36px; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); outline: none;">
             <option value="tf" selected>Terraform HCL</option>
+            <option value="cisco-ios">Cisco IOS (Interface & Route)</option>
+            <option value="cisco-acl">Cisco IOS ACL (Wildcard)</option>
+            <option value="linux-iproute2">Linux iproute2 (ip addr / ip route)</option>
             <option value="yaml">Ansible / YAML</option>
             <option value="pulumi-ts">Pulumi (TypeScript)</option>
             <option value="pulumi-py">Pulumi (Python)</option>
@@ -386,7 +582,17 @@ resource "aws_subnet" "subnet_1" &#123;
 </div>
 
 <script>
-  import { calculateSubnet, getBinaryBits, validateIPv4, ip2Long, long2Ip } from '../utils/subnetMath';
+  import { 
+    calculateSubnet, 
+    getBinaryBits, 
+    validateIPv4, 
+    ip2Long, 
+    long2Ip, 
+    netmaskToCidr, 
+    wildcardToCidr, 
+    parseSmartIpInput, 
+    calculateExamMath 
+  } from '../utils/subnetMath';
   import type { CalcTranslation } from '../utils/calc-i18n';
 
   function initIPv4Calculator() {
@@ -399,6 +605,7 @@ resource "aws_subnet" "subnet_1" &#123;
     const ipInput = document.getElementById('ip-address') as HTMLInputElement;
     const cidrInput = document.getElementById('cidr') as HTMLInputElement;
     const cidrSlider = document.getElementById('cidr-slider') as HTMLInputElement;
+    const netmaskInput = document.getElementById('netmask-input') as HTMLInputElement;
     const cloudSelector = document.getElementById('cloud-provider') as HTMLSelectElement;
     const errorBanner = document.getElementById('ip-error');
     
@@ -415,6 +622,30 @@ resource "aws_subnet" "subnet_1" &#123;
     const resDetails = document.getElementById('res-details');
     const binaryGrid = document.getElementById('binary-grid');
     
+    // Interactive Bit Grid Mode Elements
+    const modePrefixBtn = document.getElementById('mode-prefix-btn') as HTMLButtonElement;
+    const modeFlipBtn = document.getElementById('mode-flip-btn') as HTMLButtonElement;
+    const binaryModeInstruction = document.getElementById('binary-mode-instruction');
+    let bitInteractionMode: 'prefix' | 'flip' = 'prefix';
+
+    // Exam Mode Elements
+    const examModeToggle = document.getElementById('exam-mode-toggle') as HTMLButtonElement;
+    const examModeContent = document.getElementById('exam-mode-content');
+    const examToggleLabel = document.getElementById('exam-toggle-label');
+    let examModeExpanded = true;
+
+    // Subnet Stepper Elements
+    const btnPrevSubnet = document.getElementById('btn-prev-subnet') as HTMLButtonElement | null;
+    const btnNextSubnet = document.getElementById('btn-next-subnet') as HTMLButtonElement | null;
+    const stepperCurrentBadge = document.getElementById('stepper-current-badge');
+    const stepperDeltaBadge = document.getElementById('stepper-delta-badge');
+
+    // CLI Quick Copy Buttons
+    const quickCopyCiscoIp = document.getElementById('quick-copy-cisco-ip');
+    const quickCopyCiscoAcl = document.getElementById('quick-copy-cisco-acl');
+    const quickCopyLinuxIp = document.getElementById('quick-copy-linux-ip');
+    const quickCopyCiscoRoute = document.getElementById('quick-copy-cisco-route');
+
     // Aside elements
     const resAsideTitle = document.getElementById('res-aside-title');
     const resAsideDesc = document.getElementById('res-aside-desc');
@@ -428,8 +659,6 @@ resource "aws_subnet" "subnet_1" &#123;
     const copyCsvBtn = document.getElementById('copy-ipv4-csv');
     const copyMarkdownBtn = document.getElementById('copy-ipv4-markdown');
     const shareLinkBtn = document.getElementById('share-link-btn');
-    
-    let currentLang = 'tf';
 
     // Inline Splitter State
     interface InlineSubnetNode {
@@ -647,6 +876,88 @@ resource "aws_subnet" "subnet_1" &#123;
       });
     }
 
+    function renderExamMode(exam: ReturnType<typeof calculateExamMath>) {
+      if (!examModeContent) return;
+
+      const hopsHtml = exam.multiples.slice(0, 8).map(m => {
+        const isActive = m === exam.lowerBoundary;
+        return `<span class="hop-badge ${isActive ? 'active-hop' : ''}">.${m}</span>`;
+      }).join('') + (exam.multiples.length > 8 ? '<span class="hop-badge">...</span>' : '');
+
+      examModeContent.innerHTML = `
+        <div class="exam-grid">
+          <!-- Card 1: Subnet & Host Bit Calculations -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 1</div>
+            <h4>Bit Allocation (2<sup>s</sup> & 2<sup>h</sup> &minus; 2)</h4>
+            <div class="formula-box">
+              <div class="formula-line">
+                <span class="f-label">Subnets Created:</span>
+                <code>2<sup>s</sup> = 2<sup>${exam.borrowedBits}</sup> = ${exam.subnetsCreated.toLocaleString()}</code>
+              </div>
+              <div class="formula-line">
+                <span class="f-label">Usable Host IPs:</span>
+                <code>2<sup>h</sup> &minus; 2 = 2<sup>${exam.hostBits}</sup> &minus; 2 = ${exam.usableHosts.toLocaleString()}</code>
+              </div>
+            </div>
+            <p class="exam-step-desc">
+              IP is Class <strong>${exam.ipClass}</strong> (default /${exam.defaultClassCidr}). Borrowing <strong>${exam.borrowedBits}</strong> bits creates <strong>${exam.subnetsCreated.toLocaleString()}</strong> subnets with <strong>${exam.hostBits}</strong> host bits remaining.
+            </p>
+          </div>
+
+          <!-- Card 2: Magic Number & Block Size -->
+          <div class="exam-step-card highlight">
+            <div class="step-num-badge">STEP 2</div>
+            <h4>Magic Number & Block Size</h4>
+            <div class="formula-box">
+              <div class="formula-line">
+                <span class="f-label">Interesting Octet:</span>
+                <code>${exam.interestingOctetName} (Mask: ${exam.maskOctetValue})</code>
+              </div>
+              <div class="formula-line">
+                <span class="f-label">Magic Number:</span>
+                <code class="highlight-magic">256 &minus; ${exam.maskOctetValue} = ${exam.magicNumber}</code>
+              </div>
+            </div>
+            <p class="exam-step-desc">
+              The subnet boundary falls in the <strong>${exam.interestingOctetName}</strong>. Subnet blocks increment by multiples of <strong>${exam.magicNumber}</strong>.
+            </p>
+          </div>
+
+          <!-- Card 3: Boundary Hops & Range Identification -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 3</div>
+            <h4>Boundary Hops & Range Identification</h4>
+            <div class="hops-ribbon">
+              ${hopsHtml}
+            </div>
+            <p class="exam-step-desc">
+              Octet value is <strong>${exam.ipOctetValue}</strong>. It falls between <strong>.${exam.lowerBoundary}</strong> and <strong>.${exam.broadcastOctet}</strong>.
+            </p>
+            <div class="exam-summary-strip">
+              <span><strong>Net ID:</strong> ${exam.networkIp}</span>
+              <span><strong>Usable:</strong> ${exam.firstUsableIp} - ${exam.lastUsableIp}</span>
+              <span><strong>Broadcast:</strong> ${exam.broadcastIp}</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Bitwise AND Verification -->
+          <div class="exam-step-card">
+            <div class="step-num-badge">STEP 4</div>
+            <h4>Bitwise AND Verification</h4>
+            <div class="and-table">
+              <div class="and-row"><span class="and-lbl">IP (${exam.ipOctetValue}):</span><code class="and-bits">${exam.andOperation.ipOctetBin}</code></div>
+              <div class="and-row"><span class="and-lbl">Mask (${exam.maskOctetValue}):</span><code class="and-bits">${exam.andOperation.maskOctetBin}</code></div>
+              <div class="and-row and-result"><span class="and-lbl">AND Result:</span><code class="and-bits">${exam.andOperation.andResultBin} (=${exam.andOperation.resultDec})</code></div>
+            </div>
+            <p class="exam-step-desc">
+              Bitwise AND produces <strong>${exam.andOperation.resultDec}</strong>, validating the Network ID.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
     function updateAll() {
       const ip = ipInput.value.trim();
       const cidr = parseInt(cidrInput.value, 10);
@@ -663,6 +974,12 @@ resource "aws_subnet" "subnet_1" &#123;
       // Run math
       const result = calculateSubnet(ip, cidr, cloud);
       const bits = getBinaryBits(ip, cidr);
+      const exam = calculateExamMath(ip, cidr);
+
+      // Sync netmask input when user is not typing in it
+      if (netmaskInput && document.activeElement !== netmaskInput) {
+        netmaskInput.value = result.netmask;
+      }
 
       // Update display text fields
       if (resNetwork) resNetwork.innerText = `${result.network}/${cidr}`;
@@ -699,27 +1016,93 @@ resource "aws_subnet" "subnet_1" &#123;
         `).join('');
       }
 
-      // Re-render Binary grid
+      // Re-render Interactive Binary grid
       if (binaryGrid) {
+        const ipParts = ip.split('.');
         let html = '';
         for (let oIndex = 0; oIndex < 4; oIndex++) {
-          html += '<div class="binary-octet">';
+          html += `
+            <div class="binary-octet-col">
+              <div class="binary-bit-weights">
+                <span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span>
+              </div>
+              <div class="binary-octet" data-octet="${oIndex + 1}">
+          `;
           const slice = bits.slice(oIndex * 8, (oIndex + 1) * 8);
-          slice.forEach(bit => {
+          slice.forEach((bit, bIdx) => {
+            const globalIdx = oIndex * 8 + bIdx;
+            const isBoundary = globalIdx + 1 === cidr;
             html += `
-              <span 
-                class="binary-bit ${bit.type}" 
-                title="Octet ${bit.octetIndex}, Bit ${bit.bitIndex + 1}: ${bit.type === 'net' ? 'Network' : 'Host'} Bit"
-              >${bit.val}</span>
+              <button 
+                type="button" 
+                class="binary-bit ${bit.type} ${isBoundary ? 'boundary-bit' : ''}" 
+                data-bit-idx="${globalIdx}" 
+                data-bit-val="${bit.val}"
+                data-octet-idx="${bit.octetIndex}"
+                title="Bit ${globalIdx + 1} (Weight ${Math.pow(2, 7 - bit.bitIndex)}): ${bit.type === 'net' ? 'Network' : 'Host'} Bit. Click to ${bitInteractionMode === 'prefix' ? 'set prefix /' + (globalIdx + 1) : 'flip bit to ' + (bit.val === '1' ? '0' : '1')}"
+                aria-label="Bit ${globalIdx + 1}, value ${bit.val}"
+              >${bit.val}</button>
             `;
           });
-          html += '</div>';
+          html += `
+              </div>
+              <div class="binary-octet-footer">
+                Octet ${oIndex + 1}: <strong class="octet-dec-val">${ipParts[oIndex] || '0'}</strong>
+              </div>
+            </div>
+          `;
         }
         binaryGrid.innerHTML = html;
+
+        // Attach bit click handlers
+        binaryGrid.querySelectorAll('.binary-bit').forEach(btn => {
+          (btn as HTMLButtonElement).onclick = (e) => {
+            const target = e.currentTarget as HTMLButtonElement;
+            const bitIdx = parseInt(target.getAttribute('data-bit-idx')!, 10);
+            
+            if (bitInteractionMode === 'prefix') {
+              const newCidr = bitIdx + 1;
+              cidrInput.value = newCidr.toString();
+              cidrSlider.value = newCidr.toString();
+              scheduledUpdate();
+            } else {
+              // Flip bit in IP address
+              const currentLong = ip2Long(ipInput.value);
+              // In 32-bit big endian: bit 0 from left is bit 31
+              const bitMask = (1 << (31 - bitIdx)) >>> 0;
+              const flippedLong = (currentLong ^ bitMask) >>> 0;
+              ipInput.value = long2Ip(flippedLong);
+              scheduledUpdate();
+            }
+          };
+        });
+      }
+
+      // Re-render Exam Mode Step-by-Step Breakdown
+      renderExamMode(exam);
+
+      // Update Subnet Stepper Badges and States
+      if (stepperCurrentBadge) {
+        stepperCurrentBadge.innerText = `${result.network}/${cidr}`;
+      }
+      if (stepperDeltaBadge) {
+        const blockSize = Math.pow(2, 32 - cidr);
+        const currentIpLong = ip2Long(ip);
+        const maskLong = (cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0);
+        const currentNetLong = (currentIpLong & maskLong) >>> 0;
+        
+        stepperDeltaBadge.innerText = `Step: ±${blockSize.toLocaleString()} IPs (Magic Number: ${exam.magicNumber})`;
+        
+        if (btnPrevSubnet) {
+          btnPrevSubnet.disabled = (cidr === 0 || currentNetLong - blockSize < 0);
+        }
+        if (btnNextSubnet) {
+          btnNextSubnet.disabled = (cidr === 0 || currentNetLong + blockSize > 0xFFFFFFFF);
+        }
       }
 
       // Update IaC Snippet Code block
-      updateIaCCode(result.network, cidr, cloud);
+      updateIaCCode(result.network, cidr, cloud, result.netmask, result.wildcard, result.firstUsable);
 
       // Reset inline splitter if base CIDR or base Network changed
       const currentNetworkLong = ip2Long(result.network);
@@ -735,13 +1118,49 @@ resource "aws_subnet" "subnet_1" &#123;
       updateRaf = requestAnimationFrame(updateAll);
     }
 
-    function updateIaCCode(network: string, cidr: number, cloud: string) {
+    function updateIaCCode(network: string, cidr: number, cloud: string, netmask?: string, wildcard?: string, firstUsable?: string) {
       if (!iacOutput) return;
       
       const iacSelect = document.getElementById('export-iac-select') as HTMLSelectElement;
       const format = iacSelect ? iacSelect.value : 'tf';
+      const actualNetmask = netmask || (resMask ? resMask.innerText : '255.255.255.0');
+      const actualWildcard = wildcard || (resWildcard ? resWildcard.innerText : '0.0.0.255');
+      const actualFirst = firstUsable || (resHostRange ? resHostRange.innerText.split(' - ')[0] : `${network}`);
 
-      if (format === 'tf') {
+      if (format === 'cisco-ios') {
+        iacOutput.innerText = `! Cisco IOS Interface & Static Route Configuration
+! 1. Assign interface IP in subnet ${network}/${cidr}
+interface GigabitEthernet0/1
+ description Subnet Link
+ ip address ${actualFirst} ${actualNetmask}
+ no shutdown
+exit
+
+! 2. Static route targeting this subnet
+ip route ${network} ${actualNetmask} GigabitEthernet0/1`;
+      } else if (format === 'cisco-acl') {
+        iacOutput.innerText = `! Cisco IOS Access Control List (ACL) with Wildcard Mask
+! Standard ACL to permit this subnet:
+access-list 10 permit ${network} ${actualWildcard}
+
+! Extended ACL permitting all traffic from this subnet:
+access-list 101 permit ip ${network} ${actualWildcard} any
+
+! Named Extended ACL:
+ip access-list extended LAB_PERMIT_SUBNET
+ permit ip ${network} ${actualWildcard} any
+exit`;
+      } else if (format === 'linux-iproute2') {
+        iacOutput.innerText = `# Linux iproute2 Network Configuration
+# 1. Assign IP address and CIDR prefix to interface
+sudo ip addr add ${actualFirst}/${cidr} dev eth0
+
+# 2. Bring interface up
+sudo ip link set dev eth0 up
+
+# 3. Add static subnet route
+sudo ip route add ${network}/${cidr} dev eth0`;
+      } else if (format === 'tf') {
         if (cloud === 'aws') {
           iacOutput.innerText = `# AWS VPC Subnet IaC snippet
 resource "aws_subnet" "subnet_aws" {
@@ -829,6 +1248,152 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
     // Bind Listeners
     ipInput.oninput = scheduledUpdate;
     
+    // Smart IP Parsing on blur or paste (handles 192.168.1.1 255.255.255.240 or 192.168.1.1/28)
+    ipInput.addEventListener('change', () => {
+      const parsed = parseSmartIpInput(ipInput.value);
+      if (parsed) {
+        ipInput.value = parsed.ip;
+        if (parsed.cidr !== undefined) {
+          cidrInput.value = parsed.cidr.toString();
+          cidrSlider.value = parsed.cidr.toString();
+        }
+        scheduledUpdate();
+      }
+    });
+
+    // Reverse Netmask / Wildcard input listener
+    if (netmaskInput) {
+      netmaskInput.addEventListener('input', () => {
+        const val = netmaskInput.value.trim();
+        const cidrFromMask = netmaskToCidr(val) ?? wildcardToCidr(val);
+        if (cidrFromMask !== null) {
+          cidrInput.value = cidrFromMask.toString();
+          cidrSlider.value = cidrFromMask.toString();
+          scheduledUpdate();
+        }
+      });
+    }
+
+    // Interactive Bit Grid Mode Switcher
+    if (modePrefixBtn && modeFlipBtn && binaryModeInstruction) {
+      modePrefixBtn.onclick = () => {
+        bitInteractionMode = 'prefix';
+        modePrefixBtn.classList.add('active');
+        modeFlipBtn.classList.remove('active');
+        binaryModeInstruction.innerHTML = 'Click any bit above to set the <strong>CIDR prefix boundary</strong> directly.';
+        scheduledUpdate();
+      };
+
+      modeFlipBtn.onclick = () => {
+        bitInteractionMode = 'flip';
+        modeFlipBtn.classList.add('active');
+        modePrefixBtn.classList.remove('active');
+        binaryModeInstruction.innerHTML = 'Click any bit above to <strong>flip its value (0 ↔ 1)</strong> and watch the IP address dynamically recalculate.';
+        scheduledUpdate();
+      };
+    }
+
+    // Exam Mode Toggle
+    if (examModeToggle && examModeContent) {
+      examModeToggle.onclick = () => {
+        examModeExpanded = !examModeExpanded;
+        examModeToggle.setAttribute('aria-expanded', String(examModeExpanded));
+        if (examModeExpanded) {
+          examModeContent.style.display = 'block';
+          if (examToggleLabel) examToggleLabel.innerText = calcData.hideMathLabel || 'Hide Step-by-Step Math';
+        } else {
+          examModeContent.style.display = 'none';
+          if (examToggleLabel) examToggleLabel.innerText = calcData.showMathLabel || 'Show Step-by-Step Math';
+        }
+      };
+    }
+
+    // CLI Quick Copy Handlers
+    function triggerCopyFeedback(btn: HTMLElement, originalText: string) {
+      btn.classList.add('copied');
+      const span = btn.querySelector('span');
+      if (span) span.innerText = 'Copied to Clipboard!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        if (span) span.innerText = originalText;
+      }, 2000);
+    }
+
+    if (quickCopyCiscoIp) {
+      quickCopyCiscoIp.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, 'standard');
+        const text = `ip address ${res.firstUsable} ${res.netmask}`;
+        await navigator.clipboard.writeText(text);
+        triggerCopyFeedback(quickCopyCiscoIp, 'Cisco IOS IP');
+      };
+    }
+
+    if (quickCopyCiscoAcl) {
+      quickCopyCiscoAcl.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, 'standard');
+        const text = `access-list 101 permit ip ${res.network} ${res.wildcard} any`;
+        await navigator.clipboard.writeText(text);
+        triggerCopyFeedback(quickCopyCiscoAcl, 'Cisco ACL Wildcard');
+      };
+    }
+
+    if (quickCopyLinuxIp) {
+      quickCopyLinuxIp.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, 'standard');
+        const text = `sudo ip addr add ${res.firstUsable}/${cidr} dev eth0`;
+        await navigator.clipboard.writeText(text);
+        triggerCopyFeedback(quickCopyLinuxIp, 'Linux iproute2');
+      };
+    }
+
+    if (quickCopyCiscoRoute) {
+      quickCopyCiscoRoute.onclick = async () => {
+        const ip = ipInput.value.trim();
+        const cidr = parseInt(cidrInput.value, 10);
+        if (!validateIPv4(ip)) return;
+        const res = calculateSubnet(ip, cidr, 'standard');
+        const text = `ip route ${res.network} ${res.netmask} GigabitEthernet0/1`;
+        await navigator.clipboard.writeText(text);
+        triggerCopyFeedback(quickCopyCiscoRoute, 'Cisco Route');
+      };
+    }
+
+    // Subnet Stepper Click Handlers
+    function stepSubnetBlock(direction: 'prev' | 'next') {
+      const ip = ipInput.value.trim();
+      const cidr = parseInt(cidrInput.value, 10);
+      if (!validateIPv4(ip) || isNaN(cidr) || cidr < 0 || cidr > 32 || cidr === 0) return;
+
+      const blockSize = Math.pow(2, 32 - cidr);
+      const currentIpLong = ip2Long(ip);
+      const maskLong = (~0 << (32 - cidr)) >>> 0;
+      const currentNetLong = (currentIpLong & maskLong) >>> 0;
+
+      let targetNetLong: number;
+      if (direction === 'next') {
+        if (currentNetLong + blockSize > 0xFFFFFFFF) return;
+        targetNetLong = currentNetLong + blockSize;
+      } else {
+        if (currentNetLong - blockSize < 0) return;
+        targetNetLong = currentNetLong - blockSize;
+      }
+
+      ipInput.value = long2Ip(targetNetLong >>> 0);
+      scheduledUpdate();
+    }
+
+    btnPrevSubnet?.addEventListener('click', () => stepSubnetBlock('prev'));
+    btnNextSubnet?.addEventListener('click', () => stepSubnetBlock('next'));
+    
     cidrInput.oninput = (e) => {
       const val = parseInt((e.target as HTMLInputElement).value, 10);
       if (!isNaN(val) && val >= 0 && val <= 32) {
@@ -863,7 +1428,7 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
         const ip = ipInput.value.trim();
         const cidr = parseInt(cidrInput.value, 10);
         const result = calculateSubnet(ip, cidr, cloudSelector.value as any);
-        updateIaCCode(result.network, cidr, cloudSelector.value);
+        updateIaCCode(result.network, cidr, cloudSelector.value, result.netmask, result.wildcard, result.firstUsable);
       };
     }
 
@@ -999,6 +1564,7 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
         cloudSelector.value = cloudParam;
       }
     }
+
     // Keyboard Navigation & Shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl + Shift + C (Copy primary Usable Host Range)

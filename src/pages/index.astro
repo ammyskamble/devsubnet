@@ -14,7 +14,7 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
   </MainShell>
 
   <!-- FAQ Schema for SEO -->
-  <script type="application/ld+json">
+  <script is:inline type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -25,6 +25,30 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "A subnet calculator is a software utility used by network engineers, IT professionals, and students to divide IP networks into smaller subnets. By entering an IP address and CIDR prefix (e.g. /24), the calculator automates binary math to instantly determine the network address, broadcast address, subnet mask, usable host IP range, and cloud-aware VPC reserved IPs without manual calculation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate subnets using the Magic Number method for CCNA and CCNP exams?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "To calculate subnets using the Magic Number method on Cisco exams: (1) Identify the interesting octet in the subnet mask (the octet that is neither 255 nor 0). (2) Subtract the interesting mask octet from 256 to determine the block size (e.g., 256 - 192 = 64). (3) Count in multiples of the magic number (0, 64, 128, 192). (4) Identify the multiple that is less than or equal to your IP octet to find the Network ID."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I perform a reverse netmask or wildcard mask lookup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In DevSubnet, enter any dotted-decimal subnet mask (such as 255.255.255.240) or wildcard mask (such as 0.0.0.15) directly into the Subnet Mask field. DevSubnet converts the mask to CIDR notation (/28) and displays the network boundary, broadcast IP, and usable host range."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I copy Cisco IOS or Linux CLI commands directly from this subnet calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. DevSubnet provides 1-click quick-copy buttons for Cisco IOS interface configuration (ip address 192.168.1.1 255.255.255.0), Cisco ACL wildcard syntax, and Linux iproute2 commands (sudo ip addr add dev eth0) directly for Packet Tracer, GNS3, and EVE-NG labs."
           }
         },
         {
@@ -65,14 +89,6 @@ const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "A /24 subnet has 256 total IP addresses. After subtracting the network address (the first IP) and the broadcast address (the last IP), you have exactly 254 usable host IP addresses."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between network address and broadcast address?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The network address is the first IP in a subnet range and represents the network itself – routers use it to forward packets. The broadcast address is the last IP in the range and is used to send packets to all hosts simultaneously within the subnet."
           }
         }
       ]

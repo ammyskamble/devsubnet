@@ -1,40 +1,81 @@
 ---
-import { type SupportedLanguage, translations } from '../utils/i18n';
+import { type SupportedLanguage } from '../utils/i18n';
 import Layout from '../layouts/Layout.astro';
 import MainShell from '../components/MainShell.astro';
 import { pageCommonI18n } from '../utils/pages-i18n';
 
 const lang = (Astro.currentLocale as SupportedLanguage) || 'en';
-const t = translations[lang] || translations.en;
 const common = pageCommonI18n[lang] || pageCommonI18n.en;
 const homeUrl = lang === 'en' ? '/' : `/${lang}/`;
 ---
 
 <Layout lang={lang}
-  title="Subnet Calculator for Students | DevSubnet"
-  description="Free IP subnet calculator designed for CCNA/CCNP students and networking learners. All calculations run locally in your browser."
+  title="Subnet Calculator for Students | CCNA & CCNP Exam Study Tool | DevSubnet"
+  description="Free IP subnet calculator designed for CCNA/CCNP students and networking candidates. Master the Magic Number method (256 - mask), interactive bit-flipping, and 1-click Cisco IOS CLI exports."
 >
   <MainShell activeTab="ipv4" defaultCloud="standard" lang={lang}>
 
-    <!-- Student-focused FAQ -->
-    <section class="faq-section" style="margin-top: 4rem; padding: 2rem; background: var(--card-bg, rgba(255, 255, 255, 0.03)); border-radius: var(--radius-md);">
-      <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">Student FAQ</h2>
+    <!-- Student & Exam Prep Features Overview -->
+    <section class="student-features-section" style="margin-top: 4rem; padding: 2.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <span style="background: rgba(var(--hsl-highlight), 0.15); color: var(--accent-highlight); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">EXAM PREPARATION GUIDE</span>
+        <span style="color: var(--text-muted); font-size: 0.8rem;">Cisco CCNA (200-301) & CCNP Enterprise (350-401 ENCOR)</span>
+      </div>
+      <h2 style="font-family: var(--font-display); font-size: 1.75rem; margin-bottom: 1rem; color: var(--text-primary);">
+        Why DevSubnet Is Built for Networking Candidates
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem;">
+        Standard subnet calculators simply display static answers, which doesn't teach you how to pass certification exams where calculators are banned. DevSubnet provides interactive pedagogical tools to verify your mental math step-by-step.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 1.05rem; color: var(--accent-network); margin-bottom: 0.5rem;">🎓 Step-by-Step Exam Mode</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+            Learn the <strong>Magic Number method</strong> (<code>256 &minus; interesting octet = block size</code>). Verify subnet boundary hops (<code>0, 64, 128, 192</code>) and formulas (<code>2<sup>s</sup></code> subnets, <code>2<sup>h</sup> &minus; 2</code> usable hosts).
+          </p>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 1.05rem; color: var(--accent-highlight); margin-bottom: 0.5rem;">⚡ 1-Click Lab CLI Quick Copy</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+            Instantly copy <strong>Cisco IOS</strong> interface and route syntax (<code>ip address 192.168.1.1 255.255.255.192</code>) or wildcard ACLs directly into Cisco Packet Tracer, GNS3, or EVE-NG labs.
+          </p>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 1.05rem; color: var(--accent-host); margin-bottom: 0.5rem;">🎯 Interactive Bit Flipping</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+            Like <code>cidr.xyz</code>, click individual bits to dynamically shift the CIDR prefix boundary or flip bits (0 &harr; 1) with clear octet bit weights (128, 64, 32, 16, 8, 4, 2, 1).
+          </p>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 1.05rem; color: #22c55e; margin-bottom: 0.5rem;">🔒 100% Client-Side Privacy</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+            Zero analytics tracking, zero logging, and zero server roundtrips. Every IP address and subnet calculation executes locally in your browser sandbox.
+          </p>
+        </div>
+      </div>
+
+      <!-- Student-focused FAQ -->
+      <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--text-primary);">Frequently Asked Exam Questions</h3>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <details>
-          <summary>What is a subnet?</summary>
-          <p>A subnet is a logical subdivision of an IP network. Used for organizing traffic, improving security, and efficient IP address allocation.</p>
+          <summary>What is the Magic Number shortcut in subnetting?</summary>
+          <p>The Magic Number (or block size) equals <code>256 &minus; the interesting octet mask value</code>. For example, in /26 (mask <code>255.255.255.192</code>), the 4th octet is 192, giving <code>256 &minus; 192 = 64</code>. Subnets hop in multiples of 64: 0, 64, 128, 192.</p>
         </details>
         <details>
-          <summary>What is CIDR notation?</summary>
-          <p>CIDR (Classless Inter-Domain Routing) is a compact way to represent an IP address and its network prefix, using slash notation (e.g., /24).</p>
+          <summary>What is the difference between netmask and wildcard mask?</summary>
+          <p>A subnet mask has contiguous 1s followed by 0s (e.g. <code>255.255.255.240</code>). A wildcard mask is its bitwise inverse (e.g. <code>0.0.0.15</code>), commonly used in Cisco Access Control Lists (ACLs) and OSPF network statements.</p>
         </details>
         <details>
-          <summary>How many hosts in a /24 subnet?</summary>
-          <p>A /24 subnet has 256 total IP addresses. After subtracting the network and broadcast addresses, 254 are usable for hosts.</p>
+          <summary>Why do we subtract 2 for usable hosts?</summary>
+          <p>The first IP in any subnet (all host bits set to 0) represents the Network ID. The last IP (all host bits set to 1) is the Broadcast address. Neither can be assigned to host network cards.</p>
         </details>
         <details>
-          <summary>What does the calculator show?</summary>
-          <p>The calculator shows the network address, netmask, broadcast address, first and last usable host, and total usable hosts per subnet.</p>
+          <summary>How do RFC 3021 /31 and RFC 1878 /32 work?</summary>
+          <p>A <code>/31</code> subnet has only 2 addresses and is used for point-to-point router links without broadcast or network separation (RFC 3021). A <code>/32</code> represents a single host or loopback address (RFC 1878).</p>
         </details>
       </div>
     </section>
@@ -46,19 +87,39 @@ const homeUrl = lang === 'en' ? '/' : `/${lang}/`;
 </Layout>
 
 <style>
-  .faq-section details {
+  .faq-section details,
+  .student-features-section details {
     margin-bottom: 0.5rem;
-  }
-
-  .faq-section summary {
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0.5rem 0;
+    background: rgba(0, 0, 0, 0.15);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
   }
 
-  .faq-section summary:hover {
-    background: rgba(var(--accent-network-rgb, 56, 189, 248), 0.1);
+  .faq-section summary,
+  .student-features-section summary {
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  .faq-section p,
+  .student-features-section details p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .student-features-section summary:hover {
+    color: var(--accent-network);
+  }
+
+  @media (max-width: 768px) {
+    .student-features-section div[style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
   }
 </style>

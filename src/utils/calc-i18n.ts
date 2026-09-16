@@ -77,6 +77,18 @@ export interface CalcTranslation {
   arinWhois: string;
   cloudflareDns: string;
   bgpInspector: string;
+  maskOrWildcardLabel?: string;
+  maskOrWildcardTooltip?: string;
+  maskPlaceholder?: string;
+  examModeBadge?: string;
+  examModeTitle?: string;
+  showMathLabel?: string;
+  hideMathLabel?: string;
+  bitPrefixMode?: string;
+  bitFlipMode?: string;
+  stepperLabel?: string;
+  prevSubnetLabel?: string;
+  nextSubnetLabel?: string;
 }
 
 export const calcTranslations: Record<SupportedLanguage, CalcTranslation> = {
@@ -88,6 +100,18 @@ export const calcTranslations: Record<SupportedLanguage, CalcTranslation> = {
     ipAddressTooltip: "IPv4 address: Enter four octets (0-255) separated by dots.",
     ipPlaceholder: "e.g., 10.0.0.0",
     cidrLabel: "CIDR",
+    maskOrWildcardLabel: "Subnet Mask / Wildcard",
+    maskOrWildcardTooltip: "Reverse Lookup: Enter dotted netmask (e.g. 255.255.255.240) or wildcard (0.0.0.15) to auto-convert to CIDR.",
+    maskPlaceholder: "e.g. 255.255.255.0 or 0.0.0.255",
+    stepperLabel: "Subnet Stepper",
+    prevSubnetLabel: "< Prev Subnet",
+    nextSubnetLabel: "Next Subnet >",
+    examModeBadge: "CCNA / CCNP EXAM MODE",
+    examModeTitle: "Step-by-Step Subnet Math Derivation",
+    showMathLabel: "Show Step-by-Step Math",
+    hideMathLabel: "Hide Step-by-Step Math",
+    bitPrefixMode: "Set Prefix Boundary",
+    bitFlipMode: "Flip Bit (0 ↔ 1)",
     cidrTooltip: "CIDR Prefix: The number of bits allocated to the network prefix (0 to 32).",
     cloudLabel: "Cloud Architecture Rules",
     cloudTooltip: "Cloud provider rules: Select the architecture to apply vendor-specific reserved IP offsets (AWS/Azure reserve 5 IPs, GCP reserves 4).",

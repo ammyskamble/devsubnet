@@ -39,7 +39,274 @@ export function long2Ip(long: number): string {
 // Validate if IP address format is correct
 export function validateIPv4(ip: string): boolean {
   const regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  return regex.test(ip);
+  return regex.test(ip.trim());
+}
+
+// Convert dotted-decimal netmask (e.g. 255.255.255.240) to CIDR (e.g. 28)
+export function netmaskToCidr(mask: string): number | null {
+  mask = mask.trim();
+  if (!validateIPv4(mask)) return null;
+  const long = ip2Long(mask);
+  const bin = (long >>> 0).toString(2).padStart(32, '0');
+  const firstZero = bin.indexOf('0');
+  if (firstZero === -1) return 32;
+  // All bits after the first zero must be 0
+  if (bin.slice(firstZero).includes('1')) return null;
+  return firstZero;
+}
+
+// Convert wildcard mask (e.g. 0.0.0.15) to CIDR (e.g. 28)
+export function wildcardToCidr(wildcard: string): number | null {
+  wildcard = wildcard.trim();
+  if (!validateIPv4(wildcard)) return null;
+  const long = ip2Long(wildcard);
+  const maskLong = (~long) >>> 0;
+  const bin = maskLong.toString(2).padStart(32, '0');
+  const firstZero = bin.indexOf('0');
+  if (firstZero === -1) return 32;
+  if (bin.slice(firstZero).includes('1')) return null;
+  return firstZero;
+}
+
+// Smart IP parser: handles "192.168.1.1/24", "192.168.1.1 255.255.255.0", "192.168.1.1 0.0.0.255", or just "192.168.1.1"
+export function parseSmartIpInput(input: string): { ip: string; cidr?: number } | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+
+  // Case 1: Slash notation e.g. 192.168.1.1/24 or 192.168.1.1/255.255.255.0
+  if (trimmed.includes('/')) {
+    const [ipPart, maskPart] = trimmed.split('/');
+    if (!validateIPv4(ipPart)) return null;
+    const cidrNum = parseInt(maskPart, 10);
+    if (!isNaN(cidrNum) && cidrNum >= 0 && cidrNum <= 32 && String(cidrNum) === maskPart.trim()) {
+      return { ip: ipPart.trim(), cidr: cidrNum };
+    }
+    // Mask part might be dotted-decimal netmask or wildcard
+    const cidrFromMask = netmaskToCidr(maskPart) ?? wildcardToCidr(maskPart);
+    if (cidrFromMask !== null) {
+      return { ip: ipPart.trim(), cidr: cidrFromMask };
+    }
+    return { ip: ipPart.trim() };
+  }
+
+  // Case 2: Space separated e.g. "192.168.1.1 255.255.255.0" or "192.168.1.1 0.0.0.255"
+  const spaceParts = trimmed.split(/\s+/);
+  if (spaceParts.length >= 2) {
+    const ipPart = spaceParts[0];
+    const maskPart = spaceParts[1];
+    if (validateIPv4(ipPart)) {
+      const cidrFromMask = netmaskToCidr(maskPart) ?? wildcardToCidr(maskPart);
+      if (cidrFromMask !== null) {
+        return { ip: ipPart, cidr: cidrFromMask };
+      }
+    }
+  }
+
+  // Case 3: Just IP
+  if (validateIPv4(trimmed)) {
+    return { ip: trimmed };
+  }
+
+  return null;
+}
+
+export interface ExamStep {
+  stepNumber: number;
+  title: string;
+  formula: string;
+  result: string;
+  explanation: string;
+}
+
+export interface ExamMathBreakdown {
+  ip: string;
+  cidr: number;
+  ipClass: 'A' | 'B' | 'C' | 'D' | 'E';
+  defaultClassCidr: number;
+  borrowedBits: number;
+  subnetsCreated: number;
+  hostBits: number;
+  totalAddresses: number;
+  usableHosts: number;
+  interestingOctetNumber: 1 | 2 | 3 | 4;
+  interestingOctetName: string;
+  maskOctetValue: number;
+  magicNumber: number;
+  ipOctetValue: number;
+  lowerBoundary: number;
+  nextSubnetOctet: number;
+  broadcastOctet: number;
+  multiples: number[];
+  networkIp: string;
+  broadcastIp: string;
+  firstUsableIp: string;
+  lastUsableIp: string;
+  andOperation: {
+    ipOctetBin: string;
+    maskOctetBin: string;
+    andResultBin: string;
+    resultDec: number;
+  };
+  steps: ExamStep[];
+}
+
+export function calculateExamMath(ip: string, cidr: number): ExamMathBreakdown {
+  if (!validateIPv4(ip)) ip = "192.168.1.0";
+  if (cidr < 0) cidr = 0;
+  if (cidr > 32) cidr = 32;
+
+  const ipLong = ip2Long(ip);
+  const maskLong = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
+  const wildcardLong = ~maskLong >>> 0;
+  const networkLong = (ipLong & maskLong) >>> 0;
+  const broadcastLong = (networkLong | wildcardLong) >>> 0;
+
+  const ipOctets = [
+    (ipLong >>> 24) & 255,
+    (ipLong >>> 16) & 255,
+    (ipLong >>> 8) & 255,
+    ipLong & 255
+  ];
+
+  const maskOctets = [
+    (maskLong >>> 24) & 255,
+    (maskLong >>> 16) & 255,
+    (maskLong >>> 8) & 255,
+    maskLong & 255
+  ];
+
+  const firstOctet = ipOctets[0];
+  let ipClass: 'A' | 'B' | 'C' | 'D' | 'E' = 'C';
+  let defaultClassCidr = 24;
+
+  if (firstOctet >= 1 && firstOctet <= 126) {
+    ipClass = 'A';
+    defaultClassCidr = 8;
+  } else if (firstOctet >= 128 && firstOctet <= 191) {
+    ipClass = 'B';
+    defaultClassCidr = 16;
+  } else if (firstOctet >= 192 && firstOctet <= 223) {
+    ipClass = 'C';
+    defaultClassCidr = 24;
+  } else if (firstOctet >= 224 && firstOctet <= 239) {
+    ipClass = 'D';
+    defaultClassCidr = 24;
+  } else {
+    ipClass = 'E';
+    defaultClassCidr = 24;
+  }
+
+  const borrowedBits = Math.max(0, cidr - defaultClassCidr);
+  const subnetsCreated = Math.pow(2, borrowedBits);
+  const hostBits = 32 - cidr;
+  const totalAddresses = Math.pow(2, hostBits);
+  
+  let usableHosts = 0;
+  if (cidr === 32) usableHosts = 1;
+  else if (cidr === 31) usableHosts = 2;
+  else usableHosts = Math.max(0, totalAddresses - 2);
+
+  // Interesting octet: where mask boundary lands (1-indexed: 1, 2, 3, 4)
+  const interestingIndex = Math.min(3, Math.floor(cidr === 0 ? 0 : (cidr - 1) / 8));
+  const interestingOctetNumber = (interestingIndex + 1) as 1 | 2 | 3 | 4;
+  const octetNames = ['1st Octet', '2nd Octet', '3rd Octet', '4th Octet'];
+  const interestingOctetName = octetNames[interestingIndex];
+
+  const maskOctetValue = maskOctets[interestingIndex];
+  const ipOctetValue = ipOctets[interestingIndex];
+  const magicNumber = 256 - maskOctetValue;
+
+  const lowerBoundary = Math.floor(ipOctetValue / magicNumber) * magicNumber;
+  const nextSubnetOctet = lowerBoundary + magicNumber;
+  const broadcastOctet = Math.min(255, nextSubnetOctet - 1);
+
+  // Generate multiples of magic number for reference
+  const multiples: number[] = [];
+  for (let m = 0; m <= 256; m += magicNumber) {
+    multiples.push(m);
+    if (multiples.length > 17) break; // Keep manageable list
+  }
+
+  // Bitwise AND demonstration
+  const ipOctetBin = ipOctetValue.toString(2).padStart(8, '0');
+  const maskOctetBin = maskOctetValue.toString(2).padStart(8, '0');
+  const andResultDec = ipOctetValue & maskOctetValue;
+  const andResultBin = andResultDec.toString(2).padStart(8, '0');
+
+  const networkIp = long2Ip(networkLong);
+  const broadcastIp = long2Ip(broadcastLong);
+  const firstUsableIp = cidr === 32 ? networkIp : (cidr === 31 ? networkIp : long2Ip(networkLong + 1));
+  const lastUsableIp = cidr === 32 ? networkIp : (cidr === 31 ? broadcastIp : long2Ip(broadcastLong - 1));
+
+  const steps: ExamStep[] = [
+    {
+      stepNumber: 1,
+      title: "Classful Reference & Borrowed Bits (2^s)",
+      formula: `2^s = 2^${borrowedBits} = ${subnetsCreated.toLocaleString()} subnets`,
+      result: `${borrowedBits} borrowed bits (${subnetsCreated.toLocaleString()} subnets)`,
+      explanation: `First octet ${firstOctet} is Class ${ipClass} (default /${defaultClassCidr}). Subnetting to /${cidr} borrows ${borrowedBits} bit(s) from the host field, creating 2^${borrowedBits} = ${subnetsCreated.toLocaleString()} individual subnets.`
+    },
+    {
+      stepNumber: 2,
+      title: "Host Bits & Usable Capacity (2^h - 2)",
+      formula: `2^h - 2 = 2^${hostBits} - 2 = ${usableHosts.toLocaleString()} usable hosts`,
+      result: `${usableHosts.toLocaleString()} usable host IPs`,
+      explanation: `With a /${cidr} prefix, 32 - ${cidr} = ${hostBits} host bits remain. Total addresses = 2^${hostBits} = ${totalAddresses.toLocaleString()}. Subtracting 2 (Network ID and Broadcast IP) gives ${usableHosts.toLocaleString()} usable addresses.`
+    },
+    {
+      stepNumber: 3,
+      title: "Find the Interesting Octet & Magic Number (Block Size)",
+      formula: `Magic Number = 256 - ${maskOctetValue} = ${magicNumber}`,
+      result: `Magic Number = ${magicNumber} in ${interestingOctetName}`,
+      explanation: `Subnet mask is ${long2Ip(maskLong)}. The prefix boundary falls in the ${interestingOctetName} (${interestingOctetNumber}), where the mask is ${maskOctetValue}. The Magic Number (block hop size) is 256 - ${maskOctetValue} = ${magicNumber}.`
+    },
+    {
+      stepNumber: 4,
+      title: "Determine Subnet Boundaries via Boundary Hops",
+      formula: `Hop interval: [${lowerBoundary} ... ${broadcastOctet}] (next is ${nextSubnetOctet})`,
+      result: `Network ID: ${networkIp} | Broadcast: ${broadcastIp}`,
+      explanation: `Subnets hop by ${magicNumber} in octet ${interestingOctetNumber} (0, ${magicNumber}, ${magicNumber * 2}...). Since the IP has ${ipOctetValue} in this octet, it falls into the [${lowerBoundary} to ${broadcastOctet}] block.`
+    },
+    {
+      stepNumber: 5,
+      title: "Bitwise AND Verification",
+      formula: `${ipOctetBin} AND ${maskOctetBin} = ${andResultBin} (${andResultDec})`,
+      result: `Network Octet = ${andResultDec}`,
+      explanation: `Bitwise AND of IP octet (${ipOctetValue}) and Mask octet (${maskOctetValue}) yields ${andResultDec}, matching the Magic Number boundary perfectly.`
+    }
+  ];
+
+  return {
+    ip,
+    cidr,
+    ipClass,
+    defaultClassCidr,
+    borrowedBits,
+    subnetsCreated,
+    hostBits,
+    totalAddresses,
+    usableHosts,
+    interestingOctetNumber,
+    interestingOctetName,
+    maskOctetValue,
+    magicNumber,
+    ipOctetValue,
+    lowerBoundary,
+    nextSubnetOctet,
+    broadcastOctet,
+    multiples,
+    networkIp,
+    broadcastIp,
+    firstUsableIp,
+    lastUsableIp,
+    andOperation: {
+      ipOctetBin,
+      maskOctetBin,
+      andResultBin,
+      resultDec: andResultDec
+    },
+    steps
+  };
 }
 
 // Calculate details for a subnet

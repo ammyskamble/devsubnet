@@ -4,6 +4,7 @@ export default {
 
     const isHttp = url.protocol === 'http:' || request.headers.get('x-forwarded-proto') === 'http';
     const isWww = url.hostname === 'www.devsubnet.com';
+    const isWorkersDev = url.hostname.endsWith('.workers.dev');
 
     // Check if path is a directory (not root, no dot in last segment) without trailing slash
     const lastSegment = url.pathname.split('/').pop() || '';
@@ -11,9 +12,10 @@ export default {
 
     // Enforce 301 Permanent Redirect for:
     // 1. Any request coming to www.devsubnet.com -> devsubnet.com
-    // 2. Any non-secure request coming to http: -> https:
-    // 3. Any directory route missing a trailing slash
-    if (isWww || isHttp || needsTrailingSlash) {
+    // 2. Any staging request coming to *.workers.dev -> devsubnet.com
+    // 3. Any non-secure request coming to http: -> https:
+    // 4. Any directory route missing a trailing slash
+    if (isWww || isWorkersDev || isHttp || needsTrailingSlash) {
       url.hostname = 'devsubnet.com';
       url.protocol = 'https:';
       if (needsTrailingSlash) {

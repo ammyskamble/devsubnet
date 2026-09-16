@@ -289,9 +289,9 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
     },
     intro: {
       ipv4: {
-        title: "Online IP Subnet Calculator & CIDR Calculator",
-        eyebrow: "FREE ONLINE IP SUBNET CALCULATOR / IPv4 & CIDR",
-        lede: "The fast, free online IP subnet calculator and CIDR calculator online. Calculate host ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly."
+        title: "DevSubnet - Online IP Subnet Calculator & CIDR Calculator",
+        eyebrow: "DevSubnet™ · FREE ONLINE IP SUBNET & CIDR CALCULATOR",
+        lede: "DevSubnet is the fast, free online IP subnet calculator and CIDR calculator online. Calculate host ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC CIDR reservations for AWS, Azure, and GCP instantly."
       },
       splitter: {
         title: "Visual Subnet Splitter & CIDR Partitioner",
@@ -320,12 +320,12 @@ export const translations: Record<SupportedLanguage, TranslationDictionary> = {
       }
     },
     meta: {
-      defaultTitle: "Online IP Subnet Calculator & CIDR Calculator | DevSubnet",
-      defaultDesc: "Free online IP subnet calculator and CIDR calculator online. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly."
+      defaultTitle: "DevSubnet - Online IP Subnet Calculator & CIDR Calculator",
+      defaultDesc: "DevSubnet is the free online IP subnet calculator and CIDR calculator online. Calculate network ranges, subnet masks, broadcast addresses, usable hosts, and cloud VPC reservations for AWS, Azure, and GCP instantly."
     },
     guide: {
-      title: "Play with Networks – Classic Calculations, Cloud VPCs, and Subnetting Strategies",
-      lead: "Welcome to the premier online IP subnet calculator and CIDR calculator for network engineers, CCNA/CCNP candidates, and cloud architects worldwide across Australia, the Netherlands, the United States, the United Kingdom, Canada, and Europe.",
+      title: "DevSubnet Network Planner – Subnet Calculations, Cloud VPCs, and CIDR Strategies",
+      lead: "Welcome to DevSubnet, the premier client-side online IP subnet calculator and CIDR calculator for network engineers, CCNA/CCNP candidates, and cloud architects worldwide across Australia, the Netherlands, the United States, the United Kingdom, Canada, and Europe.",
       exploreTitle: "Explore Modern Subnet Planning Topics",
       cards: [
         {

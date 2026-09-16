@@ -90,6 +90,3 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
 
-https://devsubnet-com.ammyskamble.workers.dev/*
-  X-Robots-Tag: noindex
-

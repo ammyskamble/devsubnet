@@ -151,6 +151,13 @@ const templateData = topicTemplates[nextTopic.slug] || {
   ]
 };
 
+const now = new Date();
+const formattedDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const hours = String(now.getUTCHours()).padStart(2, '0');
+const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+const formattedTime = `${hours}:${minutes} UTC`;
+const isoTimestamp = now.toISOString();
+
 const articleSource = `---
 import Layout from '../../layouts/Layout.astro';
 import NavBar from '../../components/NavBar.astro';
@@ -178,7 +185,9 @@ const articleKeywords = ${JSON.stringify(nextTopic.targetKeywords || ['Networkin
           category="${nextTopic.category}"
           title="${nextTopic.title}"
           description="${templateData.description}"
-          publishDate="September 2026"
+          publishDate="${formattedDate}"
+          publishTime="${formattedTime}"
+          isoDate="${isoTimestamp}"
           readingTime="${templateData.readingTime}"
           keywords={articleKeywords}
         />
@@ -508,7 +517,9 @@ const newArticleEntry = `  {
     categoryLabel: '${nextTopic.categoryLabel || 'Architecture & RFCs'}',
     categoryIcon: '${templateData.badgeIcon}',
     readingTime: '${templateData.readingTime}',
-    date: 'September 2026',
+    date: '${formattedDate}',
+    time: '${formattedTime}',
+    isoDate: '${isoTimestamp}',
     keywords: ${JSON.stringify(nextTopic.targetKeywords || [])}
   },`;
 

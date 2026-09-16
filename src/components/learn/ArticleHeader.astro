@@ -4,6 +4,8 @@ interface Props {
   title: string;
   description: string;
   publishDate: string;
+  publishTime?: string;
+  isoDate?: string;
   readingTime: string;
   keywords: string[];
 }
@@ -13,6 +15,8 @@ const {
   title,
   description,
   publishDate,
+  publishTime,
+  isoDate,
   readingTime,
   keywords
 } = Astro.props;
@@ -48,7 +52,8 @@ const schemaData = {
   "@type": "TechArticle",
   "headline": title,
   "description": description,
-  "datePublished": publishDate,
+  "datePublished": isoDate || publishDate,
+  "dateModified": isoDate || publishDate,
   "keywords": keywords.join(", "),
   "inLanguage": "en",
   "author": {
@@ -87,20 +92,32 @@ const schemaData = {
   <div class="article-meta-row">
     <div class="meta-item">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>
-      <span>{readingTime}</span>
-    </div>
-    <span class="meta-divider">•</span>
-    <div class="meta-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
         <line x1="8" y1="2" x2="8" y2="6"></line>
         <line x1="3" y1="10" x2="21" y2="10"></line>
       </svg>
-      <span>Updated {publishDate}</span>
+      <time datetime={isoDate || publishDate}>Published {publishDate}</time>
+    </div>
+    {publishTime && (
+      <>
+        <span class="meta-divider">•</span>
+        <div class="meta-item timestamp-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>{publishTime}</span>
+        </div>
+      </>
+    )}
+    <span class="meta-divider">•</span>
+    <div class="meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+      <span>{readingTime}</span>
     </div>
     <span class="meta-divider">•</span>
     <div class="meta-item verified-badge">
@@ -207,6 +224,13 @@ const schemaData = {
 
   .meta-divider {
     opacity: 0.4;
+  }
+
+  .timestamp-badge {
+    color: #38bdf8;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8125rem;
+    font-weight: 500;
   }
 
   .verified-badge {

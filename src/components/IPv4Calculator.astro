@@ -32,7 +32,13 @@ const calc = calcTranslations[lang] || calcTranslations.en;
         <span class="step">{calc.step1}</span>
         <h2>{calc.networkParamsTitle}</h2>
       </div>
-      <span class="live-label">{calc.liveLabel}</span>
+      <div class="header-right-badges" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+        <a href="#exam-mode-section" class="exam-quick-jump-btn" id="exam-quick-jump" title="Jump directly to CCNA Step-by-Step Derivation Math">
+          <span class="jump-icon">🎓</span>
+          <span class="jump-text">View Exam Math ↓</span>
+        </a>
+        <span class="live-label">{calc.liveLabel}</span>
+      </div>
     </div>
 
     <!-- Grouped Inputs Card -->
@@ -55,7 +61,12 @@ const calc = calcTranslations[lang] || calcTranslations.en;
         </div>
 
         <div class="input-row">
-          <label for="cidr" class="tooltip-trigger" data-tooltip={calc.cidrTooltip}>{calc.cidrLabel}</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <label for="cidr" class="tooltip-trigger" data-tooltip={calc.cidrTooltip}>{calc.cidrLabel}</label>
+            <a href="#exam-mode-section" class="exam-inline-jump-link" title="Jump to Magic Number derivation">
+              <span>Exam Math ↓</span>
+            </a>
+          </div>
           <div class="ip-input">
             <span class="slash">/</span>
             <input 
@@ -879,10 +890,31 @@ resource "aws_subnet" "subnet_1" &#123;
     function renderExamMode(exam: ReturnType<typeof calculateExamMath>) {
       if (!examModeContent) return;
 
-      const hopsHtml = exam.multiples.slice(0, 8).map(m => {
-        const isActive = m === exam.lowerBoundary;
-        return `<span class="hop-badge ${isActive ? 'active-hop' : ''}">.${m}</span>`;
-      }).join('') + (exam.multiples.length > 8 ? '<span class="hop-badge">...</span>' : '');
+      let hopsHtml = '';
+      if (exam.isClassfulBoundary && exam.cidr === 24) {
+        hopsHtml = `
+          <span class="hop-badge active-hop">.0 (Net ID)</span>
+          <span class="hop-badge">.1 ... .254 (Usable Hosts)</span>
+          <span class="hop-badge">.255 (Broadcast)</span>
+        `;
+      } else if (exam.isClassfulBoundary && exam.cidr === 16) {
+        hopsHtml = `
+          <span class="hop-badge active-hop">.0.0 (Net ID)</span>
+          <span class="hop-badge">.0.1 ... .255.254 (Hosts)</span>
+          <span class="hop-badge">.255.255 (Broadcast)</span>
+        `;
+      } else if (exam.isClassfulBoundary && exam.cidr === 8) {
+        hopsHtml = `
+          <span class="hop-badge active-hop">.0.0.0 (Net ID)</span>
+          <span class="hop-badge">... 16.7M Hosts ...</span>
+          <span class="hop-badge">.255.255.255 (Broadcast)</span>
+        `;
+      } else {
+        hopsHtml = exam.multiples.slice(0, 8).map(m => {
+          const isActive = m === exam.lowerBoundary;
+          return `<span class="hop-badge ${isActive ? 'active-hop' : ''}">.${m}</span>`;
+        }).join('') + (exam.multiples.length > 8 ? '<span class="hop-badge">...</span>' : '');
+      }
 
       examModeContent.innerHTML = `
         <div class="exam-grid">
@@ -912,7 +944,7 @@ resource "aws_subnet" "subnet_1" &#123;
             <div class="formula-box">
               <div class="formula-line">
                 <span class="f-label">Interesting Octet:</span>
-                <code>${exam.interestingOctetName} (Mask: ${exam.maskOctetValue})</code>
+                <code>${exam.interestingOctetName} (${exam.isClassfulBoundary ? 'Host Field, Mask: ' + exam.maskOctetValue : 'Mask: ' + exam.maskOctetValue})</code>
               </div>
               <div class="formula-line">
                 <span class="f-label">Magic Number:</span>
@@ -920,7 +952,7 @@ resource "aws_subnet" "subnet_1" &#123;
               </div>
             </div>
             <p class="exam-step-desc">
-              The subnet boundary falls in the <strong>${exam.interestingOctetName}</strong>. Subnet blocks increment by multiples of <strong>${exam.magicNumber}</strong>.
+              ${exam.stepExplanationStep2 || `The subnet boundary falls in the <strong>${exam.interestingOctetName}</strong>. Subnet blocks increment by multiples of <strong>${exam.magicNumber}</strong>.`}
             </p>
           </div>
 
@@ -932,7 +964,7 @@ resource "aws_subnet" "subnet_1" &#123;
               ${hopsHtml}
             </div>
             <p class="exam-step-desc">
-              Octet value is <strong>${exam.ipOctetValue}</strong>. It falls between <strong>.${exam.lowerBoundary}</strong> and <strong>.${exam.broadcastOctet}</strong>.
+              ${exam.stepExplanationStep3 || `Octet value is <strong>${exam.ipOctetValue}</strong>. It falls between <strong>.${exam.lowerBoundary}</strong> and <strong>.${exam.broadcastOctet}</strong>.`}
             </p>
             <div class="exam-summary-strip">
               <span><strong>Net ID:</strong> ${exam.networkIp}</span>
@@ -1393,6 +1425,26 @@ const subnet = new ec2.Subnet(this, 'Subnet', {
 
     btnPrevSubnet?.addEventListener('click', () => stepSubnetBlock('prev'));
     btnNextSubnet?.addEventListener('click', () => stepSubnetBlock('next'));
+
+    // Quick Jump to Exam Mode with Smooth Scroll and Pulse
+    document.querySelectorAll('.exam-quick-jump-btn, .exam-inline-jump-link').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Expand exam mode if collapsed
+        if (!examModeExpanded && examModeContent) {
+          examModeExpanded = true;
+          if (examModeToggle) examModeToggle.setAttribute('aria-expanded', 'true');
+          examModeContent.style.display = 'block';
+          if (examToggleLabel) examToggleLabel.innerText = calcData.hideMathLabel || 'Hide Step-by-Step Math';
+        }
+        const target = document.getElementById('exam-mode-section');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          target.classList.add('exam-highlight-pulse');
+          setTimeout(() => target.classList.remove('exam-highlight-pulse'), 2000);
+        }
+      });
+    });
     
     cidrInput.oninput = (e) => {
       const val = parseInt((e.target as HTMLInputElement).value, 10);

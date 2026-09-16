@@ -141,6 +141,10 @@ export interface ExamMathBreakdown {
   broadcastIp: string;
   firstUsableIp: string;
   lastUsableIp: string;
+  isClassfulBoundary: boolean;
+  boundaryNote: string;
+  stepExplanationStep2: string;
+  stepExplanationStep3: string;
   andOperation: {
     ipOctetBin: string;
     maskOctetBin: string;
@@ -206,26 +210,115 @@ export function calculateExamMath(ip: string, cidr: number): ExamMathBreakdown {
   else if (cidr === 31) usableHosts = 2;
   else usableHosts = Math.max(0, totalAddresses - 2);
 
-  // Interesting octet: where mask boundary lands (1-indexed: 1, 2, 3, 4)
-  const interestingIndex = Math.min(3, Math.floor(cidr === 0 ? 0 : (cidr - 1) / 8));
-  const interestingOctetNumber = (interestingIndex + 1) as 1 | 2 | 3 | 4;
+  // Determine Interesting Octet & Magic Number
+  // On classless subnets (mask octet between 128 and 254), interesting octet is the one containing the boundary.
+  // On classful byte boundaries (/8, /16, /24), the network prefix ends at cidr/8, and the following octet forms the host block (magic number = 256).
   const octetNames = ['1st Octet', '2nd Octet', '3rd Octet', '4th Octet'];
-  const interestingOctetName = octetNames[interestingIndex];
-
-  const maskOctetValue = maskOctets[interestingIndex];
-  const ipOctetValue = ipOctets[interestingIndex];
-  const magicNumber = 256 - maskOctetValue;
-
-  const lowerBoundary = Math.floor(ipOctetValue / magicNumber) * magicNumber;
-  const nextSubnetOctet = lowerBoundary + magicNumber;
-  const broadcastOctet = Math.min(255, nextSubnetOctet - 1);
-
-  // Generate multiples of magic number for reference
+  let interestingIndex = 3;
+  let isClassfulBoundary = false;
+  let boundaryNote = '';
+  let stepExplanationStep2 = '';
+  let stepExplanationStep3 = '';
+  let magicNumber = 1;
+  let maskOctetValue = 0;
+  let lowerBoundary = 0;
+  let broadcastOctet = 255;
+  let nextSubnetOctet = 256;
   const multiples: number[] = [];
-  for (let m = 0; m <= 256; m += magicNumber) {
-    multiples.push(m);
-    if (multiples.length > 17) break; // Keep manageable list
+
+  if (cidr % 8 !== 0) {
+    // Classless subnetting: boundary falls inside an octet
+    interestingIndex = Math.min(3, Math.floor(cidr / 8));
+    maskOctetValue = maskOctets[interestingIndex];
+    magicNumber = 256 - maskOctetValue;
+    const ipVal = ipOctets[interestingIndex];
+    lowerBoundary = Math.floor(ipVal / magicNumber) * magicNumber;
+    broadcastOctet = Math.min(255, lowerBoundary + magicNumber - 1);
+    nextSubnetOctet = lowerBoundary + magicNumber;
+    isClassfulBoundary = false;
+
+    for (let m = 0; m <= 256; m += magicNumber) {
+      multiples.push(m);
+      if (multiples.length > 17) break;
+    }
+
+    stepExplanationStep2 = `The subnet boundary falls in the ${octetNames[interestingIndex]}. Subnet blocks increment by multiples of ${magicNumber} (Magic Number = 256 - ${maskOctetValue}).`;
+    stepExplanationStep3 = `Octet value is ${ipVal}. It falls between .${lowerBoundary} (Network ID) and .${broadcastOctet} (Broadcast IP).`;
+  } else if (cidr === 24) {
+    // Classful /24 boundary
+    interestingIndex = 3; // 4th Octet is the host field
+    maskOctetValue = 0;
+    magicNumber = 256;
+    lowerBoundary = 0;
+    broadcastOctet = 255;
+    nextSubnetOctet = 256;
+    isClassfulBoundary = true;
+    multiples.push(0, 256);
+
+    boundaryNote = `Classful /24 boundary: Network prefix covers the first 3 octets (${ipOctets[0]}.${ipOctets[1]}.${ipOctets[2]}.x). The 4th Octet contains the full host block of 256 IPs (.0 to .255). Consecutive /24 subnets increment by 1 in the 3rd Octet.`;
+    stepExplanationStep2 = `Classful /24 boundary: The network prefix ends at the 3rd Octet. The 4th Octet forms a full host block of 256 addresses (Magic Number block size = 256, spanning .0 to .255). Consecutive /24 subnets increment by 1 in the 3rd Octet.`;
+    stepExplanationStep3 = `The 4th Octet spans from .0 (Network ID) to .255 (Broadcast ID). The target host IP has .${ipOctets[3]} in this octet.`;
+  } else if (cidr === 16) {
+    // Classful /16 boundary
+    interestingIndex = 2; // 3rd Octet begins host field
+    maskOctetValue = 0;
+    magicNumber = 256;
+    lowerBoundary = 0;
+    broadcastOctet = 255;
+    nextSubnetOctet = 256;
+    isClassfulBoundary = true;
+    multiples.push(0, 256);
+
+    boundaryNote = `Classful /16 boundary: Network prefix covers the first 2 octets (${ipOctets[0]}.${ipOctets[1]}.x.x). Octets 3 and 4 form a 65,536 IP block. Consecutive /16 subnets increment by 1 in the 2nd Octet.`;
+    stepExplanationStep2 = `Classful /16 boundary: The network prefix ends at the 2nd Octet. Octet 3 forms a 256-block boundary (spans .0.0 to .255.255, 65,536 total IPs). Consecutive /16 subnets increment by 1 in the 2nd Octet.`;
+    stepExplanationStep3 = `Octets 3 & 4 span from .0.0 (Network ID) to .255.255 (Broadcast ID). Octet 3 value is ${ipOctets[2]}.`;
+  } else if (cidr === 8) {
+    // Classful /8 boundary
+    interestingIndex = 1;
+    maskOctetValue = 0;
+    magicNumber = 256;
+    lowerBoundary = 0;
+    broadcastOctet = 255;
+    nextSubnetOctet = 256;
+    isClassfulBoundary = true;
+    multiples.push(0, 256);
+
+    boundaryNote = `Classful /8 boundary: Network prefix covers the 1st Octet (${ipOctets[0]}.x.x.x). Octets 2, 3, and 4 form a 16,777,216 IP block. Consecutive /8 subnets increment by 1 in the 1st Octet.`;
+    stepExplanationStep2 = `Classful /8 boundary: Network prefix ends at the 1st Octet. Octets 2, 3, and 4 provide 16,777,216 addresses. Consecutive /8 blocks increment by 1 in the 1st Octet.`;
+    stepExplanationStep3 = `Host field spans .0.0.0 to .255.255.255. Octet 2 value is ${ipOctets[1]}.`;
+  } else if (cidr === 32) {
+    // Host route /32
+    interestingIndex = 3;
+    maskOctetValue = 255;
+    magicNumber = 1;
+    lowerBoundary = ipOctets[3];
+    broadcastOctet = ipOctets[3];
+    nextSubnetOctet = lowerBoundary + 1;
+    isClassfulBoundary = true;
+    multiples.push(ipOctets[3]);
+
+    boundaryNote = `Host route (/32): Single IP address with no network or broadcast overhead.`;
+    stepExplanationStep2 = `Host route (/32): Subnet mask is 255.255.255.255. Block size is 1 single IP.`;
+    stepExplanationStep3 = `Single dedicated host address: ${ip}.`;
+  } else {
+    // Default route /0
+    interestingIndex = 0;
+    maskOctetValue = 0;
+    magicNumber = 256;
+    lowerBoundary = 0;
+    broadcastOctet = 255;
+    nextSubnetOctet = 256;
+    isClassfulBoundary = true;
+    multiples.push(0, 256);
+
+    boundaryNote = `Default route (0.0.0.0/0): Covers the entire IPv4 space (4,294,967,296 addresses).`;
+    stepExplanationStep2 = `Default route (/0): Subnet mask is 0.0.0.0. Spans all IPv4 addresses.`;
+    stepExplanationStep3 = `Entire IPv4 space (0.0.0.0 to 255.255.255.255).`;
   }
+
+  const interestingOctetNumber = (interestingIndex + 1) as 1 | 2 | 3 | 4;
+  const interestingOctetName = octetNames[interestingIndex];
+  const ipOctetValue = ipOctets[interestingIndex];
 
   // Bitwise AND demonstration
   const ipOctetBin = ipOctetValue.toString(2).padStart(8, '0');
@@ -258,21 +351,21 @@ export function calculateExamMath(ip: string, cidr: number): ExamMathBreakdown {
       title: "Find the Interesting Octet & Magic Number (Block Size)",
       formula: `Magic Number = 256 - ${maskOctetValue} = ${magicNumber}`,
       result: `Magic Number = ${magicNumber} in ${interestingOctetName}`,
-      explanation: `Subnet mask is ${long2Ip(maskLong)}. The prefix boundary falls in the ${interestingOctetName} (${interestingOctetNumber}), where the mask is ${maskOctetValue}. The Magic Number (block hop size) is 256 - ${maskOctetValue} = ${magicNumber}.`
+      explanation: stepExplanationStep2
     },
     {
       stepNumber: 4,
       title: "Determine Subnet Boundaries via Boundary Hops",
       formula: `Hop interval: [${lowerBoundary} ... ${broadcastOctet}] (next is ${nextSubnetOctet})`,
       result: `Network ID: ${networkIp} | Broadcast: ${broadcastIp}`,
-      explanation: `Subnets hop by ${magicNumber} in octet ${interestingOctetNumber} (0, ${magicNumber}, ${magicNumber * 2}...). Since the IP has ${ipOctetValue} in this octet, it falls into the [${lowerBoundary} to ${broadcastOctet}] block.`
+      explanation: stepExplanationStep3
     },
     {
       stepNumber: 5,
       title: "Bitwise AND Verification",
       formula: `${ipOctetBin} AND ${maskOctetBin} = ${andResultBin} (${andResultDec})`,
       result: `Network Octet = ${andResultDec}`,
-      explanation: `Bitwise AND of IP octet (${ipOctetValue}) and Mask octet (${maskOctetValue}) yields ${andResultDec}, matching the Magic Number boundary perfectly.`
+      explanation: `Bitwise AND of IP octet (${ipOctetValue}) and Mask octet (${maskOctetValue}) yields ${andResultDec}, validating the Network ID.`
     }
   ];
 
@@ -299,6 +392,10 @@ export function calculateExamMath(ip: string, cidr: number): ExamMathBreakdown {
     broadcastIp,
     firstUsableIp,
     lastUsableIp,
+    isClassfulBoundary,
+    boundaryNote,
+    stepExplanationStep2,
+    stepExplanationStep3,
     andOperation: {
       ipOctetBin,
       maskOctetBin,

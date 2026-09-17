@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import {
   getHrefLangAlternates,
   languages,
@@ -59,7 +58,6 @@ const currentLangInfo = languages[lang] || languages.en;
 <!doctype html>
 <html lang={lang} data-theme="dark">
   <head>
-    <ClientRouter />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
@@ -78,15 +76,8 @@ const currentLangInfo = languages[lang] || languages.en;
       type="font/woff2"
       crossorigin="anonymous"
     />
-    <link
-      rel="preload"
-      href="/fonts/jetbrains-mono-latin-400.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
 
-    <!-- Resilient Non-blocking Google Analytics & Telemetry (Safe from Ad-blocker Rejections) -->
+    <!-- Resilient Non-blocking Google Analytics & Telemetry (Deferred until user interaction/idle) -->
     <script is:inline>
       try {
         const consent = localStorage.getItem("devsubnet-analytics-consent");
@@ -105,12 +96,14 @@ const currentLangInfo = languages[lang] || languages.en;
 
           function initAnalytics() {
             try {
+              if (window.__gaInitialized) return;
+              window.__gaInitialized = true;
               const gaScript = document.createElement("script");
               gaScript.async = true;
               gaScript.defer = true;
               gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-F2T4WC5Y9V";
               gaScript.onerror = function () {
-                // Gracefully swallow ad-blocker (uBlock, Brave, Pi-hole) net::ERR_BLOCKED_BY_CLIENT
+                // Gracefully swallow ad-blocker net::ERR_BLOCKED_BY_CLIENT
               };
               document.head.appendChild(gaScript);
 
@@ -123,14 +116,22 @@ const currentLangInfo = languages[lang] || languages.en;
             }
           }
 
-          // Perf Fix C: Defer until after load event, then yield to idle time
-          window.addEventListener('load', function() {
+          // Defer until first user interaction or long idle to keep main-thread 100% free for initial paint
+          const triggerEvents = ["pointerdown", "touchstart", "scroll", "keydown"];
+          let scheduled = false;
+          function triggerAnalytics() {
+            if (scheduled) return;
+            scheduled = true;
+            triggerEvents.forEach(evt => window.removeEventListener(evt, triggerAnalytics, { passive: true }));
             if ("requestIdleCallback" in window) {
-              requestIdleCallback(initAnalytics, { timeout: 4000 });
+              requestIdleCallback(initAnalytics, { timeout: 2000 });
             } else {
-              setTimeout(initAnalytics, 2000);
+              setTimeout(initAnalytics, 500);
             }
-          }, { once: true });
+          }
+          triggerEvents.forEach(evt => window.addEventListener(evt, triggerAnalytics, { once: true, passive: true }));
+          // Fallback to guarantee firing after 7 seconds if user remains completely idle
+          setTimeout(triggerAnalytics, 7000);
         }
       } catch (e) {
         // Telemetry fail-safe
@@ -200,7 +201,7 @@ const currentLangInfo = languages[lang] || languages.en;
       content="https://devsubnet.com/og-image.png"
     />
 
-    <!-- Anti-Flash Theme Script (runs inline & on astro:after-swap) -->
+    <!-- Anti-Flash Theme Script -->
     <script is:inline>
       function applyTheme() {
         const theme =
@@ -211,7 +212,6 @@ const currentLangInfo = languages[lang] || languages.en;
         document.documentElement.setAttribute("data-theme", theme);
       }
       applyTheme();
-      document.addEventListener("astro:after-swap", applyTheme);
     </script>
 
     <!-- WebSite, Organization & WebApplication Brand Schema JSON-LD for Google Rich Results & Brand Anchoring -->

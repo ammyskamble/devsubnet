@@ -35,5 +35,9 @@ export default defineConfig({
     port: 4321
   },
 
+  build: {
+    inlineStylesheets: 'always'
+  },
+
   integrations: [sitemap()]
 });

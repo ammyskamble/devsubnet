@@ -134,7 +134,7 @@ const prefixTableRows = [
       {guideData.faqs.map((faq) => (
         <div class="seo-netsudoku-card">
           <div>
-            <h4 style="font-size: 1.05rem;">{faq.q}</h4>
+            <h3 style="font-size: 1.05rem;">{faq.q}</h3>
             <p style="font-size: 0.85rem; color: var(--text-secondary);">
               {faq.a}
             </p>
@@ -227,6 +227,7 @@ const prefixTableRows = [
     transform: translateY(-2px);
   }
   
+  .seo-netsudoku-card h3,
   .seo-netsudoku-card h4 {
     font-family: var(--font-display);
     font-size: 1.15rem;

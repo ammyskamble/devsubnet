@@ -1,46 +1,42 @@
-# Astro Starter Kit: Basics
+# DevSubnet 🌐
 
-```sh
-npm create astro@latest -- --template basics
-```
+> Free, 100% client-side IP subnet and CIDR calculator engineered for network engineers, DevOps specialists, and cloud architects.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Live application: **[devsubnet.com](https://devsubnet.com)**
 
-## 🚀 Project Structure
+---
 
-Inside of your Astro project, you'll see the following folders and files:
+## ⚡ Key Features
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+- **100% Client-Side Execution:** Zero server logging or external telemetry. Internal network schemas and private IP topology never leave your browser.
+- **Cloud-Aware VPC Reservations:** Accounts for platform-reserved addresses across AWS VPC (5 IPs), Azure VNet (5 IPs), and Google Cloud VPC (4 IPs).
+- **IaC Export:** 1-click syntax generation for Terraform (`cidrsubnet()`), Cisco IOS, Linux `iproute2`, and AWS CloudFormation.
+- **Kubernetes CNI Planning:** Sizing tools for Pod and Service CIDR allocations (Cilium, Calico, AWS VPC CNI).
+- **Interactive Visual Splitter:** Recursive subnet tree visualization and binary bitwise allocation grids.
+- **CCNA/CCNP Exam Derivations:** Step-by-step mathematical breakdowns including magic numbers, block boundaries, and wildcard masks.
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+---
 
-## 🧞 Commands
+## 🛠️ Tech Stack
 
-All commands are run from the root of the project, from a terminal:
+- **Framework:** [Astro](https://astro.build)
+- **Language:** TypeScript / JavaScript
+- **Styling:** Tailwind CSS
+- **Deployment:** Cloudflare Pages / Workers
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+---
 
-## 👀 Want to learn more?
+## 🚀 Local Development
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+# Clone the repository
+git clone [https://github.com/ammyskamble/devsubnet.git](https://github.com/ammyskamble/devsubnet.git)
+
+# Install dependencies
+npm install
+
+# Start local dev server
+npm run dev
+
+# Build for production
+npm run build

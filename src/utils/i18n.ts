@@ -87,13 +87,13 @@ export interface HreflangAlternate {
  */
 
 
-export const LOCALIZED_ROUTES = new Set([
-  '/',
-  '/visual-subnet-splitter/',
-  '/ipv6-subnet-calculator/',
-  '/kubernetes-subnet-planner/',
-  '/cidr-cheat-sheet/',
-  '/faq/'
+export const EXCLUDED_LOCALIZED_ROUTES = new Set([
+  '/400/',
+  '/403/',
+  '/404/',
+  '/500/',
+  '/503/',
+  '/offline/'
 ]);
 
 export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https://devsubnet.com'): HreflangAlternate[] {
@@ -111,7 +111,7 @@ export function getHrefLangAlternates(pathname: string, siteUrl: string = 'https
   }
 
   const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.endsWith('/') ? cleanPath : `${cleanPath}/`);
-  const hasLocalizedVersion = LOCALIZED_ROUTES.has(normalizedPath);
+  const hasLocalizedVersion = !EXCLUDED_LOCALIZED_ROUTES.has(normalizedPath);
   const enUrl = `${siteUrl}${normalizedPath}`;
   const deUrl = `${siteUrl}/de${normalizedPath}`;
   const esUrl = `${siteUrl}/es${normalizedPath}`;
@@ -203,8 +203,8 @@ export function getLocalizedPath(currentPath: string, targetLang: SupportedLangu
     return normalizedPath;
   }
 
-  // If page does NOT have a localized version, keep user on canonical English page
-  if (!LOCALIZED_ROUTES.has(normalizedPath)) {
+  // If page is an error or offline page, keep user on base path
+  if (EXCLUDED_LOCALIZED_ROUTES.has(normalizedPath)) {
     return normalizedPath;
   }
 

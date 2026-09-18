@@ -28,9 +28,7 @@ Live application: **[devsubnet.com](https://devsubnet.com)**
 
 ## 🚀 Local Development
 
-```bash
-# Clone the repository
-git clone [https://github.com/ammyskamble/devsubnet.git](https://github.com/ammyskamble/devsubnet.git)
+git clone https://github.com/ammyskamble/devsubnet.git
 
 # Install dependencies
 npm install
